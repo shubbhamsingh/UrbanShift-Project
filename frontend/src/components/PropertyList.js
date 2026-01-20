@@ -1,84 +1,72 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom'; // Link import kiya
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom'; // ✅ Ye import jaruri hai
 
 const PropertyList = () => {
   const [properties, setProperties] = useState([]);
 
   useEffect(() => {
-    axios.get('http://127.0.0.1:8000/api/properties/')
-      .then(response => {
-        setProperties(response.data);
-      })
-      .catch(error => {
-        console.error("Error fetching properties:", error);
-      });
+    const fetchProperties = async () => {
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/properties/');
+        const data = await response.json();
+        setProperties(data);
+      } catch (error) {
+        console.error('Error fetching properties:', error);
+      }
+    };
+
+    fetchProperties();
   }, []);
 
   return (
     <div style={{ padding: '20px' }}>
-      <h2 style={{ textAlign: 'center', color: '#333' }}>🏡 Available Properties</h2>
+      <h2>Available Properties for Rent</h2>
       
-      {properties.length === 0 ? (
-        <p style={{ textAlign: 'center' }}>No properties listed yet.</p>
-      ) : (
-        // ✅ Flex wrap container
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '30px', justifyContent: 'center' }}>
-          {properties.map(property => (
-            <div key={property.id} style={{ 
-              border: '1px solid #ddd', 
-              borderRadius: '10px', 
-              width: '320px',
-              background: '#fff',
-              overflow: 'hidden',
-              boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-              // ✅ Alignment Fix: Isse card ki height barabar rahegi aur content fail jayega
-              display: 'flex',
-              flexDirection: 'column'
-            }}>
+      {/* Grid Layout for Properties */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
+        
+        {properties.map((property) => (
+          <div key={property.id} style={{ border: '1px solid #ddd', borderRadius: '10px', overflow: 'hidden', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>
+            
+            {/* Image */}
+            {property.image ? (
+              <img src={property.image} alt={property.title} style={{ width: '100%', height: '200px', objectFit: 'cover' }} />
+            ) : (
+              <div style={{ width: '100%', height: '200px', backgroundColor: '#eee', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span>No Image</span>
+              </div>
+            )}
+
+            {/* Content */}
+            <div style={{ padding: '15px' }}>
+              <h3 style={{ margin: '0 0 10px 0' }}>{property.title}</h3>
+              <p style={{ color: '#555' }}>📍 {property.location}</p>
+              <h4 style={{ color: '#28a745' }}>₹{property.price}/month</h4>
               
-              {/* Image Section */}
-              <div style={{ display: 'flex', overflowX: 'auto', whiteSpace: 'nowrap', scrollbarWidth: 'none', height: '200px', background: '#f9f9f9', flexShrink: 0 }}>
-                {property.image ? (
-                   <img src={property.image} alt="Main" style={{ width: '320px', height: '100%', objectFit: 'cover', flexShrink: 0 }} />
-                ) : null}
-                
-                {property.images && property.images.map((imgObj) => (
-                   <img key={imgObj.id} src={imgObj.image} alt="Gallery" style={{ width: '320px', height: '100%', objectFit: 'cover', flexShrink: 0 }} />
-                ))}
+              {/* ✅ View Details Button linked to Detail Page */}
+              <Link to={`/properties/${property.id}`} style={{ textDecoration: 'none' }}>
+                <button 
+                  style={{ 
+                    width: '100%', 
+                    padding: '10px', 
+                    backgroundColor: '#007bff', 
+                    color: 'white', 
+                    border: 'none', 
+                    borderRadius: '5px', 
+                    cursor: 'pointer',
+                    fontSize: '16px',
+                    marginTop: '10px' 
+                  }}
+                >
+                  View Details ➜
+                </button>
+              </Link>
 
-                {!property.image && (!property.images || property.images.length === 0) && (
-                   <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>No Images</div>
-                )}
-              </div>
-
-              {/* Swipe Hint */}
-              {(property.images && property.images.length > 0) && (
-                <p style={{textAlign:'center', fontSize:'12px', color:'gray', margin:'5px 0'}}>Swipe ➡ to see more photos</p>
-              )}
-
-              {/* Details Section */}
-              {/* ✅ flexGrow: 1 ka matlab ye hissa baki jagah lega */}
-              <div style={{ padding: '15px', display: 'flex', flexDirection: 'column', flexGrow: 1 }}>
-                <h3 style={{ margin: '0 0 10px 0', color: '#007bff' }}>{property.title}</h3>
-                <p><strong>📍 Location:</strong> {property.city}</p>
-                <p><strong>💰 Price:</strong> ₹{property.price}</p>
-                <p><strong>🏠 Type:</strong> {property.property_type}</p>
-                
-                {/* ✅ marginTop: 'auto' button ko hamesha niche chipka dega */}
-                <Link to={`/properties/${property.id}`} style={{ marginTop: 'auto', textDecoration: 'none' }}>
-                  <button style={{
-                    width: '100%', padding: '10px', background: '#28a745', color: 'white', 
-                    border: 'none', borderRadius: '5px', cursor: 'pointer', marginTop: '10px'
-                  }}>
-                    View Details
-                  </button>
-                </Link>
-              </div>
             </div>
-          ))}
-        </div>
-      )}
+          </div>
+        ))}
+
+      </div>
     </div>
   );
 };

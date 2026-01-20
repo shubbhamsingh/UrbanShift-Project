@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     
     # Third party apps
     'rest_framework',
-    'corsheaders',
+    'corsheaders',  # ✅ Ye bas ek baar hona chahiye
 
     # Hamare Custom Apps
     'users',
@@ -43,7 +43,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # Ye sabse upar hona chahiye
+    'corsheaders.middleware.CorsMiddleware',  # ✅ Ye sabse upar (Correct)
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -115,7 +115,7 @@ STATIC_URL = 'static/'
 # Hamara Custom User Model
 AUTH_USER_MODEL = 'users.User'
 
-# React ke liye permission (CORS)
+# React ke liye permission (CORS) - ✅ Bas ek baar
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ]

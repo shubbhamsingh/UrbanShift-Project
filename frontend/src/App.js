@@ -1,8 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+// Components Import
 import Navbar from './components/Navbar';
 import PropertyList from './components/PropertyList';
-import PropertyDetail from './components/PropertyDetail'; // ✅ Ye nayi file import ki hai
+import PropertyDetail from './components/PropertyDetail';
+import PackersMovers from './components/PackersMovers';
+import Login from './components/Login'; // ✅ Ye rahi Login ki sahi import
 
 function App() {
   return (
@@ -10,14 +14,20 @@ function App() {
       <Navbar />
       <div style={{ padding: '20px' }}>
         <Routes>
+          {/* Home Page */}
           <Route path="/" element={<h1>🏠 Home Page - Welcome to UrbanShift</h1>} />
+          
+          {/* Properties List */}
           <Route path="/properties" element={<PropertyList />} />
           
-          {/* 👇 Ye nayi line hai jo detail page kholegi 👇 */}
+          {/* Property Details */}
           <Route path="/properties/:id" element={<PropertyDetail />} />
 
-          <Route path="/movers" element={<h1>🚚 Packers & Movers Service (Coming Soon)</h1>} />
-          <Route path="/login" element={<h1>🔑 Login Page (Coming Soon)</h1>} />
+          {/* Packers & Movers */}
+          <Route path="/movers" element={<PackersMovers />} />
+
+          {/* ✅ Login Route (Isse page khulega) */}
+          <Route path="/login" element={<Login />} />
         </Routes>
       </div>
     </Router>

@@ -6,6 +6,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/properties/', include('properties.urls')),
+    path('api/users/', include('users.urls')),
     
     # ✅ Packers & Movers ka rasta yahan joda gaya hai:
     path('api/relocation/', include('relocation.urls')),
