@@ -1,0 +1,33 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+/* === Image Gallery Fix === */
+
+/* 1. Ye gallery ki images ko ek fix height dega */
+.image-gallery-slide img {
+  height: 500px !important;   /* Aap ise 400px ya 600px bhi kar sakte hain */
+  width: 100%;
+  object-fit: contain;        /* Isse puri photo dikhegi, kategi nahi */
+  background-color: #f0f0f0;  /* Photo ke piche halka gray color */
+}
+
+/* 2. Fullscreen mode me height limit hata denge */
+.image-gallery-fullscreen-button .image-gallery-slide img {
+  height: auto !important;
+}
+
+/* 3. Thumbnails (niche wali chhoti photos) ko clean dikhane ke liye */
+.image-gallery-thumbnails-wrapper {
+  margin-top: 10px;
+}
