@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const AddProperty = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // ✅ अब इसका इस्तेमाल नीचे handleSubmit में हो रहा है
   
   // State for toggling Image Type
   const [imageType, setImageType] = useState('file'); // 'file' or 'url'
@@ -39,7 +39,12 @@ const AddProperty = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Submitting Data:", formData);
+    
+    // Success Alert
     alert("Property Posted Successfully! (Data logged in console)");
+    
+    // ✅ Redirect to Home Page after success
+    navigate('/'); 
   };
 
   return (
@@ -112,7 +117,7 @@ const AddProperty = () => {
                 <div style={{ marginTop: '20px', textAlign: 'center' }}>
                     <p style={{fontSize:'0.8rem', opacity:0.7, marginBottom:'10px'}}>Preview:</p>
                     <img src={preview} alt="Preview" style={{ width: '100%', maxHeight: '300px', objectFit: 'cover', borderRadius: '15px', border: '1px solid #555' }} 
-                         onError={(e) => e.target.style.display = 'none'} /> 
+                          onError={(e) => e.target.style.display = 'none'} /> 
                 </div>
             )}
           </div>
@@ -129,28 +134,28 @@ const AddProperty = () => {
 const containerStyle = {
   display: 'flex',
   justifyContent: 'center',
-  padding: '60px 20px', // ✅ Upar niche padding badhayi
+  padding: '60px 20px', 
   color: 'var(--text-primary)'
 };
 
 const formCardStyle = {
   background: 'var(--card-bg)',
-  padding: '50px', // ✅ Card ke andar space badhaya
+  padding: '50px', 
   borderRadius: '20px',
   boxShadow: 'var(--card-shadow)',
   width: '100%',
-  maxWidth: '800px', // ✅ Card ko thoda aur chouda kiya
+  maxWidth: '800px', 
   border: '1px solid var(--border-color)'
 };
 
 const inputGroupStyle = {
-  marginBottom: '35px' // ✅ Inputs ke bich gap badhaya (25px -> 35px)
+  marginBottom: '35px' 
 };
 
 const rowStyle = {
   display: 'flex',
-  gap: '40px', // ✅ Side-by-side inputs ka gap badhaya (25px -> 40px)
-  marginBottom: '35px', // ✅ Row ke niche gap badhaya
+  gap: '40px', 
+  marginBottom: '35px', 
   flexWrap: 'wrap'
 };
 
@@ -161,7 +166,7 @@ const smallInputDiv = {
 
 const labelStyle = {
     display: 'block',
-    marginBottom: '10px', // ✅ Label aur input ke bich thoda gap
+    marginBottom: '10px', 
     fontWeight: '600',
     color: 'var(--text-primary)',
     fontSize: '1.05rem'
@@ -169,7 +174,7 @@ const labelStyle = {
 
 const inputStyle = {
   width: '100%',
-  padding: '14px', // ✅ Inputs ko thoda mota kiya
+  padding: '14px', 
   borderRadius: '10px',
   border: '1px solid var(--border-color)',
   background: 'var(--bg-color)',
@@ -189,7 +194,7 @@ const fileInputStyle = {
 
 const submitBtnStyle = {
   width: '100%',
-  padding: '18px', // ✅ Button bada kiya
+  padding: '18px', 
   background: 'linear-gradient(135deg, #FF9966 0%, #FF5E62 100%)',
   color: 'white',
   border: 'none',
