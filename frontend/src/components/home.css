@@ -1,0 +1,155 @@
+/* --- Home.css --- */
+
+/* Hero Section */
+.hero-section {
+  position: relative;
+  height: 85vh;
+  background-image: url("https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=1973&auto=format&fit=crop");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  padding: 0 20px;
+}
+
+.overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.8));
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  width: 100%;
+}
+
+.hero-title {
+  font-size: 3.5rem;
+  font-Weight: 800;
+  margin-bottom: 20px;
+  line-height: 1.2;
+}
+
+.highlight {
+  color: #f29f05;
+}
+
+.hero-subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+  opacity: 0.9;
+}
+
+/* Buttons */
+.button-group {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.main-btn {
+  padding: 15px 30px;
+  font-size: 1.1rem;
+  text-decoration: none;
+  display: inline-block;
+  color: white;
+}
+
+.secondary-btn {
+  background: white !important;
+  color: #0a7e8c !important;
+}
+
+/* Features Section */
+.features-section {
+  padding: 60px 20px;
+  text-align: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  margin-bottom: 50px;
+  color: var(--text-primary);
+}
+
+.highlight-text {
+  color: var(--accent-orange);
+}
+
+.cards-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 30px;
+  flex-wrap: wrap;
+}
+
+.feature-card {
+  flex: 1;
+  min-width: 280px;
+  padding: 40px 20px;
+  text-align: center;
+  background: var(--card-bg);
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.icon {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.card-title {
+  color: var(--accent-teal);
+  margin-bottom: 15px;
+  font-size: 1.5rem;
+}
+
+.card-text {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* --- MOBILE RESPONSIVE MEDIA QUERY --- */
+@media (max-width: 768px) {
+  
+  .hero-section {
+    height: 70vh;
+  }
+
+  .hero-title {
+    font-size: 2rem;
+  }
+
+  .hero-subtitle {
+    font-size: 1rem;
+    padding: 0 10px;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 15px;
+    align-items: center;
+  }
+
+  .main-btn {
+    width: 80%;
+    text-align: center;
+  }
+
+  .features-section {
+    padding: 40px 15px;
+  }
+
+  .section-title {
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+  }
+}
