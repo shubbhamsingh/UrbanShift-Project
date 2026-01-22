@@ -1,104 +1,128 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Login = () => {
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
-  const [message, setMessage] = useState('');
-  const navigate = useNavigate(); // Page badalne ke liye tool
+  const [formData, setFormData] = useState({ username: '', password: '' });
+  const navigate = useNavigate();
 
-  // Jab user type karega
   const handleChange = (e) => {
-    setCredentials({ ...credentials, [e.target.name]: e.target.value });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Jab button dabayega
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage('Checking credentials...');
-
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/users/login/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        // Login Successful!
-        setMessage('✅ Login Successful! Redirecting...');
-        
-        // User ki jankari browser me save karein (Local Storage)
-        localStorage.setItem('userInfo', JSON.stringify(data));
-
-        // 1 second baad Home page par bhej dein
-        setTimeout(() => {
-          navigate('/');
-        }, 1000);
+      const res = await axios.post('https://urbanshift-project.onrender.com/api/users/login/', formData);
+      localStorage.setItem('userInfo', JSON.stringify(res.data));
+      alert('Login Successful!');
+      
+      if (res.data.user_type === 'SELLER') {
+        navigate('/seller-dashboard');
       } else {
-        // Login Failed
-        setMessage('❌ ' + data.error);
+        navigate('/');
       }
     } catch (error) {
-      console.error('Error:', error);
-      setMessage('❌ Server Error. Please try again.');
+      alert('Invalid Credentials');
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '10px', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
-      <h2 style={{ textAlign: 'center', color: '#333' }}>🔑 Login</h2>
-      
-      {message && <p style={{ textAlign: 'center', padding: '10px', backgroundColor: '#f0f0f0' }}>{message}</p>}
-
-      <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+    <div style={pageContainerStyle}>
+      <div style={cardStyle}>
+        <h2 style={{ textAlign: 'center', marginBottom: '30px', color: 'var(--text-primary)', fontSize: '2rem' }}>🔐 Welcome Back</h2>
         
-        <div>
-          <label><strong>Username:</strong></label>
-          <input
-            type="text"
-            name="username"
-            value={credentials.username}
-            onChange={handleChange}
-            placeholder="Enter username"
-            required
-            style={{ width: '100%', padding: '10px', marginTop: '5px' }}
-          />
-        </div>
+        <form onSubmit={handleSubmit}>
+          <div style={inputGroupStyle}>
+            <label style={labelStyle}>Username</label>
+            <input 
+              type="text" 
+              name="username" 
+              placeholder="Enter your username" 
+              onChange={handleChange} 
+              style={inputStyle} 
+            />
+          </div>
 
-        <div>
-          <label><strong>Password:</strong></label>
-          <input
-            type="password"
-            name="password"
-            value={credentials.password}
-            onChange={handleChange}
-            placeholder="Enter password"
-            required
-            style={{ width: '100%', padding: '10px', marginTop: '5px' }}
-          />
-        </div>
+          <div style={inputGroupStyle}>
+            <label style={labelStyle}>Password</label>
+            <input 
+              type="password" 
+              name="password" 
+              placeholder="Enter your password" 
+              onChange={handleChange} 
+              style={inputStyle} 
+            />
+          </div>
 
-        <button 
-          type="submit" 
-          style={{ 
-            backgroundColor: '#28a745', 
-            color: 'white', 
-            padding: '12px', 
-            border: 'none', 
-            borderRadius: '5px', 
-            cursor: 'pointer',
-            fontSize: '16px',
-            marginTop: '10px'
-          }}
-        >
-          Login Now
-        </button>
+          <button type="submit" style={buttonStyle}>Login Securely</button>
+        </form>
 
-      </form>
+        <p style={{ textAlign: 'center', marginTop: '20px', color: 'var(--text-secondary)' }}>
+          New here? <Link to="/register" style={{ color: '#007bff', fontWeight: 'bold', textDecoration: 'none' }}>Create an Account</Link>
+        </p>
+      </div>
     </div>
   );
+};
+
+// --- STYLES ---
+const pageContainerStyle = {
+  minHeight: '80vh',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  background: 'var(--bg-color)',
+  padding: '20px'
+};
+
+// ✅ Card Style Contrast Improved (Same as Register)
+const cardStyle = {
+  background: 'var(--card-bg)',
+  padding: '50px',
+  borderRadius: '20px',
+  // Zyaada gehri aur faili hui shadow
+  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', 
+  width: '100%',
+  maxWidth: '450px',
+  border: '1px solid var(--border-color)',
+  transition: 'transform 0.3s ease'
+};
+
+const inputGroupStyle = { marginBottom: '20px' };
+
+const labelStyle = {
+  display: 'block',
+  marginBottom: '8px',
+  fontWeight: '600',
+  color: 'var(--text-primary)',
+  fontSize: '0.9rem'
+};
+
+const inputStyle = {
+  width: '100%',
+  padding: '14px',
+  borderRadius: '10px',
+  border: '1px solid var(--border-color)',
+  background: 'var(--bg-color)',
+  color: 'var(--text-primary)',
+  fontSize: '1rem',
+  outline: 'none',
+  transition: 'all 0.3s'
+};
+
+const buttonStyle = {
+  width: '100%',
+  padding: '15px',
+  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+  color: 'white',
+  border: 'none',
+  borderRadius: '10px',
+  fontSize: '1.1rem',
+  fontWeight: 'bold',
+  cursor: 'pointer',
+  marginTop: '10px',
+  boxShadow: '0 10px 20px rgba(118, 75, 162, 0.3)'
 };
 
 export default Login;

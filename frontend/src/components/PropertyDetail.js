@@ -13,7 +13,7 @@ const PropertyDetail = () => {
   useEffect(() => {
     const fetchProperty = async () => {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/properties/${id}/`);
+        const response = await fetch(`https://urbanshift-project.onrender.com/api/properties/${id}/`);
         const data = await response.json();
         setProperty(data);
         
@@ -92,7 +92,7 @@ const PropertyDetail = () => {
           <>
             {/* Image Source Fix: Agar URL http se shuru nahi hota to backend URL jodo */}
             <img 
-              src={allImages[currentImageIndex].startsWith('http') ? allImages[currentImageIndex] : `http://127.0.0.1:8000${allImages[currentImageIndex]}`}
+              src={allImages[currentImageIndex].startsWith('http') ? allImages[currentImageIndex] : `https://urbanshift-project.onrender.com${allImages[currentImageIndex]}`}
               alt="Property" 
               style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
             />

@@ -25,7 +25,7 @@ const PackersMovers = () => {
     setMessage('Sending request...');
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/relocation/requests/', {
+      const response = await fetch('https://urbanshift-project.onrender.com/api/relocation/requests/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

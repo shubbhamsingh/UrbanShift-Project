@@ -1,33 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+/* --- 🎨 THEME VARIABLES --- */
+:root {
+  /* Default (Light Mode) Colors */
+  --bg-color: #f4f7f6;
+  --card-bg: #ffffff;
+  --text-primary: #1d3557;
+  --text-secondary: #6c757d;
+  --accent-teal: #0a7e8c;
+  --accent-orange: #f29f05;
+  --navbar-bg: #ffffff;
+  --navbar-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  --overlay-color: rgba(0, 0, 0, 0.5); /* Black Overlay instead of Blue */
+  --card-shadow: 0 8px 24px rgba(29, 53, 87, 0.08);
+}
+
+/* --- 🌙 DARK MODE COLORS --- */
+[data-theme='dark'] {
+  --bg-color: #121212;
+  --card-bg: #1e1e1e;
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --accent-teal: #4db6ac; /* Thoda bright teal dark mode ke liye */
+  --accent-orange: #ffb74d;
+  --navbar-bg: #1e1e1e;
+  --navbar-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  --overlay-color: rgba(0, 0, 0, 0.7);
+  --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Montserrat', sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth Transition */
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+a { text-decoration: none; color: inherit; transition: 0.3s; }
+
+/* --- 3D UTILS --- */
+.btn-3d-orange {
+  background: linear-gradient(135deg, var(--accent-orange), #ff8f00);
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(242, 159, 5, 0.3);
+  transition: transform 0.2s;
 }
+.btn-3d-orange:hover { transform: translateY(-2px); }
 
-/* === Image Gallery Fix === */
-
-/* 1. Ye gallery ki images ko ek fix height dega */
-.image-gallery-slide img {
-  height: 500px !important;   /* Aap ise 400px ya 600px bhi kar sakte hain */
-  width: 100%;
-  object-fit: contain;        /* Isse puri photo dikhegi, kategi nahi */
-  background-color: #f0f0f0;  /* Photo ke piche halka gray color */
-}
-
-/* 2. Fullscreen mode me height limit hata denge */
-.image-gallery-fullscreen-button .image-gallery-slide img {
-  height: auto !important;
-}
-
-/* 3. Thumbnails (niche wali chhoti photos) ko clean dikhane ke liye */
-.image-gallery-thumbnails-wrapper {
-  margin-top: 10px;
+.card-3d {
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: var(--card-shadow);
+  padding: 2rem;
+  border: 1px solid rgba(128, 128, 128, 0.1);
 }

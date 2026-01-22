@@ -7,7 +7,7 @@ const PropertyList = () => {
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const response = await fetch('http://127.0.0.1:8000/api/properties/');
+        const response = await fetch('https://urbanshift-project.onrender.com/api/properties/');
         const data = await response.json();
         setProperties(data);
       } catch (error) {

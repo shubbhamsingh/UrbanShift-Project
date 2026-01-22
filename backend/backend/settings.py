@@ -111,7 +111,7 @@ AUTH_USER_MODEL = 'users.User'
 
 # React ke liye permission (CORS)
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "https://urbanshift-project.onrender.com/",
     "https://urbanshift-frontend.vercel.app", # Future Vercel URL
 ]
 # Testing ke liye sabko allow kar sakte hain (Optional)

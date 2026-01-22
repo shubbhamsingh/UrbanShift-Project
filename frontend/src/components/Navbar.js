@@ -1,57 +1,131 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import logo from '../logo.png';
+import { ThemeContext } from '../context/ThemeContext';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { mode, cycleTheme } = useContext(ThemeContext);
   
-  // Check karein ki user login hai ya nahi (Local Storage se)
-  const user = JSON.parse(localStorage.getItem('userInfo'));
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
+  const userType = userInfo ? userInfo.user_type : null;
 
   const handleLogout = () => {
-    // Logout logic: Data hatayein aur page reload karein
     localStorage.removeItem('userInfo');
-    alert('Logged out successfully!');
     navigate('/login');
-    window.location.reload(); // Page refresh taki navbar update ho jaye
+    window.location.reload(); 
+  };
+
+  const getThemeIcon = () => {
+    if (mode === 'light') return '☀️';
+    if (mode === 'dark') return '🌙';
+    return '🖥️';
   };
 
   return (
-    <nav style={{ display: 'flex', justifyContent: 'space-between', padding: '15px 30px', backgroundColor: '#333', color: 'white', alignItems: 'center' }}>
+    <nav style={{...navContainerStyle, backgroundColor: 'var(--navbar-bg)', boxShadow: 'var(--navbar-shadow)'}}>
       
-      {/* Logo */}
-      <h2 style={{ margin: 0 }}>
-        <Link to="/" style={{ textDecoration: 'none', color: 'white' }}>UrbanShift 🚚</Link>
-      </h2>
+      {/* BRANDING */}
+      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <img src={logo} alt="Logo" style={{ height: '45px', width: 'auto' }} />
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <h1 style={{...brandTitleStyle, color: 'var(--text-primary)'}}>
+                Urban<span style={{ color: 'var(--accent-orange)' }}>Shift</span>
+            </h1>
+        </div>
+      </Link>
 
-      {/* Links */}
+      {/* LINKS + THEME TOGGLE */}
       <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-        <Link to="/" style={{ textDecoration: 'none', color: 'white', fontSize: '18px' }}>Home</Link>
-        <Link to="/properties" style={{ textDecoration: 'none', color: 'white', fontSize: '18px' }}>Properties</Link>
-        <Link to="/movers" style={{ textDecoration: 'none', color: 'white', fontSize: '18px' }}>Packers & Movers</Link>
+        
+        {/* THEME BUTTON */}
+        <button 
+          onClick={cycleTheme} 
+          style={themeBtnStyle} 
+          title={`Current Mode: ${mode.toUpperCase()}`}
+        >
+            {getThemeIcon()}
+        </button>
 
-        {/* Dynamic Login/Logout Button */}
-        {user ? (
-          // Agar user Login hai to ye dikhega:
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-            <span style={{ color: '#aaa' }}>Hi, {user.username} 👋</span>
-            <button 
-              onClick={handleLogout}
-              style={{ padding: '8px 15px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-              Logout
-            </button>
-          </div>
-        ) : (
-          // Agar user Login NAHI hai to ye dikhega:
-          <Link to="/login">
-            <button style={{ padding: '8px 15px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-              Login
-            </button>
-          </Link>
+        <Link to="/" style={linkStyle}>Home</Link>
+
+        {/* --- ✅ USER LINKS (DreamHome Added) --- */}
+        {userType === 'USER' && (
+            <>
+                <Link to="/properties" style={linkStyle}>Find Homes</Link>
+                
+                {/* ✨ NEW DREAM HOME LINK ✨ */}
+                <Link to="/wishlist" style={{...linkStyle, color: 'var(--accent-orange)'}}>
+                    DreamHome🏠
+                </Link>
+
+                <Link to="/packers" style={linkStyle}>Movers</Link>
+            </>
         )}
 
+        {/* --- SELLER LINKS --- */}
+        {userType === 'SELLER' && (
+            <>
+                <Link to="/seller-dashboard" style={linkStyle}>Dashboard</Link>
+                <Link to="/add-property" className="btn-3d-orange">Post Property</Link>
+            </>
+        )}
+
+        {/* --- COMPANY LINKS --- */}
+        {userType === 'COMPANY' && (
+            <>
+                 <Link to="/company-dashboard" style={linkStyle}>Dashboard</Link>
+                 <Link to="/company-requests" style={linkStyle}>Requests</Link>
+            </>
+        )}
+
+        {userType === 'ADMIN' && <Link to="/admin-dashboard" style={linkStyle}>Admin</Link>}
+
+        {/* AUTH BUTTONS */}
+        {userInfo ? (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <span style={{ fontWeight: '600', color: 'var(--accent-teal)', fontSize: '14px' }}>Hi, {userInfo.username}</span>
+            <button onClick={handleLogout} style={logoutBtnStyle}>Logout</button>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+            <Link to="/login" style={linkStyle}>Login</Link>
+            <Link to="/register" className="btn-3d-orange">Register</Link>
+          </div>
+        )}
       </div>
     </nav>
   );
+};
+
+// --- STYLES ---
+const navContainerStyle = {
+    padding: '12px 40px',
+    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+    position: 'sticky', top: 0, zIndex: 1000,
+    transition: 'background-color 0.3s'
+};
+
+const brandTitleStyle = { margin: 0, fontSize: '24px', fontWeight: '800', lineHeight: '1' };
+
+const linkStyle = {
+    textDecoration: 'none', color: 'var(--text-primary)', fontWeight: '600', fontSize: '15px', transition: '0.3s'
+};
+
+const themeBtnStyle = {
+    background: 'var(--bg-color)', 
+    color: 'var(--text-primary)',
+    border: '1px solid var(--text-secondary)', 
+    cursor: 'pointer', 
+    fontSize: '1.2rem', 
+    padding: '6px 10px',
+    borderRadius: '20px',
+    transition: 'all 0.3s'
+};
+
+const logoutBtnStyle = {
+    padding: '6px 14px', background: 'transparent', color: '#dc3545',
+    border: '1px solid #dc3545', borderRadius: '6px', cursor: 'pointer', fontWeight: '600'
 };
 
 export default Navbar;
