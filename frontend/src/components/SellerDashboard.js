@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Upload ke liye axios chahiye
 
 const SellerDashboard = () => {
   const navigate = useNavigate();
