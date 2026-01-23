@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom'; 
 import axios from 'axios';
+// 👇 1. Toast Import Karein
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
-  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -12,54 +14,57 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // ⏳ Loading Start
+
     try {
-      const res = await axios.post('https://urbanshift-project.onrender.com/api/users/login/', formData);
-      localStorage.setItem('userInfo', JSON.stringify(res.data));
-      alert('Login Successful!');
+      const response = await axios.post('http://127.0.0.1:8000/api/users/login/', formData);
       
-      if (res.data.user_type === 'SELLER') {
-        navigate('/seller-dashboard');
-      } else {
-        navigate('/');
-      }
+      // Token Save karein
+      localStorage.setItem('token', response.data.access);
+      localStorage.setItem('userType', response.data.user_type);
+      localStorage.setItem('username', response.data.username);
+      
+      // ✅ 2. SUCCESS TOAST (Alert Hataya)
+      toast.success(`Welcome back, ${response.data.username}! 👋`);
+      
+      // Thoda wait karke redirect, taaki popup dikhe
+      setTimeout(() => {
+          window.location.href = '/'; 
+      }, 1500);
+      
     } catch (error) {
-      alert('Invalid Credentials');
+      console.error("Login Error:", error);
+      // ✅ 3. ERROR TOAST
+      toast.error('Login Failed! Invalid Username or Password ❌');
+    } finally {
+      setIsLoading(false); // ✅ Loading Stop
     }
   };
 
   return (
     <div style={pageContainerStyle}>
       <div style={cardStyle}>
-        <h2 style={{ textAlign: 'center', marginBottom: '30px', color: 'var(--text-primary)', fontSize: '2rem' }}>🔐 Welcome Back</h2>
-        
+        <h2 style={{ textAlign: 'center', marginBottom: '10px', color: 'var(--text-primary)' }}>👋 Welcome Back</h2>
+        <p style={{ textAlign: 'center', marginBottom: '30px', color: 'var(--text-secondary)' }}>Login to continue.</p>
+
         <form onSubmit={handleSubmit}>
           <div style={inputGroupStyle}>
             <label style={labelStyle}>Username</label>
-            <input 
-              type="text" 
-              name="username" 
-              placeholder="Enter your username" 
-              onChange={handleChange} 
-              style={inputStyle} 
-            />
+            <input type="text" name="username" placeholder="Enter username" onChange={handleChange} style={inputStyle} required />
           </div>
 
           <div style={inputGroupStyle}>
             <label style={labelStyle}>Password</label>
-            <input 
-              type="password" 
-              name="password" 
-              placeholder="Enter your password" 
-              onChange={handleChange} 
-              style={inputStyle} 
-            />
+            <input type="password" name="password" placeholder="Enter password" onChange={handleChange} style={inputStyle} required />
           </div>
 
-          <button type="submit" style={buttonStyle}>Login Securely</button>
+          <button type="submit" style={{...buttonStyle, opacity: isLoading ? 0.7 : 1, cursor: isLoading ? 'not-allowed' : 'pointer'}} disabled={isLoading}>
+            {isLoading ? '⏳ Logging In...' : 'Login'}
+          </button>
         </form>
 
         <p style={{ textAlign: 'center', marginTop: '20px', color: 'var(--text-secondary)' }}>
-          New here? <Link to="/register" style={{ color: '#007bff', fontWeight: 'bold', textDecoration: 'none' }}>Create an Account</Link>
+          Don't have an account? <Link to="/register" style={{ color: '#007bff', fontWeight: 'bold', textDecoration: 'none' }}>Register here</Link>
         </p>
       </div>
     </div>
@@ -76,17 +81,14 @@ const pageContainerStyle = {
   padding: '20px'
 };
 
-// ✅ Card Style Contrast Improved (Same as Register)
 const cardStyle = {
   background: 'var(--card-bg)',
-  padding: '50px',
+  padding: '40px',
   borderRadius: '20px',
-  // Zyaada gehri aur faili hui shadow
-  boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)', 
+  boxShadow: '0 10px 25px rgba(0,0,0,0.1)',
   width: '100%',
-  maxWidth: '450px',
-  border: '1px solid var(--border-color)',
-  transition: 'transform 0.3s ease'
+  maxWidth: '400px',
+  border: '1px solid var(--border-color)'
 };
 
 const inputGroupStyle = { marginBottom: '20px' };
@@ -95,34 +97,31 @@ const labelStyle = {
   display: 'block',
   marginBottom: '8px',
   fontWeight: '600',
-  color: 'var(--text-primary)',
-  fontSize: '0.9rem'
+  color: 'var(--text-primary)'
 };
 
 const inputStyle = {
   width: '100%',
-  padding: '14px',
-  borderRadius: '10px',
+  padding: '12px',
+  borderRadius: '8px',
   border: '1px solid var(--border-color)',
   background: 'var(--bg-color)',
   color: 'var(--text-primary)',
   fontSize: '1rem',
-  outline: 'none',
-  transition: 'all 0.3s'
+  outline: 'none'
 };
 
 const buttonStyle = {
   width: '100%',
-  padding: '15px',
+  padding: '12px',
   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
   color: 'white',
   border: 'none',
-  borderRadius: '10px',
+  borderRadius: '8px',
   fontSize: '1.1rem',
   fontWeight: 'bold',
   cursor: 'pointer',
-  marginTop: '10px',
-  boxShadow: '0 10px 20px rgba(118, 75, 162, 0.3)'
+  marginTop: '10px'
 };
 
 export default Login;

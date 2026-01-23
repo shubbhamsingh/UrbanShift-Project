@@ -21,12 +21,6 @@ UrbanShift
 │   │   │   ├── urls.cpython-313.pyc
 │   │   │   └── views.cpython-313.pyc
 │   │   ├── migrations
-│   │   │   ├── __pycache__
-│   │   │   │   ├── 0001_initial.cpython-313.pyc
-│   │   │   │   ├── 0002_initial.cpython-313.pyc
-│   │   │   │   └── __init__.cpython-313.pyc
-│   │   │   ├── 0001_initial.py
-│   │   │   ├── 0002_initial.py
 │   │   │   └── __init__.py
 │   │   ├── __init__.py
 │   │   ├── admin.py
@@ -81,12 +75,6 @@ UrbanShift
 │   │   │   ├── urls.cpython-313.pyc
 │   │   │   └── views.cpython-313.pyc
 │   │   ├── migrations
-│   │   │   ├── __pycache__
-│   │   │   │   ├── 0001_initial.cpython-313.pyc
-│   │   │   │   ├── 0002_rename_contact_number_user_phone_and_more.cpython-313.pyc
-│   │   │   │   └── __init__.cpython-313.pyc
-│   │   │   ├── 0001_initial.py
-│   │   │   ├── 0002_rename_contact_number_user_phone_and_more.py
 │   │   │   └── __init__.py
 │   │   ├── __init__.py
 │   │   ├── admin.py
@@ -98,7 +86,6 @@ UrbanShift
 │   │   └── views.py
 │   ├── .env
 │   ├── build.sh
-│   ├── db.sqlite3
 │   ├── manage.py
 │   └── requirements.txt
 ├── frontend
@@ -111,14 +98,15 @@ UrbanShift
 │   ├── src
 │   │   ├── components
 │   │   │   ├── AddProperty.js
-│   │   │   ├── Home.js
 │   │   │   ├── Login.js
 │   │   │   ├── Navbar.js
 │   │   │   ├── PackersMovers.js
 │   │   │   ├── PropertyDetail.js
 │   │   │   ├── PropertyList.js
 │   │   │   ├── Register.js
-│   │   │   └── SellerDashboard.js
+│   │   │   ├── SellerDashboard.js
+│   │   │   ├── home.css
+│   │   │   └── home.js
 │   │   ├── context
 │   │   │   └── ThemeContext.js
 │   │   ├── App.css

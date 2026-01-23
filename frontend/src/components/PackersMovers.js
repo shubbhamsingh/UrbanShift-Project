@@ -1,129 +1,113 @@
 import React, { useState } from 'react';
+import './packersMovers.css'; // CSS Import
 
 const PackersMovers = () => {
-  // Form ka data store karne ke liye state
   const [formData, setFormData] = useState({
-    from_location: '',
-    to_location: '',
-    move_date: '',
-    inventory_items: ''
+    fromLocation: '',
+    toLocation: '',
+    moveDate: '',
+    contact: ''
   });
 
-  const [message, setMessage] = useState('');
+  const [submitted, setSubmitted] = useState(false);
 
-  // Jab user kuch type karega, to state update hogi
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    setFormData({...formData, [e.target.name]: e.target.value});
   };
 
-  // Jab user form submit karega
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setMessage('Sending request...');
-
-    try {
-      const response = await fetch('https://urbanshift-project.onrender.com/api/relocation/requests/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (response.ok) {
-        setMessage('✅ Request Sent Successfully! We will contact you soon.');
-        setFormData({ from_location: '', to_location: '', move_date: '', inventory_items: '' }); // Form clear karein
-      } else {
-        setMessage('❌ Something went wrong. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      setMessage('❌ Error connecting to server.');
-    }
+    // Filhal hum sirf UI dikha rahe hain, baad me ise Backend se jodenge
+    console.log("Inquiry Data:", formData);
+    setSubmitted(true);
+    
+    // 3 second baad form reset
+    setTimeout(() => {
+        setSubmitted(false);
+        setFormData({fromLocation: '', toLocation: '', moveDate: '', contact: ''});
+    }, 3000);
   };
 
   return (
-    <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
-      <h2>🚚 Packers & Movers Service</h2>
-      <p>Fill this form to get a shifting estimate.</p>
-
-      {message && <p style={{ padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>{message}</p>}
-
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+    <div className="packers-page">
+      
+      {/* --- HERO SECTION WITH FORM --- */}
+      <div className="packers-hero">
+        <div className="overlay-dark"></div>
         
-        {/* Kahan se shift karna hai */}
-        <div>
-          <label><strong>From Location:</strong></label>
-          <input
-            type="text"
-            name="from_location"
-            value={formData.from_location}
-            onChange={handleChange}
-            placeholder="Ex: Malviya Nagar, Jaipur"
-            required
-            style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-          />
+        <div className="hero-content-packers">
+            <h1>Shift Your Home, <span className="highlight-text">Hassle-Free!</span> 🚚</h1>
+            <p>Get instant quotes from verified Packers & Movers in your city.</p>
+            
+            {/* INQUIRY FORM */}
+            <div className="quote-form-container">
+                {submitted ? (
+                    <div className="success-msg">
+                        <h3>✅ Request Received!</h3>
+                        <p>Our top movers will contact you shortly.</p>
+                    </div>
+                ) : (
+                    <form onSubmit={handleSubmit} className="quote-form">
+                        <h3>Get a Free Quote</h3>
+                        <div className="form-grid">
+                            <input 
+                                type="text" name="fromLocation" placeholder="Moving From (City/Area)" 
+                                value={formData.fromLocation} onChange={handleChange} required 
+                            />
+                            <input 
+                                type="text" name="toLocation" placeholder="Moving To (City/Area)" 
+                                value={formData.toLocation} onChange={handleChange} required 
+                            />
+                            <input 
+                                type="date" name="moveDate" 
+                                value={formData.moveDate} onChange={handleChange} required 
+                            />
+                            <input 
+                                type="tel" name="contact" placeholder="Mobile Number" 
+                                value={formData.contact} onChange={handleChange} required 
+                            />
+                        </div>
+                        <button type="submit" className="submit-btn">🚀 Check Prices</button>
+                    </form>
+                )}
+            </div>
         </div>
+      </div>
 
-        {/* Kahan jana hai */}
-        <div>
-          <label><strong>To Location:</strong></label>
-          <input
-            type="text"
-            name="to_location"
-            value={formData.to_location}
-            onChange={handleChange}
-            placeholder="Ex: Vaishali Nagar, Jaipur"
-            required
-            style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-          />
+      {/* --- TOP MOVERS LIST (Static Data) --- */}
+      <div className="movers-section">
+        <h2 className="section-title">Top Rated <span className="highlight-text">Movers</span></h2>
+        
+        <div className="movers-grid">
+            {/* Mover 1 */}
+            <div className="mover-card">
+                <div className="mover-badge">⭐ 4.8</div>
+                <h3>Agarwal Packers & Movers</h3>
+                <p className="mover-spec">📦 Household & Office Shifting</p>
+                <p className="mover-loc">📍 Servicing: All India</p>
+                <button className="call-btn">📞 Call Now</button>
+            </div>
+
+            {/* Mover 2 */}
+            <div className="mover-card">
+                <div className="mover-badge">⭐ 4.5</div>
+                <h3>UrbanShift Logistics</h3>
+                <p className="mover-spec">🚚 Express Delivery</p>
+                <p className="mover-loc">📍 Servicing: Jaipur, Delhi, Mumbai</p>
+                <button className="call-btn">📞 Call Now</button>
+            </div>
+
+            {/* Mover 3 */}
+            <div className="mover-card">
+                <div className="mover-badge">⭐ 4.7</div>
+                <h3>Porter Services</h3>
+                <p className="mover-spec">🚛 Mini Trucks & Tempo</p>
+                <p className="mover-loc">📍 Servicing: Local City</p>
+                <button className="call-btn">📞 Call Now</button>
+            </div>
         </div>
+      </div>
 
-        {/* Kab shift karna hai */}
-        <div>
-          <label><strong>Moving Date:</strong></label>
-          <input
-            type="date"
-            name="move_date"
-            value={formData.move_date}
-            onChange={handleChange}
-            required
-            style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-          />
-        </div>
-
-        {/* Kya saman hai */}
-        <div>
-          <label><strong>Items List (Inventory):</strong></label>
-          <textarea
-            name="inventory_items"
-            value={formData.inventory_items}
-            onChange={handleChange}
-            placeholder="Ex: 1 Bed, 1 Sofa, 2 Almirah, 5 Cartons..."
-            required
-            rows="4"
-style={{ width: '100%', padding: '8px', marginTop: '5px' }}
-></textarea>
-</div>
-        <button 
-          type="submit" 
-          style={{ 
-            backgroundColor: '#007bff', 
-            color: 'white', 
-            padding: '10px', 
-            border: 'none', 
-            borderRadius: '5px', 
-            cursor: 'pointer',
-            fontSize: '16px'
-          }}
-        >
-          Get Free Quote 🚀
-        </button>
-
-      </form>
     </div>
   );
 };

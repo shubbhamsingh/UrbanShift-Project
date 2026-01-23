@@ -87,3 +87,71 @@ a { text-decoration: none; color: inherit; transition: 0.3s; }
   padding: 2rem;
   border: 1px solid rgba(128, 128, 128, 0.1);
 }
+/* =========================================
+   1. PHONE INPUT & COUNTRY SEARCH THEME FIX
+   ========================================= */
+
+/* इनपुट बॉक्स का रंग */
+.react-tel-input .form-control {
+  background-color: var(--bg-color) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* झंडे वाला बटन */
+.react-tel-input .flag-dropdown {
+  background-color: var(--bg-color) !important;
+  border: 1px solid var(--border-color) !important;
+}
+
+/* ड्रापडाउन लिस्ट (जहाँ देश दिखते हैं) */
+.react-tel-input .country-list {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important;
+}
+
+/* सर्च बॉक्स (Country Search Box) */
+.react-tel-input .country-list .search-box {
+  background-color: var(--bg-color) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  margin: 10px auto !important;
+  width: 90% !important;
+  padding: 8px !important;
+}
+
+/* जब माउस किसी देश पर जाए (Hover Effect) */
+.react-tel-input .country-list .country:hover,
+.react-tel-input .country-list .country.highlight {
+  background-color: var(--accent-orange) !important; /* आपकी थीम का ऑरेंज */
+  color: white !important;
+}
+
+/* =========================================
+   2. POPUP NOTIFICATIONS (Toastify) THEME
+   ========================================= */
+
+/* ये लाइनें Toastify को आपकी वेबसाइट के रंगों से जोड़ देंगी */
+:root {
+  --toastify-color-light: var(--card-bg);
+  --toastify-color-dark: var(--card-bg);
+  --toastify-text-color-light: var(--text-primary);
+  --toastify-text-color-dark: var(--text-primary);
+  --toastify-font-family: inherit; /* आपकी वेबसाइट का ही फॉन्ट यूज़ होगा */
+}
+
+/* Toastify का बैकग्राउंड और बॉर्डर */
+.Toastify__toast {
+  background-color: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+  border-radius: 12px !important;
+}
+
+/* क्लोज बटन का रंग */
+.Toastify__close-button {
+  color: var(--text-primary) !important;
+}

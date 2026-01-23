@@ -1,25 +1,19 @@
 from pathlib import Path
 import os
-import dj_database_url
-from dotenv import load_dotenv
-
-load_dotenv()
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-a@&t7omml3r^l$ra@^fqx*hmasc*6-jrpj%(0k#=(^1l7h+d_u'
+SECRET_KEY = 'django-insecure-change-me-urbanshift-dev-key'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ✅ CHANGE 1: Allow all hosts for Render
 ALLOWED_HOSTS = ['*']
 
-
 # Application definition
-
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -27,24 +21,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+
     # Third party apps
     'rest_framework',
     'corsheaders',
 
-    # Hamare Custom Apps
+    # Custom Apps
     'users',
     'properties',
     'relocation',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # ✅ CORS Sabse upar
     'django.middleware.security.SecurityMiddleware',
-    
-    # ✅ CHANGE 2: WhiteNoise for Static Files (CSS/Images on Render)
-    'whitenoise.middleware.WhiteNoiseMiddleware', 
-    
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -62,6 +53,7 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
+                'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
@@ -72,16 +64,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-
-# --- DATABASE CONFIGURATION (Neon / Render) ---
+# Database
 DATABASES = {
-    'default': dj_database_url.config(
-        # Aapka Sahi Neon URL ✅
-        default='postgresql://neondb_owner:npg_VW3uMgo1TdpQ@ep-super-fire-a1p6e23d-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require',
-        conn_max_age=600
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
-
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -91,28 +80,46 @@ AUTH_PASSWORD_VALIDATORS = [
     { 'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
-
 # Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-
-# --- STATIC FILES CONFIGURATION (WhiteNoise) ---
+# Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
-# ✅ CHANGE 3: Static Root for Render
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# CSS Compression
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Hamara Custom User Model
+# Media Files (Images Upload)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ✅ Custom User Model
 AUTH_USER_MODEL = 'users.User'
 
-# React ke liye permission (CORS)
+# ✅ CORS Configuration
 CORS_ALLOWED_ORIGINS = [
-    "https://urbanshift-project.onrender.com/",
-    "https://urbanshift-frontend.vercel.app", # Future Vercel URL
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
 ]
-# Testing ke liye sabko allow kar sakte hain (Optional)
 CORS_ALLOW_ALL_ORIGINS = True
+
+# 👇 ✅ REST FRAMEWORK CONFIGURATION (Ye Missing Tha!)
+# Iske bina server ko pata nahi chalta ki Token kaise check karna hai
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+}
+
+# ✅ JWT SETTINGS
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1), # Token 1 din tak chalega
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+}

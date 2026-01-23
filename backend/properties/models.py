@@ -1,60 +1,32 @@
 from django.db import models
-from django.conf import settings 
+from django.conf import settings
 
 class Property(models.Model):
-    # Property Types
-    PROPERTY_TYPES = (
-        ('FLAT', 'Flat/Apartment'),
-        ('HOUSE', 'Independent House'),
-        ('ROOM', 'Single Room'),
-        ('COMMERCIAL', 'Commercial Space'),
-    )
-    
-    # Listing Types
-    LISTING_TYPES = (
-        ('RENT', 'For Rent'),
-        ('SELL', 'For Sale'),
-    )
-
-    # Owner link karega User table se
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='properties')
+    # Property Seller se link hogi
+    seller = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     
     title = models.CharField(max_length=255)
     description = models.TextField()
-    address = models.CharField(max_length=500)
-    city = models.CharField(max_length=100)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    location = models.CharField(max_length=255)
     
-    # Price aur Phone Number
-    price = models.DecimalField(max_digits=12, decimal_places=2) 
-    phone_number = models.CharField(max_length=15, default="919999999999") 
-
-    property_type = models.CharField(max_length=20, choices=PROPERTY_TYPES)
-    listing_type = models.CharField(max_length=20, choices=LISTING_TYPES)
+    # Dropdown Options
+    CATEGORY_CHOICES = [('RENT', 'Rent'), ('SELL', 'Sell')]
+    category = models.CharField(max_length=10, choices=CATEGORY_CHOICES, default='RENT')
     
-    # Amenities
-    bedrooms = models.IntegerField(default=1)
-    bathrooms = models.IntegerField(default=1)
-    is_furnished = models.BooleanField(default=False)
-    
-    # --- Photo Logic ---
-    # 1. File Upload (Purana)
-    image = models.ImageField(upload_to='property_images/', blank=True, null=True)
-    
-    # 2. ✅ Web Image URL (Naya Feature - Link Paste karne ke liye)
-    image_url = models.URLField(max_length=500, blank=True, null=True)
-    
-    # Sold Status
-    is_sold = models.BooleanField(default=False)
+    BEDROOM_CHOICES = [('1BHK', '1 BHK'), ('2BHK', '2 BHK'), ('3BHK', '3 BHK'), ('Villa', 'Villa')]
+    bedrooms = models.CharField(max_length=10, choices=BEDROOM_CHOICES, default='1BHK')
 
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.title} - {self.city}"
+        return self.title
 
-# Gallery Images Class
+# 🖼️ Property Images Model (File ya URL dono save karega)
 class PropertyImage(models.Model):
     property = models.ForeignKey(Property, related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='property_gallery/')
+    image = models.ImageField(upload_to='property_photos/', null=True, blank=True) # File Upload ke liye
+    image_url = models.URLField(null=True, blank=True) # URL Link ke liye
 
     def __str__(self):
         return f"Image for {self.property.title}"

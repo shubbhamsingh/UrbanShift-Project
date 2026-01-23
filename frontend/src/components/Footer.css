@@ -1,0 +1,133 @@
+.footer {
+    background-color: #111;
+    color: #fff;
+    padding: 60px 20px 20px;
+    margin-top: auto; 
+    border-top: 3px solid var(--accent-orange);
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.footer-col {
+    flex: 1;
+    min-width: 250px;
+}
+
+.footer-logo {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.footer-logo .highlight {
+    color: var(--accent-orange);
+}
+
+.footer-text {
+    color: #aaa;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+.footer-col h3 {
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    color: var(--accent-teal);
+    position: relative;
+    display: inline-block;
+}
+
+.footer-col h3::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -8px;
+    width: 40px;
+    height: 2px;
+    background: var(--accent-orange);
+}
+
+/* LINKS */
+.footer-links, .footer-contact {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 10px;
+}
+
+.footer-links a {
+    color: #ccc;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.footer-links a:hover {
+    color: var(--accent-orange);
+    padding-left: 5px;
+}
+
+.footer-contact li {
+    color: #ccc;
+    margin-bottom: 10px;
+}
+
+/* --- ✅ NEW SOCIAL ICONS STYLING --- */
+.social-icons {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.icon-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #222;
+    color: white;
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+/* Colors on Hover */
+.icon-box.facebook:hover { background: #1877F2; transform: translateY(-3px); }
+.icon-box.instagram:hover { background: #E1306C; transform: translateY(-3px); }
+.icon-box.twitter:hover { background: #1DA1F2; transform: translateY(-3px); }
+.icon-box.linkedin:hover { background: #0077B5; transform: translateY(-3px); }
+
+/* BOTTOM BAR */
+.footer-bottom {
+    text-align: center;
+    margin-top: 50px;
+    padding-top: 20px;
+    border-top: 1px solid #333;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        text-align: center;
+    }
+    .footer-col h3::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    .social-icons {
+        justify-content: center;
+    }
+}

@@ -1,44 +1,62 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+// 👇 Phone Input Library Imports
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+// 👇 Toast Import (Popup ke liye)
+import { toast } from 'react-toastify';
 
 const Register = () => {
   const navigate = useNavigate();
-
-  // ✅ FIX: Clean Array Definition
-  const countryCodes = [
-    { code: '+91', name: 'IN', flag: '🇮🇳' },
-    { code: '+1',  name: 'US', flag: '🇺🇸' },
-    { code: '+44', name: 'UK', flag: '🇬🇧' },
-    { code: '+971',name: 'UAE', flag: '🇦🇪' },
-    { code: '+81', name: 'JP', flag: '🇯🇵' },
-  ];
-
-  const [countryCode, setCountryCode] = useState('+91');
   
+  // ✅ Loading State
+  const [isLoading, setIsLoading] = useState(false);
+   
   const [formData, setFormData] = useState({
     username: '',
     email: '',
     password: '',
     user_type: 'BUYER',
-    phone: ''
+    phone: '' 
   });
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // ✅ UPDATED handleSubmit FUNCTION IS HERE 👇
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const fullMobile = `${countryCode} ${formData.phone}`;
-    const dataToSend = { ...formData, phone: fullMobile };
+    
+    // 1. Phone Validation (Toast Error)
+    if (!formData.phone || formData.phone.length < 10) {
+        toast.error("Please enter a valid phone number 📱");
+        return;
+    }
+
+    setIsLoading(true); // ⏳ Loading shuru
 
     try {
-      await axios.post('https://urbanshift-project.onrender.com/api/users/register/', dataToSend);
-      alert('Registration Successful! Please Login.');
-      navigate('/login');
+      // Phone input library "+" nahi deti, isliye manually add kar rahe hain
+      const dataToSend = { ...formData, phone: `+${formData.phone}` };
+      
+      await axios.post('http://127.0.0.1:8000/api/users/register/', dataToSend);
+      
+      // ✅ SUCCESS POPUP (Alert hataya, Toast lagaya)
+      toast.success('Registration Successful! Please Login 🎉');
+      
+      // Thoda wait karke redirect karein taaki user popup dekh sake
+      setTimeout(() => {
+          navigate('/login');
+      }, 2000);
+
     } catch (error) {
-      alert('Registration Failed (Username might be taken)');
+      console.error("Registration Error:", error.response?.data);
+      // ✅ ERROR POPUP
+      toast.error('Registration Failed! (Check username or email) ❌');
+    } finally {
+      setIsLoading(false); // ✅ Loading khatam
     }
   };
 
@@ -49,7 +67,7 @@ const Register = () => {
         <p style={{ textAlign: 'center', marginBottom: '30px', color: 'var(--text-secondary)' }}>Start your property journey today.</p>
 
         <form onSubmit={handleSubmit}>
-          
+           
           <div style={inputGroupStyle}>
             <label style={labelStyle}>Username</label>
             <input type="text" name="username" placeholder="Choose a username" onChange={handleChange} style={inputStyle} required />
@@ -78,33 +96,38 @@ const Register = () => {
 
           <div style={inputGroupStyle}>
             <label style={labelStyle}>Mobile Number</label>
-            <div style={{ display: 'flex', gap: '10px' }}>
-                {/* ✅ FIX 2: Correct Dropdown Display (Only Flag + Code) */}
-                <select 
-                    style={{ ...dropdownStyle, width: '130px', padding: '10px' }} 
-                    value={countryCode}
-                    onChange={(e) => setCountryCode(e.target.value)}
-                >
-                    {countryCodes.map((item) => (
-                        <option key={item.name} value={item.code}>
-                           {/* Sirf Flag aur Code dikhaya hai */}
-                           {item.flag} {item.code} 
-                        </option>
-                    ))}
-                </select>
-
-                <input 
-                    type="number" 
-                    name="phone" 
-                    placeholder="Enter number" 
-                    onChange={handleChange} 
-                    style={{ ...inputStyle, flex: 1 }} 
-                    required 
-                />
-            </div>
+            {/* ✅ Smart Phone Input with Flags & Search */}
+            <PhoneInput
+              country={'in'} // Default India
+              value={formData.phone}
+              onChange={(phone) => setFormData({ ...formData, phone: phone })}
+              inputStyle={{
+                width: '100%',
+                height: '45px',
+                fontSize: '1rem',
+                paddingLeft: '48px',
+                borderRadius: '8px',
+                border: '1px solid var(--border-color)',
+                backgroundColor: 'var(--bg-color)',
+                color: 'var(--text-primary)'
+              }}
+              buttonStyle={{
+                border: '1px solid var(--border-color)',
+                borderRadius: '8px 0 0 8px',
+                backgroundColor: 'var(--bg-color)'
+              }}
+              dropdownStyle={{
+                backgroundColor: 'var(--card-bg)',
+                color: 'var(--text-primary)' // ✅ Fixed text color for Dark Mode
+              }}
+              enableSearch={true}
+              searchPlaceholder="Search country..."
+            />
           </div>
 
-          <button type="submit" style={buttonStyle}>Create Account</button>
+          <button type="submit" style={{...buttonStyle, opacity: isLoading ? 0.7 : 1, cursor: isLoading ? 'not-allowed' : 'pointer'}} disabled={isLoading}>
+            {isLoading ? '⏳ Creating Account...' : 'Create Account'}
+          </button>
         </form>
 
         <p style={{ textAlign: 'center', marginTop: '20px', color: 'var(--text-secondary)' }}>
@@ -180,7 +203,6 @@ const buttonStyle = {
   borderRadius: '10px',
   fontSize: '1.1rem',
   fontWeight: 'bold',
-  cursor: 'pointer',
   marginTop: '10px',
   boxShadow: '0 10px 20px rgba(255, 94, 98, 0.3)'
 };

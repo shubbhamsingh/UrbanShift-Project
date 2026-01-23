@@ -7,11 +7,14 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { mode, cycleTheme } = useContext(ThemeContext);
   
-  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-  const userType = userInfo ? userInfo.user_type : null;
+  // ✅ FIX 1: Data wahan se nikalo jahan Login.js ne save kiya tha
+  const token = localStorage.getItem('token');
+  const username = localStorage.getItem('username');
+  const userType = localStorage.getItem('userType'); // 'BUYER', 'SELLER', 'COMPANY'
 
   const handleLogout = () => {
-    localStorage.removeItem('userInfo');
+    // ✅ FIX 2: Sab kuch clear karo
+    localStorage.clear();
     navigate('/login');
     window.location.reload(); 
   };
@@ -26,7 +29,7 @@ const Navbar = () => {
     <nav style={{...navContainerStyle, backgroundColor: 'var(--navbar-bg)', boxShadow: 'var(--navbar-shadow)'}}>
       
       {/* BRANDING */}
-      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none' }}>
         <img src={logo} alt="Logo" style={{ height: '45px', width: 'auto' }} />
         <div style={{ display: 'flex', flexDirection: 'column' }}>
             <h1 style={{...brandTitleStyle, color: 'var(--text-primary)'}}>
@@ -49,8 +52,8 @@ const Navbar = () => {
 
         <Link to="/" style={linkStyle}>Home</Link>
 
-        {/* --- ✅ USER LINKS (DreamHome Added) --- */}
-        {userType === 'USER' && (
+        {/* --- ✅ USER LINKS (Changed 'USER' to 'BUYER' to match Register.js) --- */}
+        {userType === 'BUYER' && (
             <>
                 <Link to="/properties" style={linkStyle}>Find Homes</Link>
                 
@@ -67,7 +70,7 @@ const Navbar = () => {
         {userType === 'SELLER' && (
             <>
                 <Link to="/seller-dashboard" style={linkStyle}>Dashboard</Link>
-                <Link to="/add-property" className="btn-3d-orange">Post Property</Link>
+                <Link to="/add-property" className="btn-3d-orange" style={{textDecoration:'none', padding:'8px 15px', color:'white'}}>Post Property</Link>
             </>
         )}
 
@@ -82,15 +85,15 @@ const Navbar = () => {
         {userType === 'ADMIN' && <Link to="/admin-dashboard" style={linkStyle}>Admin</Link>}
 
         {/* AUTH BUTTONS */}
-        {userInfo ? (
+        {token ? (
           <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            <span style={{ fontWeight: '600', color: 'var(--accent-teal)', fontSize: '14px' }}>Hi, {userInfo.username}</span>
+            <span style={{ fontWeight: '600', color: 'var(--accent-teal)', fontSize: '14px' }}>Hi, {username}</span>
             <button onClick={handleLogout} style={logoutBtnStyle}>Logout</button>
           </div>
         ) : (
           <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
             <Link to="/login" style={linkStyle}>Login</Link>
-            <Link to="/register" className="btn-3d-orange">Register</Link>
+            <Link to="/register" className="btn-3d-orange" style={{textDecoration:'none', padding:'8px 15px', color:'white'}}>Register</Link>
           </div>
         )}
       </div>

@@ -1,163 +1,106 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import axios from 'axios';
+import './propertyDetail.css';
 
 const PropertyDetail = () => {
   const { id } = useParams();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
-  
-  // Slider ke liye state
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [allImages, setAllImages] = useState([]);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchProperty = async () => {
       try {
-        const response = await fetch(`https://urbanshift-project.onrender.com/api/properties/${id}/`);
-        const data = await response.json();
-        setProperty(data);
-        
-        // Saari images (Main + Extra) ko ek list me daal rahe hain
-        let imagesList = [];
-        if (data.image) imagesList.push(data.image); // Main image
-        
-        // Agar extra images hain to unhe bhi list me jodein
-        if (data.images && data.images.length > 0) {
-          data.images.forEach(img => imagesList.push(img.image)); 
-        }
-        
-        setAllImages(imagesList);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching property:', error);
+        const res = await axios.get(`http://127.0.0.1:8000/api/properties/${id}/`);
+        setProperty(res.data);
+      } catch (err) {
+        console.error("Error fetching details:", err);
+        setError("Property not found or connection failed.");
+      } finally {
         setLoading(false);
       }
     };
-
     fetchProperty();
   }, [id]);
 
-// ✅ WhatsApp Button Logic (Fixed)
-  const handleWhatsApp = () => {
-    if (property && property.phone_number) {
-      
-      // 1. Pehle non-digits hatayein (Spaces, +, - sab hat jayega)
-      let number = property.phone_number.replace(/\D/g, ''); 
-
-      // 2. Check karein ki kya number pehle se 91 se shuru ho raha hai?
-      // Agar number 10 digit ka hai (Jaise 9876543210), to aage 91 lagayein.
-      if (number.length === 10) {
-        number = '91' + number;
-      }
-      // Agar number 12 digit ka hai aur 91 se shuru hai, to kuch mat karein.
-
-      const url = `https://wa.me/${number}?text=Hello, I am interested in your property: ${property.title}`;
-      window.open(url, '_blank');
-    } else {
-      alert("Owner phone number not available");
+  // 🖼️ SMART IMAGE HELPER
+  const getImageUrl = (imageObj) => {
+    if (!imageObj) return 'https://via.placeholder.com/600';
+    if (imageObj.image) {
+        if (imageObj.image.startsWith('http')) return imageObj.image;
+        return `http://127.0.0.1:8000${imageObj.image}`;
     }
+    return imageObj.image_url || 'https://via.placeholder.com/600';
   };
 
-  // Slider Logic (Next/Prev)
-  const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev === allImages.length - 1 ? 0 : prev + 1));
-  };
-
-  const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev === 0 ? allImages.length - 1 : prev - 1));
-  };
-
-  if (loading) return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>Loading... ⏳</h2>;
-  if (!property) return <h2 style={{ textAlign: 'center', marginTop: '50px' }}>❌ Property Not Found</h2>;
+  if (loading) return <div className="loading-container"><h2>⏳ Loading Property Details...</h2></div>;
+  if (error) return <div className="error-container"><h2>❌ {error}</h2><Link to="/properties" className="back-btn">← Back to Listings</Link></div>;
 
   return (
-    <div style={{ maxWidth: '800px', margin: '20px auto', padding: '20px', boxShadow: '0 0 10px rgba(0,0,0,0.1)', borderRadius: '10px' }}>
-      
-      {/* Back Button */}
-      <Link to="/properties" style={{ textDecoration: 'none', color: '#007bff', fontSize: '18px' }}>
-        ← Back to List
-      </Link>
-
-      {/* Title & Price */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '20px' }}>
-        <h1 style={{ margin: 0 }}>{property.title}</h1>
-        <h2 style={{ color: '#28a745', margin: 0 }}>₹{property.price}/mo</h2>
-      </div>
-      <p style={{ color: '#666', fontSize: '18px' }}>📍 {property.city} - {property.address}</p>
-
-      {/* --- IMAGE SLIDER --- */}
-      <div style={{ position: 'relative', width: '100%', height: '400px', marginTop: '20px', backgroundColor: '#000', borderRadius: '10px', overflow: 'hidden' }}>
+    <div className="detail-page">
+      <div className="detail-container">
         
-        {allImages.length > 0 ? (
-          <>
-            {/* Image Source Fix: Agar URL http se shuru nahi hota to backend URL jodo */}
-            <img 
-              src={allImages[currentImageIndex].startsWith('http') ? allImages[currentImageIndex] : `https://urbanshift-project.onrender.com${allImages[currentImageIndex]}`}
-              alt="Property" 
-              style={{ width: '100%', height: '100%', objectFit: 'contain' }} 
-            />
+        {/* --- HEADER --- */}
+        <div className="detail-header">
+            <Link to="/properties" className="back-link">← Back</Link>
+            <span className={`status-badge ${property.category}`}>{property.category}</span>
+        </div>
+
+        <div className="content-wrapper">
             
-            {/* Left Arrow */}
-            {allImages.length > 1 && (
-              <button onClick={prevImage} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', padding: '10px', cursor: 'pointer', borderRadius: '50%', fontSize: '20px' }}>
-                ❮
-              </button>
-            )}
-
-            {/* Right Arrow */}
-            {allImages.length > 1 && (
-              <button onClick={nextImage} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%)', backgroundColor: 'rgba(0,0,0,0.5)', color: 'white', border: 'none', padding: '10px', cursor: 'pointer', borderRadius: '50%', fontSize: '20px' }}>
-                ❯
-              </button>
-            )}
-
-            {/* Image Counter */}
-            <div style={{ position: 'absolute', bottom: '10px', right: '10px', backgroundColor: 'rgba(0,0,0,0.6)', color: 'white', padding: '5px 10px', borderRadius: '5px' }}>
-              {currentImageIndex + 1} / {allImages.length}
+            {/* --- LEFT: IMAGES --- */}
+            <div className="image-section">
+                <img 
+                    // 👇 Main Image Fix
+                    src={property.images && property.images.length > 0 
+                        ? getImageUrl(property.images[0])
+                        : 'https://via.placeholder.com/600'} 
+                    alt={property.title} 
+                    className="main-image"
+                />
+                
+                {/* Thumbnails Fix */}
+                {property.images && property.images.length > 1 && (
+                    <div className="thumbnails">
+                        {property.images.slice(1).map((img, idx) => (
+                            <img 
+                                key={idx}
+                                // 👇 Thumbnail Fix
+                                src={getImageUrl(img)} 
+                                alt="thumb"
+                                className="thumb-img"
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
-          </>
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'white' }}>No Images Available</div>
-        )}
-      </div>
 
-      {/* Description */}
-      <div style={{ marginTop: '30px' }}>
-        <h3>🏡 Description</h3>
-        <p style={{ lineHeight: '1.6', fontSize: '16px' }}>{property.description}</p>
-        
-        <div style={{ display: 'flex', gap: '20px', marginTop: '20px' }}>
-          <span style={{ backgroundColor: '#f0f0f0', padding: '10px', borderRadius: '5px' }}>
-            🛏️ {property.bedrooms ? `${property.bedrooms} Bedrooms` : 'N/A'}
-          </span>
-          <span style={{ backgroundColor: '#f0f0f0', padding: '10px', borderRadius: '5px' }}>
-            🚿 {property.bathrooms ? `${property.bathrooms} Bathrooms` : 'N/A'}
-          </span>
-          <span style={{ backgroundColor: '#f0f0f0', padding: '10px', borderRadius: '5px' }}>
-            🛋️ {property.is_furnished ? 'Furnished' : 'Unfurnished'}
-          </span>
+            {/* --- RIGHT: INFO --- */}
+            <div className="info-section">
+                <h1 className="prop-title">{property.title}</h1>
+                <h2 className="prop-price">₹{property.price} <span className="per-month">/ month</span></h2>
+                
+                <div className="prop-meta">
+                    <p>📍 <strong>Location:</strong> {property.location}</p>
+                    <p>🛏 <strong>Bedrooms:</strong> {property.bedrooms}</p>
+                    <p>📅 <strong>Posted:</strong> {new Date(property.created_at).toLocaleDateString()}</p>
+                </div>
+
+                <div className="prop-desc">
+                    <h3>Description</h3>
+                    <p>{property.description}</p>
+                </div>
+
+                <div className="seller-box">
+                    <h3>👤 Owner Details</h3>
+                    <p><strong>Name:</strong> {property.seller_name || "Verified Owner"}</p>
+                    <button className="contact-btn">📞 Contact Owner</button>
+                </div>
+            </div>
+
         </div>
       </div>
-
-      {/* Buttons Section */}
-      <div style={{ marginTop: '40px', display: 'flex', gap: '15px' }}>
-        
-        {/* WhatsApp Button */}
-        <button 
-          onClick={handleWhatsApp}
-          style={{ flex: 1, padding: '15px', backgroundColor: '#25D366', color: 'white', border: 'none', borderRadius: '5px', fontSize: '18px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-          <span>💬</span> Chat on WhatsApp
-        </button>
-
-        {/* Book Visit Button */}
-        <button 
-          onClick={() => alert('Booking feature coming soon! Please contact owner on WhatsApp.')}
-          style={{ flex: 1, padding: '15px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', fontSize: '18px', cursor: 'pointer' }}>
-          📅 Book Visit
-        </button>
-
-      </div>
-
     </div>
   );
 };

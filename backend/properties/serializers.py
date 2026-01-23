@@ -4,15 +4,12 @@ from .models import Property, PropertyImage
 class PropertyImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyImage
-        fields = ['id', 'image']
+        fields = ['id', 'image', 'image_url']
 
 class PropertySerializer(serializers.ModelSerializer):
     images = PropertyImageSerializer(many=True, read_only=True)
-    
-    # Owner ka naam dikhane ke liye (ID ki jagah)
-    owner_name = serializers.ReadOnlyField(source='owner.username')
+    seller_name = serializers.CharField(source='seller.username', read_only=True)
 
     class Meta:
         model = Property
-        fields = '__all__' 
-        # '__all__' likhne se ye automatically 'image_url' ko bhi le lega ✅
+        fields = ['id', 'seller_name', 'title', 'description', 'price', 'location', 'category', 'bedrooms', 'images', 'created_at']

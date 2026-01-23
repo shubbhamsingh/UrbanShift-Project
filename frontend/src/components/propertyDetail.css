@@ -1,0 +1,162 @@
+.detail-page {
+    padding: 40px 20px;
+    background: var(--bg-color);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+}
+
+.detail-container {
+    max-width: 1100px;
+    width: 100%;
+    background: var(--card-bg);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    border: 1px solid var(--border-color);
+}
+
+.detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.back-link {
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-size: 1.1rem;
+}
+
+.back-link:hover {
+    color: var(--accent-teal);
+}
+
+.status-badge {
+    padding: 5px 15px;
+    border-radius: 20px;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+}
+.status-badge.RENT { background: #00b894; }
+.status-badge.SELL { background: #e17055; }
+
+/* LAYOUT */
+.content-wrapper {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+/* IMAGES */
+.image-section {
+    flex: 1.5;
+    min-width: 300px;
+}
+
+.main-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 15px;
+    border: 1px solid var(--border-color);
+}
+
+.thumbnails {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    overflow-x: auto;
+}
+
+.thumb-img {
+    width: 80px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: 0.3s;
+}
+
+.thumb-img:hover {
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+/* INFO */
+.info-section {
+    flex: 1;
+    min-width: 300px;
+    color: var(--text-primary);
+}
+
+.prop-title {
+    font-size: 2rem;
+    margin-bottom: 10px;
+}
+
+.prop-price {
+    font-size: 1.8rem;
+    color: var(--accent-orange);
+    margin-bottom: 20px;
+}
+
+.per-month {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    font-weight: normal;
+}
+
+.prop-meta p {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+.prop-desc {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.prop-desc p {
+    line-height: 1.6;
+    color: var(--text-secondary);
+}
+
+.seller-box {
+    margin-top: 30px;
+    background: rgba(0,0,0,0.2);
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.contact-btn {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent-teal);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+.contact-btn:hover {
+    background: #0a7e8c;
+}
+
+/* LOADING / ERROR */
+.loading-container, .error-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 80vh;
+    color: var(--text-primary);
+}

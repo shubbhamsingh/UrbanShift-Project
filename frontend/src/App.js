@@ -1,46 +1,85 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
-import SellerDashboard from './components/SellerDashboard'; // ✅ Import confirm karein
 
-// Components
+// 👇 Toastify Imports
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+// --- COMPONENTS ---
 import Navbar from './components/Navbar';
+import Home from './components/Home'; 
 import Login from './components/Login';
 import Register from './components/Register';
-import Home from './components/Home';
-import PropertyList from './components/PropertyList';
+
+// Property Components
+import Properties from './components/Properties'; 
 import AddProperty from './components/AddProperty';
 import PropertyDetail from './components/PropertyDetail';
+
+// Other Components
+import SellerDashboard from './components/SellerDashboard'; 
 import PackersMovers from './components/PackersMovers'; 
+import Footer from './components/Footer'; // ✅ Footer Import
 
 function App() {
   return (
     <ThemeProvider>
       <Router>
-        <Navbar />
-        <Routes>
-          {/* Public Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/packers" element={<PackersMovers />} />
-          
-          {/* Property Routes */}
-          <Route path="/properties" element={<PropertyList />} />
-          <Route path="/add-property" element={<AddProperty />} />
-          <Route path="/property/:id" element={<PropertyDetail />} />
+        <div style={{display: 'flex', flexDirection: 'column', minHeight: '100vh'}}>
+            {/* Wrapper div ensure karta hai ki footer hamesha bottom me rahe */}
+            
+            <Navbar />
+            
+            {/* 👇 Toast Container Global Setup */}
+            <ToastContainer 
+                position="top-center" 
+                autoClose={3000} 
+                hideProgressBar={false} 
+                newestOnTop={false} 
+                closeOnClick 
+                rtl={false} 
+                pauseOnFocusLoss 
+                draggable 
+                pauseOnHover 
+                theme="colored"
+            />
 
-          {/* ✅ SELLER DASHBOARD (Ye line zaroori hai!) */}
-          <Route path="/seller-dashboard" element={<SellerDashboard />} />
+            <Routes>
+              {/* --- PUBLIC ROUTES --- */}
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/packers" element={<PackersMovers />} />
+              
+              {/* --- PROPERTY ROUTES --- */}
+              <Route path="/properties" element={<Properties />} /> 
+              <Route path="/add-property" element={<AddProperty />} />
+              <Route path="/property/:id" element={<PropertyDetail />} />
 
-          {/* Placeholders (Future Features) */}
-          <Route path="/wishlist" element={<div style={{textAlign:'center', padding:'50px', color:'var(--text-primary)'}}><h2>Your DreamHome🏠 Collection (Coming Soon)</h2></div>} />
-          <Route path="/company-dashboard" element={<div style={{padding:'50px'}}>Company Dashboard</div>} />
-          <Route path="/admin-dashboard" element={<div style={{padding:'50px'}}>Admin Dashboard</div>} />
-        </Routes>
+              {/* --- SELLER DASHBOARD --- */}
+              <Route path="/seller-dashboard" element={<SellerDashboard />} />
+
+              {/* --- PLACEHOLDERS --- */}
+              <Route path="/wishlist" element={<div style={placeholderStyle}><h2>Your DreamHome🏠 Collection (Coming Soon)</h2></div>} />
+              <Route path="/company-dashboard" element={<div style={placeholderStyle}><h2>Company Dashboard</h2></div>} />
+              <Route path="/admin-dashboard" element={<div style={placeholderStyle}><h2>Admin Dashboard</h2></div>} />
+            </Routes>
+
+            {/* ✅ FOOTER Added Here (Inside Router, Outside Routes) */}
+            <Footer />
+        </div>
       </Router>
     </ThemeProvider>
   );
 }
+
+// Simple style for placeholders
+const placeholderStyle = {
+    textAlign: 'center', 
+    padding: '100px 20px', 
+    color: 'var(--text-primary)',
+    minHeight: '60vh'
+};
 
 export default App;
