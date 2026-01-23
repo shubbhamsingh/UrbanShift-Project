@@ -160,3 +160,112 @@
     min-height: 80vh;
     color: var(--text-primary);
 }
+
+/* ... purane css ke neeche add karein ... */
+
+.wishlist-btn {
+    background: white;
+    border: 2px solid #eee;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.wishlist-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
+
+/* ... Purane code ke neeche paste karein ... */
+
+/* --- MODAL STYLES --- */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: white;
+    width: 90%;
+    max-width: 400px;
+    padding: 30px;
+    border-radius: 15px;
+    position: relative;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    animation: popUp 0.3s ease-out;
+}
+
+@keyframes popUp {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-content h2 {
+    color: var(--text-primary);
+    margin-bottom: 25px;
+}
+
+.contact-info {
+    text-align: left;
+}
+
+.contact-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.icon-c {
+    font-size: 1.5rem;
+    color: var(--accent-teal);
+}
+
+.contact-row div {
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-row span {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+.contact-row strong, .contact-row a {
+    font-size: 1rem;
+    color: #333;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.modal-note {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 15px;
+}

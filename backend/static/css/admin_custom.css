@@ -1,0 +1,92 @@
+/* --- UrbanShift Admin Custom Theme --- */
+
+/* 1. Entire Background Deep Black */
+body, .content-wrapper, .main-footer, .main-header {
+    background-color: #0d0d0d !important; /* Deepest Black */
+    color: #ffffff !important;
+}
+
+/* 2. Sidebar (Menu) Black */
+.main-sidebar {
+    background-color: #000000 !important; /* Pure Black Sidebar */
+    border-right: 1px solid #333;
+}
+
+/* 3. Brand Logo Area */
+.brand-link {
+    background-color: #000000 !important;
+    border-bottom: 1px solid #ff9f1c !important; /* Orange Border */
+}
+
+.brand-text {
+    color: #ff9f1c !important; /* UrbanShift Orange */
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* 4. Menu Links */
+.nav-link {
+    color: #cccccc !important;
+}
+
+.nav-link.active {
+    background-color: #ff9f1c !important; /* Active Link Orange */
+    color: #000 !important; /* Text Black on Orange */
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.nav-link:hover {
+    color: #ff9f1c !important;
+}
+
+/* 5. Headers & Cards */
+.card {
+    background-color: #1a1a1a !important; /* Slightly lighter black for cards */
+    border: 1px solid #333;
+}
+
+.card-header {
+    background-color: #111 !important;
+    border-bottom: 2px solid #ff9f1c !important; /* Orange line under headers */
+    color: #ff9f1c !important;
+}
+
+/* 6. Buttons (Orange & Teal) */
+.btn-primary {
+    background-color: #ff9f1c !important;
+    border-color: #ff9f1c !important;
+    color: #000 !important;
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    background-color: #e68a00 !important;
+}
+
+.btn-success, .btn-info {
+    background-color: #2ec4b6 !important; /* Teal for other actions */
+    border: none;
+    color: #000 !important;
+}
+
+/* 7. Tables */
+table.table {
+    background-color: #1a1a1a !important;
+    color: #fff !important;
+}
+
+table.table thead th {
+    color: #ff9f1c !important; /* Table Headers Orange */
+    border-bottom: 1px solid #444;
+}
+
+table.table tbody tr:hover {
+    background-color: #222 !important;
+}
+
+/* 8. Top Navbar */
+.navbar-dark {
+    background-color: #000 !important;
+    border-bottom: 1px solid #333;
+}

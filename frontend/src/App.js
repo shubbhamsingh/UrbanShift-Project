@@ -21,6 +21,7 @@ import PropertyDetail from './components/PropertyDetail';
 import SellerDashboard from './components/SellerDashboard'; 
 import PackersMovers from './components/PackersMovers'; 
 import Footer from './components/Footer'; // ✅ Footer Import
+import Wishlist from './components/Wishlist'; // ✅ Import Wishlist
 
 function App() {
   return (
@@ -60,7 +61,7 @@ function App() {
               {/* --- SELLER DASHBOARD --- */}
               <Route path="/seller-dashboard" element={<SellerDashboard />} />
 
-              {/* --- PLACEHOLDERS --- */}
+              <Route path="/wishlist" element={<Wishlist />} />
               <Route path="/wishlist" element={<div style={placeholderStyle}><h2>Your DreamHome🏠 Collection (Coming Soon)</h2></div>} />
               <Route path="/company-dashboard" element={<div style={placeholderStyle}><h2>Company Dashboard</h2></div>} />
               <Route path="/admin-dashboard" element={<div style={placeholderStyle}><h2>Admin Dashboard</h2></div>} />

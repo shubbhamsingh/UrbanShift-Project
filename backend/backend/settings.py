@@ -15,6 +15,7 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -122,4 +123,39 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1), # Token 1 din tak chalega
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+}
+
+# 👇 PURANA 'JAZZMIN_UI_TWEAKS' HATAYEIN AUR YE NAYA WALA PASTE KAREIN
+
+JAZZMIN_UI_TWEAKS = {
+    # ✅ THEME: 'Cyborg' sabse best Deep Black theme hai (Site jaisa)
+    "theme": "cyborg", 
+    
+    # ✅ Colors Customization (UrbanShift Branding)
+    "navbar": "navbar-dark",          # Top Bar Black
+    "brand_colour": "navbar-dark",    # Logo Background Black
+    "sidebar": "sidebar-dark-warning", # Sidebar Black + Orange Active Links
+    "accent": "accent-warning",       # Highlights Orange honge
+    
+    # ✅ Text & Layout
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "no_navbar_border": True,         # Border hata diya clean look ke liye
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar_nav_small_text": False,
+    
+    # ✅ Buttons Styling (Site se match karne ke liye)
+    "button_classes": {
+        "primary": "btn-primary",    # Blue (Default action)
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",    # Orange (Important action)
+        "danger": "btn-danger",      # Red (Delete)
+        "success": "btn-success"     # Green (Save)
+    }
 }

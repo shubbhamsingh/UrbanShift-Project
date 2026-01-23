@@ -1,30 +1,69 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { FaHeart, FaRegHeart, FaTimes, FaPhone, FaEnvelope, FaUser } from 'react-icons/fa'; 
+import { toast } from 'react-toastify';
 import './propertyDetail.css';
 
 const PropertyDetail = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isWishlisted, setIsWishlisted] = useState(false); 
+  
+  // 🆕 Modal State
+  const [showContact, setShowContact] = useState(false);
 
   useEffect(() => {
-    const fetchProperty = async () => {
+    const fetchData = async () => {
       try {
         const res = await axios.get(`http://127.0.0.1:8000/api/properties/${id}/`);
         setProperty(res.data);
+        setLoading(false); 
+
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const wishlistRes = await axios.get('http://127.0.0.1:8000/api/properties/wishlist/', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                const found = wishlistRes.data.some(item => item.property.id === res.data.id);
+                setIsWishlisted(found);
+            } catch (wishlistErr) {
+                console.warn("Wishlist check failed");
+            }
+        }
       } catch (err) {
-        console.error("Error fetching details:", err);
+        console.error("Main Error:", err);
         setError("Property not found or connection failed.");
-      } finally {
         setLoading(false);
       }
     };
-    fetchProperty();
+    fetchData();
   }, [id]);
 
-  // 🖼️ SMART IMAGE HELPER
+  const handleWishlistToggle = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        toast.error("Please Login to save properties! 🔒");
+        navigate('/login');
+        return;
+    }
+    try {
+        const res = await axios.post(`http://127.0.0.1:8000/api/properties/${id}/toggle-wishlist/`, {}, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        setIsWishlisted(res.data.liked); 
+        if (res.data.liked) toast.success("Added to DreamHome ❤️");
+        else toast.info("Removed from DreamHome 💔");
+    } catch (err) {
+        toast.error("Something went wrong!");
+    }
+  };
+
   const getImageUrl = (imageObj) => {
     if (!imageObj) return 'https://via.placeholder.com/600';
     if (imageObj.image) {
@@ -34,8 +73,8 @@ const PropertyDetail = () => {
     return imageObj.image_url || 'https://via.placeholder.com/600';
   };
 
-  if (loading) return <div className="loading-container"><h2>⏳ Loading Property Details...</h2></div>;
-  if (error) return <div className="error-container"><h2>❌ {error}</h2><Link to="/properties" className="back-btn">← Back to Listings</Link></div>;
+  if (loading) return <div className="loading-container"><h2>⏳ Loading...</h2></div>;
+  if (error) return <div className="error-container"><h2>❌ {error}</h2><Link to="/properties" className="back-btn">← Back</Link></div>;
 
   return (
     <div className="detail-page">
@@ -44,39 +83,31 @@ const PropertyDetail = () => {
         {/* --- HEADER --- */}
         <div className="detail-header">
             <Link to="/properties" className="back-link">← Back</Link>
-            <span className={`status-badge ${property.category}`}>{property.category}</span>
+            <div style={{display:'flex', gap:'15px', alignItems:'center'}}>
+                <span className={`status-badge ${property.category}`}>{property.category}</span>
+                <button onClick={handleWishlistToggle} className="wishlist-btn" title="Add to Wishlist">
+                    {isWishlisted ? <FaHeart color="red" size={28} /> : <FaRegHeart color="#ccc" size={28} />}
+                </button>
+            </div>
         </div>
 
         <div className="content-wrapper">
-            
-            {/* --- LEFT: IMAGES --- */}
+            {/* LEFT: IMAGES */}
             <div className="image-section">
                 <img 
-                    // 👇 Main Image Fix
-                    src={property.images && property.images.length > 0 
-                        ? getImageUrl(property.images[0])
-                        : 'https://via.placeholder.com/600'} 
-                    alt={property.title} 
-                    className="main-image"
+                    src={property.images && property.images.length > 0 ? getImageUrl(property.images[0]) : 'https://via.placeholder.com/600'} 
+                    alt={property.title} className="main-image"
                 />
-                
-                {/* Thumbnails Fix */}
                 {property.images && property.images.length > 1 && (
                     <div className="thumbnails">
                         {property.images.slice(1).map((img, idx) => (
-                            <img 
-                                key={idx}
-                                // 👇 Thumbnail Fix
-                                src={getImageUrl(img)} 
-                                alt="thumb"
-                                className="thumb-img"
-                            />
+                            <img key={idx} src={getImageUrl(img)} alt="thumb" className="thumb-img" />
                         ))}
                     </div>
                 )}
             </div>
 
-            {/* --- RIGHT: INFO --- */}
+            {/* RIGHT: INFO */}
             <div className="info-section">
                 <h1 className="prop-title">{property.title}</h1>
                 <h2 className="prop-price">₹{property.price} <span className="per-month">/ month</span></h2>
@@ -95,12 +126,54 @@ const PropertyDetail = () => {
                 <div className="seller-box">
                     <h3>👤 Owner Details</h3>
                     <p><strong>Name:</strong> {property.seller_name || "Verified Owner"}</p>
-                    <button className="contact-btn">📞 Contact Owner</button>
+                    
+                    {/* 👇 Updated Button to Open Modal */}
+                    <button onClick={() => setShowContact(true)} className="contact-btn">
+                        📞 Contact Owner
+                    </button>
                 </div>
             </div>
-
         </div>
       </div>
+
+      {/* 🆕 CONTACT MODAL (POPUP) */}
+      {showContact && (
+        <div className="modal-overlay" onClick={() => setShowContact(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                <button className="close-modal" onClick={() => setShowContact(false)}>
+                    <FaTimes />
+                </button>
+                
+                <h2>Owner Contact Details</h2>
+                <div className="contact-info">
+                    <div className="contact-row">
+                        <FaUser className="icon-c" />
+                        <div>
+                            <span>Name</span>
+                            <strong>{property.seller_name}</strong>
+                        </div>
+                    </div>
+                    <div className="contact-row">
+                        <FaEnvelope className="icon-c" />
+                        <div>
+                            <span>Email</span>
+                            <a href={`mailto:${property.seller_email}`}>{property.seller_email}</a>
+                        </div>
+                    </div>
+                    <div className="contact-row">
+                        <FaPhone className="icon-c" />
+                        <div>
+                            <span>Phone</span>
+                            <a href={`tel:${property.seller_phone}`}>{property.seller_phone || "+91 XXXXX XXXXX"}</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <p className="modal-note">⚠️ Note: Please mention 'UrbanShift' when calling.</p>
+            </div>
+        </div>
+      )}
+
     </div>
   );
 };

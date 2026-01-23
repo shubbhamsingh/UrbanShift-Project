@@ -22,11 +22,25 @@ class Property(models.Model):
     def __str__(self):
         return self.title
 
-# 🖼️ Property Images Model (File ya URL dono save karega)
+# 🖼️ Property Images Model
 class PropertyImage(models.Model):
     property = models.ForeignKey(Property, related_name='images', on_delete=models.CASCADE)
-    image = models.ImageField(upload_to='property_photos/', null=True, blank=True) # File Upload ke liye
-    image_url = models.URLField(null=True, blank=True) # URL Link ke liye
+    image = models.ImageField(upload_to='property_photos/', null=True, blank=True)
+    image_url = models.URLField(null=True, blank=True)
 
     def __str__(self):
         return f"Image for {self.property.title}"
+
+# ❤️ Wishlist Model
+class Wishlist(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wishlist')
+    property = models.ForeignKey(Property, on_delete=models.CASCADE, related_name='favorited_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'property')
+        ordering = ['-created_at']
+
+    def __str__(self):
+        # ✅ Ab ye sahi jagah (indented) hai
+        return f"{self.user.username} likes {self.property.title}"

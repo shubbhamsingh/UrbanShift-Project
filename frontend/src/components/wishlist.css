@@ -1,0 +1,147 @@
+.wishlist-page {
+    min-height: 80vh;
+    padding: 40px 20px;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+}
+
+.page-title {
+    text-align: center;
+    margin-bottom: 40px;
+    color: var(--accent-teal);
+    border-bottom: 2px solid #333;
+    padding-bottom: 20px;
+    display: inline-block;
+    width: 100%;
+}
+
+/* Empty State */
+.empty-wishlist {
+    text-align: center;
+    margin-top: 50px;
+    color: #888;
+}
+
+.btn-explore {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 12px 25px;
+    background: var(--accent-orange);
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-explore:hover {
+    background: #ff5e62;
+}
+
+/* Grid Layout */
+.wishlist-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Card Design */
+.wishlist-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.3s;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.wishlist-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-img-wrapper {
+    position: relative;
+    height: 200px;
+}
+
+.card-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.category-tag {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.7);
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+}
+
+.card-content {
+    padding: 20px;
+}
+
+.card-content h3 {
+    margin: 0 0 10px;
+    font-size: 1.2rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.card-content .price {
+    color: var(--accent-teal);
+    font-weight: bold;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.card-content .location {
+    color: #aaa;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.view-btn-small {
+    flex: 1;
+    text-align: center;
+    background: var(--accent-teal);
+    color: black;
+    padding: 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.view-btn-small:hover {
+    background: #4db6ac;
+}
+
+.remove-btn {
+    background: transparent;
+    border: 1px solid #ff4444;
+    color: #ff4444;
+    padding: 8px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+.remove-btn:hover {
+    background: #ff4444;
+    color: white;
+}

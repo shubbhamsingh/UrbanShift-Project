@@ -51,3 +51,33 @@ class PropertyViewSet(viewsets.ModelViewSet):
         properties = Property.objects.filter(seller=user).order_by('-created_at')
         serializer = self.get_serializer(properties, many=True)
         return Response(serializer.data)
+    # 👇 File ke sabse neeche ye paste karein:
+from .models import Wishlist
+from .serializers import WishlistSerializer
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def toggle_wishlist(request, pk):
+    """Add or Remove property from wishlist"""
+    property_obj = get_object_or_404(Property, pk=pk)
+    
+    # Check if already in wishlist
+    wishlist_item = Wishlist.objects.filter(user=request.user, property=property_obj).first()
+
+    if wishlist_item:
+        wishlist_item.delete()
+        return Response({'message': 'Removed from Wishlist 💔', 'liked': False})
+    else:
+        Wishlist.objects.create(user=request.user, property=property_obj)
+        return Response({'message': 'Added to Wishlist ❤️', 'liked': True})
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def my_wishlist(request):
+    """Get all properties liked by logged-in user"""
+    wishlist = Wishlist.objects.filter(user=request.user)
+    serializer = WishlistSerializer(wishlist, many=True)
+    return Response(serializer.data)
