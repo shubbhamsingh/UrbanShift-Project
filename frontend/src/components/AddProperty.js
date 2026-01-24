@@ -7,6 +7,9 @@ const AddProperty = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   
+  // 👇 LIVE SERVER URL
+  const BACKEND_URL = 'https://urbanshift-project.onrender.com';
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -18,7 +21,7 @@ const AddProperty = () => {
 
   // 🖼️ Mixed State: Can contain File objects OR URL strings
   const [images, setImages] = useState([]);
-  const [tempUrl, setTempUrl] = useState(''); // URL input ke liye
+  const [tempUrl, setTempUrl] = useState(''); 
 
   // --- HANDLERS ---
   const handleChange = (e) => {
@@ -61,8 +64,8 @@ const AddProperty = () => {
         return;
     }
 
-    setImages([...images, tempUrl]); // URL ko list me jodo
-    setTempUrl(''); // Input khali karo
+    setImages([...images, tempUrl]); 
+    setTempUrl(''); 
   };
 
   const removeImage = (index) => {
@@ -95,15 +98,13 @@ const AddProperty = () => {
     // 🧠 Separate Files and URLs for Backend
     images.forEach((img) => {
         if (typeof img === 'string') {
-            data.append('image_urls', img); // Agar URL hai
+            data.append('image_urls', img); 
         } else {
-            // Backend expects 'photos' for files
             data.append('photos', img); 
         }
     });
 
     try {
-      // 👇👇👇 MAIN FIX HERE: Changed 'access_token' to 'token' 👇👇👇
       const token = localStorage.getItem('token'); 
       
       if (!token) {
@@ -112,7 +113,8 @@ const AddProperty = () => {
           return;
       }
 
-      await axios.post('http://127.0.0.1:8000/api/properties/', data, {
+      // 👇 Use BACKEND_URL here
+      await axios.post(`${BACKEND_URL}/api/properties/`, data, {
         headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'multipart/form-data'

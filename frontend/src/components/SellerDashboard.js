@@ -8,20 +8,23 @@ const SellerDashboard = () => {
   const [properties, setProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  // 👤 User State (Verification status check karne ke liye)
+  // 👇 LIVE SERVER URL
+  const BACKEND_URL = 'https://urbanshift-project.onrender.com';
+
+  // 👤 User State 
   const [user, setUser] = useState({
       username: 'Seller',
-      is_verified: false // Default false hai, taaki box dikhe agar API fail ho
+      is_verified: false 
   });
 
-  // ✅ 1. FUNCTION: Fetch User Details (Status check karne ke liye)
+  // ✅ 1. FUNCTION: Fetch User Details
   const fetchUserDetails = async () => {
     try {
-        // 👇 FIX: 'access_token' ki jagah 'token' kiya
         const token = localStorage.getItem('token'); 
         if (!token) return;
 
-        const response = await axios.get('http://127.0.0.1:8000/api/users/me/', {
+        // 👇 Use BACKEND_URL
+        const response = await axios.get(`${BACKEND_URL}/api/users/me/`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         setUser(response.data);
@@ -33,8 +36,9 @@ const SellerDashboard = () => {
   // ✅ 2. FUNCTION: Fetch Properties
   const fetchMyProperties = async () => {
     try {
-      const token = localStorage.getItem('token'); // 👇 FIX
-      const response = await axios.get('http://127.0.0.1:8000/api/properties/my-properties/', {
+      const token = localStorage.getItem('token'); 
+      // 👇 Use BACKEND_URL
+      const response = await axios.get(`${BACKEND_URL}/api/properties/my-properties/`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       setProperties(response.data);
@@ -53,15 +57,15 @@ const SellerDashboard = () => {
     formData.append('document', file);
 
     try {
-        const token = localStorage.getItem('token'); // 👇 FIX
-        await axios.post('http://127.0.0.1:8000/api/users/upload-verification/', formData, {
+        const token = localStorage.getItem('token');
+        // 👇 Use BACKEND_URL
+        await axios.post(`${BACKEND_URL}/api/users/upload-verification/`, formData, {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'multipart/form-data'
             }
         });
         toast.success("Document Uploaded! Admin will verify you shortly. 🕒");
-        // Reload user details to update UI if needed
         fetchUserDetails();
     } catch (error) {
         console.error(error);
@@ -74,8 +78,9 @@ const SellerDashboard = () => {
     if(!window.confirm("Are you sure you want to delete this property?")) return;
 
     try {
-      const token = localStorage.getItem('token'); // 👇 FIX
-      await axios.delete(`http://127.0.0.1:8000/api/properties/${id}/`, {
+      const token = localStorage.getItem('token'); 
+      // 👇 Use BACKEND_URL
+      await axios.delete(`${BACKEND_URL}/api/properties/${id}/`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -87,9 +92,23 @@ const SellerDashboard = () => {
     }
   };
 
+  // 🖼️ SMART IMAGE HELPER (Images Fixed)
+  const getImageUrl = (imageObj) => {
+    if (!imageObj) return 'https://via.placeholder.com/300';
+    
+    if (imageObj.image) {
+        // Agar full URL hai
+        if (imageObj.image.startsWith('http')) {
+            return imageObj.image;
+        }
+        // Agar relative URL hai to Live Backend URL jodo
+        return `${BACKEND_URL}${imageObj.image}`;
+    }
+    return imageObj.image_url || 'https://via.placeholder.com/300';
+  };
+
   useEffect(() => {
     const token = localStorage.getItem('token'); 
-    
     
     if (!token) {
         toast.error("Access Denied! Login as Seller.");
@@ -97,8 +116,8 @@ const SellerDashboard = () => {
         return;
     }
 
-    fetchUserDetails(); // User info laao (Yellow box logic ke liye)
-    fetchMyProperties(); // Properties laao
+    fetchUserDetails(); 
+    fetchMyProperties(); 
 
   }, [navigate]);
 
@@ -119,13 +138,12 @@ const SellerDashboard = () => {
             <p style={{ color: 'var(--text-secondary)', marginTop: '5px' }}>Manage your properties and profile.</p>
         </div>
         
-        {/* Post Button Logic: Sirf verified user hi click kar payega */}
         <Link to="/add-property" style={{...addBtnStyle, opacity: user.is_verified ? 1 : 0.5, pointerEvents: user.is_verified ? 'auto' : 'none'}}>
             ➕ Post New Property
         </Link>
       </div>
 
-      {/* --- ⚠️ YELLOW BOX: VERIFICATION WARNING (Agar Verified Nahi hai) --- */}
+      {/* --- WARNING BOX --- */}
       {!user.is_verified && (
         <div style={{ backgroundColor: '#fff3cd', padding: '20px', margin: '0 0 30px 0', borderRadius: '8px', border: '1px solid #ffeeba', color: '#856404' }}>
             <h3 style={{ margin: '0 0 10px 0' }}>⚠️ Action Required: Verify Account</h3>
@@ -158,16 +176,18 @@ const SellerDashboard = () => {
             {user.is_verified && <Link to="/add-property" style={{...addBtnStyle, background:'var(--accent-teal)', marginTop:'15px'}}>Post Now</Link>}
         </div>
       ) : (
-        // ✅ PROPERTIES GRID
+        // ✅ PROPERTIES GRID (Images Fixed)
         <div style={gridStyle}>
             {properties.map((property) => (
                 <div key={property.id} style={propertyCardStyle}>
                     <img 
+                        // 👇 Ab Helper function use kar rahe hain
                         src={property.images && property.images.length > 0 
-                                ? (property.images[0].image ? `http://127.0.0.1:8000${property.images[0].image}` : property.images[0].image_url)
-                                : 'https://via.placeholder.com/300'} 
+                            ? getImageUrl(property.images[0])
+                            : 'https://via.placeholder.com/300'} 
                         alt={property.title} 
                         style={imageStyle} 
+                        onError={(e) => { e.target.src = 'https://via.placeholder.com/300'; }}
                     />
                     <div style={{padding: '15px'}}>
                         <h4 style={{margin: '0 0 10px 0', color: 'var(--text-primary)'}}>{property.title}</h4>

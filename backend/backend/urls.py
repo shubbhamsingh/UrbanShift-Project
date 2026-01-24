@@ -8,6 +8,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),       # User App
     path('api/properties/', include('properties.urls')), # ✅ Ab ye sahi jagah point karega
+    path('api/relocation/', include('relocation.urls')),
 ]
 
 # 👇 Image Uploads ke liye ye zaroori hai

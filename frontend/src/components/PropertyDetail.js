@@ -14,20 +14,24 @@ const PropertyDetail = () => {
   const [error, setError] = useState(null);
   const [isWishlisted, setIsWishlisted] = useState(false); 
   
-  // 🆕 Modal State
   const [showContact, setShowContact] = useState(false);
+
+  // 👇 LIVE SERVER URL
+  const BACKEND_URL = 'https://urbanshift-project.onrender.com';
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`http://127.0.0.1:8000/api/properties/${id}/`);
+        // 👇 Use BACKEND_URL
+        const res = await axios.get(`${BACKEND_URL}/api/properties/${id}/`);
         setProperty(res.data);
         setLoading(false); 
 
         const token = localStorage.getItem('token');
         if (token) {
             try {
-                const wishlistRes = await axios.get('http://127.0.0.1:8000/api/properties/wishlist/', {
+                // 👇 Use BACKEND_URL
+                const wishlistRes = await axios.get(`${BACKEND_URL}/api/properties/wishlist/`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 const found = wishlistRes.data.some(item => item.property.id === res.data.id);
@@ -53,7 +57,8 @@ const PropertyDetail = () => {
         return;
     }
     try {
-        const res = await axios.post(`http://127.0.0.1:8000/api/properties/${id}/toggle-wishlist/`, {}, {
+        // 👇 Use BACKEND_URL
+        const res = await axios.post(`${BACKEND_URL}/api/properties/${id}/toggle-wishlist/`, {}, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setIsWishlisted(res.data.liked); 
@@ -68,7 +73,8 @@ const PropertyDetail = () => {
     if (!imageObj) return 'https://via.placeholder.com/600';
     if (imageObj.image) {
         if (imageObj.image.startsWith('http')) return imageObj.image;
-        return `http://127.0.0.1:8000${imageObj.image}`;
+        // 👇 Use BACKEND_URL for relative paths
+        return `${BACKEND_URL}${imageObj.image}`;
     }
     return imageObj.image_url || 'https://via.placeholder.com/600';
   };
@@ -127,7 +133,6 @@ const PropertyDetail = () => {
                     <h3>👤 Owner Details</h3>
                     <p><strong>Name:</strong> {property.seller_name || "Verified Owner"}</p>
                     
-                    {/* 👇 Updated Button to Open Modal */}
                     <button onClick={() => setShowContact(true)} className="contact-btn">
                         📞 Contact Owner
                     </button>

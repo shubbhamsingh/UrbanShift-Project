@@ -1,8 +1,15 @@
 from rest_framework import serializers
-from .models import RelocationRequest
+from .models import MoveRequest
 
-class RelocationRequestSerializer(serializers.ModelSerializer):
+class MoveRequestSerializer(serializers.ModelSerializer):
+    # Frontend par customer ka naam dikhane ke liye
+    customer_name = serializers.CharField(source='customer.username', read_only=True)
+    
+    # Agar future me User model me phone number ho, to ise uncomment kar sakte hain
+    # customer_phone = serializers.CharField(source='customer.phone_number', read_only=True)
+
     class Meta:
-        model = RelocationRequest
-        # Ye saari fields hum frontend (React) se bhejenge
-        fields = ['id', 'from_location', 'to_location', 'move_date', 'inventory_items', 'estimated_cost', 'status']
+        model = MoveRequest
+        fields = '__all__'
+        # Ye fields frontend se edit nahi honi chahiye
+        read_only_fields = ('customer', 'status', 'company', 'created_at')

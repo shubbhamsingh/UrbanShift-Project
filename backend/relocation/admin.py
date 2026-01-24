@@ -1,6 +1,8 @@
 from django.contrib import admin
-from .models import RelocationRequest
+from .models import MoveRequest
 
-@admin.register(RelocationRequest)
-class RelocationAdmin(admin.ModelAdmin): # <-- Yahan bhi sudhar diya
-    list_display = ('customer', 'from_location', 'to_location', 'status')
+@admin.register(MoveRequest)
+class MoveRequestAdmin(admin.ModelAdmin):
+    list_display = ('id', 'customer', 'source', 'destination', 'move_date', 'status')
+    list_filter = ('status', 'move_date')
+    search_fields = ('source', 'destination', 'customer__username')
