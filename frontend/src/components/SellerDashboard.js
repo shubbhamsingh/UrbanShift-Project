@@ -88,8 +88,8 @@ const SellerDashboard = () => {
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('token'); // 👇 FIX
-    const userType = localStorage.getItem('userType'); // Optional check
+    const token = localStorage.getItem('token'); 
+    
     
     if (!token) {
         toast.error("Access Denied! Login as Seller.");
