@@ -24,28 +24,23 @@ const Home = () => {
   }, []);
 
   // 🖼️ SMART IMAGE HELPER FUNCTION
-  // Ye check karega ki URL me http pehle se hai ya nahi
   const getImageUrl = (imageObj) => {
     if (!imageObj) return 'https://via.placeholder.com/300';
-
     if (imageObj.image) {
-        // Agar backend full URL bhej raha hai (http se shuru ho raha hai)
         if (imageObj.image.startsWith('http')) {
             return imageObj.image;
         }
-        // Agar relative path hai (/media/...)
         return `http://127.0.0.1:8000${imageObj.image}`;
     }
-    // Agar direct URL string hai
     return imageObj.image_url || 'https://via.placeholder.com/300';
   };
 
   return (
-    <div className="home-container">
-      {/* --- HERO SECTION --- */}
+    <div className="home-container" style={{ backgroundColor: 'var(--bg-primary)', minHeight: '100vh' }}>
+      
+      {/* --- HERO SECTION (Iska background image/dark hi rahega usually) --- */}
       <div className="hero-section">
         <div className="overlay"></div>
-        
         <div className="hero-content">
           <h1 className="hero-title">
             Move to your <span className="highlight">Dream Home</span> <br/> without the Stress.
@@ -66,30 +61,31 @@ const Home = () => {
       </div>
 
       {/* --- 🔥 LATEST PROPERTIES SECTION --- */}
-      <div className="latest-properties-section">
-        <h2 className="section-title">Latest <span className="highlight-text">Listings</span></h2>
+      {/* 👇 FIXED: Background color ab Theme ke hisab se change hoga */}
+      <div className="latest-properties-section" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', padding: '50px 0' }}>
+        <h2 className="section-title" style={{ color: 'var(--text-primary)' }}>Latest <span className="highlight-text">Listings</span></h2>
         
         {isLoading ? (
-            <p style={{textAlign:'center', color:'white'}}>Loading amazing homes...</p>
+            // 👇 FIXED: Color 'white' hata diya, ab theme color lega
+            <p style={{textAlign:'center', color:'var(--text-primary)'}}>Loading amazing homes...</p>
         ) : recentProperties.length === 0 ? (
-            <p style={{textAlign:'center', color:'#ccc'}}>No properties listed yet. Be the first!</p>
+            <p style={{textAlign:'center', color:'var(--text-secondary)'}}>No properties listed yet. Be the first!</p>
         ) : (
             <div className="property-grid-home">
                 {recentProperties.map((prop) => (
-                    <div key={prop.id} className="card-3d property-card-home">
+                    <div key={prop.id} className="card-3d property-card-home" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
                         <img 
-                            // 👇 Yahan humne Smart Function use kiya hai
                             src={prop.images && prop.images.length > 0 
                                 ? getImageUrl(prop.images[0])
                                 : 'https://via.placeholder.com/300'} 
                             alt={prop.title} 
                             className="prop-img-home"
-                            onError={(e) => { e.target.src = 'https://via.placeholder.com/300'; }} // Fallback
+                            onError={(e) => { e.target.src = 'https://via.placeholder.com/300'; }} 
                         />
                         <div className="prop-info-home">
-                            <h3>{prop.title}</h3>
-                            <p className="price">₹{prop.price}/mo</p>
-                            <p className="loc">📍 {prop.location}</p>
+                            <h3 style={{ color: 'var(--text-primary)' }}>{prop.title}</h3>
+                            <p className="price" style={{ color: '#ff5722' }}>₹{prop.price}/mo</p>
+                            <p className="loc" style={{ color: 'var(--text-secondary)' }}>📍 {prop.location}</p>
                             <Link to={`/property/${prop.id}`} className="view-btn">View Details</Link>
                         </div>
                     </div>
@@ -98,31 +94,32 @@ const Home = () => {
         )}
         
         <div style={{textAlign: 'center', marginTop: '30px'}}>
-            <Link to="/properties" className="btn-text">View All Properties →</Link>
+            <Link to="/properties" className="btn-text" style={{ color: '#ff5722' }}>View All Properties →</Link>
         </div>
       </div>
 
       {/* --- FEATURES SECTION --- */}
-      <div className="features-section">
-        <h2 className="section-title">Why Choose Urban<span className="highlight-text">Shift</span>?</h2>
+      {/* 👇 FIXED: Background aur Text color dynamic kar diye */}
+      <div className="features-section" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', paddingBottom: '50px' }}>
+        <h2 className="section-title" style={{ color: 'var(--text-primary)' }}>Why Choose Urban<span className="highlight-text">Shift</span>?</h2>
         
         <div className="cards-container">
-          <div className="card-3d feature-card">
+          <div className="card-3d feature-card" style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}>
             <div className="icon">🏡</div>
-            <h3 className="card-title">Verified Listings</h3>
-            <p className="card-text">Direct connections with verified property owners. No fake listings, no hidden brokers.</p>
+            <h3 className="card-title" style={{ color: 'var(--text-primary)' }}>Verified Listings</h3>
+            <p className="card-text" style={{ color: 'var(--text-secondary)' }}>Direct connections with verified property owners. No fake listings, no hidden brokers.</p>
           </div>
 
-          <div className="card-3d feature-card">
+          <div className="card-3d feature-card" style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}>
             <div className="icon">📦</div>
-            <h3 className="card-title">Safe Relocation</h3>
-            <p className="card-text">Top-rated Packers & Movers ensuring your belongings reach safely and on time.</p>
+            <h3 className="card-title" style={{ color: 'var(--text-primary)' }}>Safe Relocation</h3>
+            <p className="card-text" style={{ color: 'var(--text-secondary)' }}>Top-rated Packers & Movers ensuring your belongings reach safely and on time.</p>
           </div>
 
-          <div className="card-3d feature-card">
+          <div className="card-3d feature-card" style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}>
             <div className="icon">🛡️</div>
-            <h3 className="card-title">Secure & Trusted</h3>
-            <p className="card-text">We prioritize your safety with background checks and secure payment options.</p>
+            <h3 className="card-title" style={{ color: 'var(--text-primary)' }}>Secure & Trusted</h3>
+            <p className="card-text" style={{ color: 'var(--text-secondary)' }}>We prioritize your safety with background checks and secure payment options.</p>
           </div>
         </div>
       </div>
