@@ -149,3 +149,16 @@ html, body, .content-wrapper, .main-footer, .main-header {
 .main-header .nav-link, .navbar-nav .nav-link {
     color: #ffffff !important;
 }
+
+/* Admin Login Page Logo Fix */
+.login-logo img {
+    max-width: 250px !important; /* Logo ki choudayi kam karega */
+    height: auto !important;
+    margin-bottom: 20px;
+}
+
+/* Sidebar Logo Fix (Andar wale page ke liye) */
+.brand-link .brand-image {
+    max-width: 40px !important;
+    opacity: 1 !important;
+}
