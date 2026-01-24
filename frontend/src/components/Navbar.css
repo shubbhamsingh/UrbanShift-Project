@@ -1,0 +1,178 @@
+/* --- NAVBAR CONTAINER --- */
+.navbar-container {
+    padding: 12px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    background-color: var(--navbar-bg);
+    box-shadow: var(--navbar-shadow);
+}
+
+/* --- BRAND / LOGO --- */
+.nav-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    z-index: 1002;
+}
+
+.brand-logo {
+    height: 45px;
+    width: auto;
+}
+
+.brand-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--text-primary);
+}
+
+/* --- MENU --- */
+.nav-menu {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 15px;
+    transition: 0.3s;
+}
+
+.nav-link:hover {
+    color: var(--accent-orange);
+}
+
+/* --- THEME BUTTON STYLES --- */
+.theme-btn {
+    background: var(--bg-color);
+    color: var(--text-primary);
+    border: 1px solid var(--text-secondary);
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 6px 10px;
+    border-radius: 20px;
+    transition: all 0.3s;
+}
+
+/* Default Visibility (Desktop) */
+.mobile-theme-btn {
+    display: none; /* Desktop par Mobile button chupao */
+}
+.desktop-theme-btn {
+    display: block; /* Desktop par Desktop button dikhao */
+}
+
+/* --- MOBILE ACTIONS WRAPPER (Hamburger + Mobile Theme Btn) --- */
+.mobile-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Button aur Hamburger ke beech gap */
+    z-index: 1002;
+}
+
+/* --- BUTTONS --- */
+.btn-logout {
+    padding: 6px 14px;
+    background: transparent;
+    color: #dc3545;
+    border: 1px solid #dc3545;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.btn-3d-orange {
+    background: linear-gradient(145deg, #ff6b35, #e05a2b);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    transition: transform 0.1s;
+}
+
+.btn-3d-orange:active {
+    transform: translateY(2px);
+}
+
+/* --- HAMBURGER ICON --- */
+.hamburger {
+    display: none; /* Desktop par hidden */
+    flex-direction: column;
+    cursor: pointer;
+    gap: 5px;
+}
+
+.bar {
+    width: 25px;
+    height: 3px;
+    background-color: var(--text-primary);
+    transition: 0.3s;
+    border-radius: 2px;
+}
+
+/* --- MOBILE RESPONSIVENESS --- */
+@media screen and (max-width: 768px) {
+    .navbar-container {
+        padding: 12px 20px;
+    }
+
+    /* Mobile par buttons ko swap karo */
+    .mobile-theme-btn {
+        display: block;
+    }
+    .desktop-theme-btn {
+        display: none; /* Menu ke andar wala button chupao */
+    }
+
+    .hamburger {
+        display: flex;
+    }
+
+    .nav-menu {
+        position: fixed;
+        top: 0;
+        right: -100%;
+        height: 100vh;
+        width: 70%;
+        background-color: var(--navbar-bg);
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+        transition: right 0.3s ease-in-out;
+        z-index: 1001;
+    }
+
+    .nav-menu.active {
+        right: 0;
+    }
+
+    .nav-link {
+        font-size: 1.2rem;
+        margin: 10px 0;
+    }
+    
+    /* Hamburger Animation */
+    .hamburger.open .bar:nth-child(1) {
+        transform: rotate(45deg) translate(5px, 6px);
+    }
+    .hamburger.open .bar:nth-child(2) {
+        opacity: 0;
+    }
+    .hamburger.open .bar:nth-child(3) {
+        transform: rotate(-45deg) translate(5px, -6px);
+    }
+}

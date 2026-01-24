@@ -1,19 +1,20 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import logo from '../logo.png';
 import { ThemeContext } from '../context/ThemeContext';
+import './Navbar.css';
 
 const Navbar = () => {
   const navigate = useNavigate();
   const { mode, cycleTheme } = useContext(ThemeContext);
-  
-  // ✅ FIX 1: Data wahan se nikalo jahan Login.js ne save kiya tha
+  const [isOpen, setIsOpen] = useState(false);
+
+  // Auth Data
   const token = localStorage.getItem('token');
   const username = localStorage.getItem('username');
-  const userType = localStorage.getItem('userType'); // 'BUYER', 'SELLER', 'COMPANY'
+  const userType = localStorage.getItem('userType'); 
 
   const handleLogout = () => {
-    // ✅ FIX 2: Sab kuch clear karo
     localStorage.clear();
     navigate('/login');
     window.location.reload(); 
@@ -25,110 +26,98 @@ const Navbar = () => {
     return '🖥️';
   };
 
+  const closeMenu = () => setIsOpen(false);
+
   return (
-    <nav style={{...navContainerStyle, backgroundColor: 'var(--navbar-bg)', boxShadow: 'var(--navbar-shadow)'}}>
+    <nav className="navbar-container">
       
       {/* BRANDING */}
-      <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none' }}>
-        <img src={logo} alt="Logo" style={{ height: '45px', width: 'auto' }} />
+      <Link to="/" className="nav-brand" onClick={closeMenu}>
+        <img src={logo} alt="Logo" className="brand-logo" />
         <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <h1 style={{...brandTitleStyle, color: 'var(--text-primary)'}}>
+            <h1 className="brand-title">
                 Urban<span style={{ color: 'var(--accent-orange)' }}>Shift</span>
             </h1>
         </div>
       </Link>
 
-      {/* LINKS + THEME TOGGLE */}
-      <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+      {/* --- 📱 MOBILE RIGHT SIDE (Theme Btn + Hamburger) --- */}
+      <div className="mobile-actions">
+        {/* Mobile Theme Button (Only visible on mobile) */}
+        <button 
+            onClick={cycleTheme} 
+            className="theme-btn mobile-theme-btn"
+            title={`Current Mode: ${mode.toUpperCase()}`}
+        >
+            {getThemeIcon()}
+        </button>
+
+        {/* Hamburger Icon */}
+        <div className={`hamburger ${isOpen ? 'open' : ''}`} onClick={() => setIsOpen(!isOpen)}>
+            <span className="bar"></span>
+            <span className="bar"></span>
+            <span className="bar"></span>
+        </div>
+      </div>
+
+      {/* --- LINKS MENU --- */}
+      <div className={`nav-menu ${isOpen ? 'active' : ''}`}>
         
-        {/* THEME BUTTON */}
+        {/* Desktop Theme Button (Hidden on Mobile) */}
         <button 
           onClick={cycleTheme} 
-          style={themeBtnStyle} 
+          className="theme-btn desktop-theme-btn"
           title={`Current Mode: ${mode.toUpperCase()}`}
         >
             {getThemeIcon()}
         </button>
 
-        <Link to="/" style={linkStyle}>Home</Link>
+        <Link to="/" className="nav-link" onClick={closeMenu}>Home</Link>
 
-        {/* --- ✅ USER LINKS (Changed 'USER' to 'BUYER' to match Register.js) --- */}
+        {/* --- BUYER LINKS --- */}
         {userType === 'BUYER' && (
             <>
-                <Link to="/properties" style={linkStyle}>Find Homes</Link>
-                
-                {/* ✨ NEW DREAM HOME LINK ✨ */}
-                <Link to="/wishlist" style={{...linkStyle, color: 'var(--accent-orange)'}}>
+                <Link to="/properties" className="nav-link" onClick={closeMenu}>Find Homes</Link>
+                <Link to="/wishlist" className="nav-link" onClick={closeMenu} style={{color: 'var(--accent-orange)'}}>
                     DreamHome🏠
                 </Link>
-
-                <Link to="/packers" style={linkStyle}>Movers</Link>
+                <Link to="/packers" className="nav-link" onClick={closeMenu}>Movers</Link>
             </>
         )}
 
         {/* --- SELLER LINKS --- */}
         {userType === 'SELLER' && (
             <>
-                <Link to="/seller-dashboard" style={linkStyle}>Dashboard</Link>
-                <Link to="/add-property" className="btn-3d-orange" style={{textDecoration:'none', padding:'8px 15px', color:'white'}}>Post Property</Link>
+                <Link to="/seller-dashboard" className="nav-link" onClick={closeMenu}>Dashboard</Link>
+                <Link to="/add-property" className="btn-3d-orange" onClick={closeMenu}>Post Property</Link>
             </>
         )}
 
         {/* --- COMPANY LINKS --- */}
         {userType === 'COMPANY' && (
             <>
-                 <Link to="/company-dashboard" style={linkStyle}>Dashboard</Link>
-                 <Link to="/company-requests" style={linkStyle}>Requests</Link>
+                 <Link to="/company-dashboard" className="nav-link" onClick={closeMenu}>Dashboard</Link>
+                 <Link to="/company-requests" className="nav-link" onClick={closeMenu}>Requests</Link>
             </>
         )}
 
-        {userType === 'ADMIN' && <Link to="/admin-dashboard" style={linkStyle}>Admin</Link>}
+        {userType === 'ADMIN' && <Link to="/admin-dashboard" className="nav-link" onClick={closeMenu}>Admin</Link>}
 
         {/* AUTH BUTTONS */}
         {token ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: 'inherit' }}>
             <span style={{ fontWeight: '600', color: 'var(--accent-teal)', fontSize: '14px' }}>Hi, {username}</span>
-            <button onClick={handleLogout} style={logoutBtnStyle}>Logout</button>
+            <button onClick={handleLogout} className="btn-logout">Logout</button>
           </div>
         ) : (
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
-            <Link to="/login" style={linkStyle}>Login</Link>
-            <Link to="/register" className="btn-3d-orange" style={{textDecoration:'none', padding:'8px 15px', color:'white'}}>Register</Link>
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexDirection: 'inherit' }}>
+            <Link to="/login" className="nav-link" onClick={closeMenu}>Login</Link>
+            <Link to="/register" className="btn-3d-orange" onClick={closeMenu}>Register</Link>
           </div>
         )}
       </div>
     </nav>
   );
-};
-
-// --- STYLES ---
-const navContainerStyle = {
-    padding: '12px 40px',
-    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-    position: 'sticky', top: 0, zIndex: 1000,
-    transition: 'background-color 0.3s'
-};
-
-const brandTitleStyle = { margin: 0, fontSize: '24px', fontWeight: '800', lineHeight: '1' };
-
-const linkStyle = {
-    textDecoration: 'none', color: 'var(--text-primary)', fontWeight: '600', fontSize: '15px', transition: '0.3s'
-};
-
-const themeBtnStyle = {
-    background: 'var(--bg-color)', 
-    color: 'var(--text-primary)',
-    border: '1px solid var(--text-secondary)', 
-    cursor: 'pointer', 
-    fontSize: '1.2rem', 
-    padding: '6px 10px',
-    borderRadius: '20px',
-    transition: 'all 0.3s'
-};
-
-const logoutBtnStyle = {
-    padding: '6px 14px', background: 'transparent', color: '#dc3545',
-    border: '1px solid #dc3545', borderRadius: '6px', cursor: 'pointer', fontWeight: '600'
 };
 
 export default Navbar;

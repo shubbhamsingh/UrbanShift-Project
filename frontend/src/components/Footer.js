@@ -33,8 +33,8 @@ const Footer = () => {
             <h3>Contact Us</h3>
             <ul className="footer-contact">
                 <li>📍 Sitapura, Jaipur, Rajasthan</li>
-                <li>📧 shubham@urbanshift.com</li>
-                <li>📞 +91 98765 43210</li>
+                <li>📧 shubhamsingh161203@gmail.com</li>
+                <li>📞 +91 84098 58830</li>
             </ul>
             
             {/* ✅ YOUR REAL SOCIAL LINKS ADDED HERE */}
