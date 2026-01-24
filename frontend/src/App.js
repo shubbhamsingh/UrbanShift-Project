@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
+import { Analytics } from '@vercel/analytics/react'; // ✅ Import Ready
 
 // 👇 Toastify Imports
 import { ToastContainer } from 'react-toastify';
@@ -20,8 +21,8 @@ import PropertyDetail from './components/PropertyDetail';
 // Other Components
 import SellerDashboard from './components/SellerDashboard'; 
 import PackersMovers from './components/PackersMovers'; 
-import Footer from './components/Footer'; // ✅ Footer Import
-import Wishlist from './components/Wishlist'; // ✅ Import Wishlist
+import Footer from './components/Footer'; 
+import Wishlist from './components/Wishlist'; 
 
 function App() {
   return (
@@ -61,13 +62,18 @@ function App() {
               {/* --- SELLER DASHBOARD --- */}
               <Route path="/seller-dashboard" element={<SellerDashboard />} />
 
+              {/* ✅ Wishlist (Duplicate removed) */}
               <Route path="/wishlist" element={<Wishlist />} />
-              <Route path="/wishlist" element={<div style={placeholderStyle}><h2>Your DreamHome🏠 Collection (Coming Soon)</h2></div>} />
+              
+              {/* Placeholders */}
               <Route path="/company-dashboard" element={<div style={placeholderStyle}><h2>Company Dashboard</h2></div>} />
               <Route path="/admin-dashboard" element={<div style={placeholderStyle}><h2>Admin Dashboard</h2></div>} />
             </Routes>
 
-            {/* ✅ FOOTER Added Here (Inside Router, Outside Routes) */}
+            {/* ✅ Analytics Added Here */}
+            <Analytics />
+
+            {/* ✅ FOOTER Added Here */}
             <Footer />
         </div>
       </Router>
