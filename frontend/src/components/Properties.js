@@ -13,11 +13,15 @@ const Properties = () => {
   const [category, setCategory] = useState('ALL');
   const [maxPrice, setMaxPrice] = useState(50000); 
 
+  // 👇 LIVE BACKEND URL (Change Localhost to Render)
+  const BACKEND_URL = 'https://urbanshift-project.onrender.com';
+
   // ✅ 1. Fetch Data
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get('http://127.0.0.1:8000/api/properties/');
+        // 👇 Localhost removed, using Live URL
+        const res = await axios.get(`${BACKEND_URL}/api/properties/`);
         setProperties(res.data);
         setFilteredProps(res.data); 
       } catch (err) {
@@ -49,7 +53,7 @@ const Properties = () => {
     setFilteredProps(temp);
   }, [searchTerm, category, maxPrice, properties]);
 
-  // 🖼️ SMART IMAGE HELPER (Ye missing tha!)
+  // 🖼️ SMART IMAGE HELPER
   const getImageUrl = (imageObj) => {
     if (!imageObj) return 'https://via.placeholder.com/300';
     
@@ -58,8 +62,8 @@ const Properties = () => {
         if (imageObj.image.startsWith('http')) {
             return imageObj.image;
         }
-        // Agar relative path hai (/media/...)
-        return `http://127.0.0.1:8000${imageObj.image}`;
+        // 👇 Relative path ke sath Live URL joda
+        return `${BACKEND_URL}${imageObj.image}`;
     }
     return imageObj.image_url || 'https://via.placeholder.com/300';
   };
@@ -102,7 +106,7 @@ const Properties = () => {
         </h2>
 
         {loading ? (
-            <p>Loading...</p>
+            <p style={{color: 'var(--text-primary)'}}>Loading properties...</p>
         ) : filteredProps.length === 0 ? (
             <div className="no-results">
                 <h3>😕 No properties found.</h3>
@@ -115,7 +119,6 @@ const Properties = () => {
                         <div className="img-wrapper">
                             <span className={`badge ${prop.category}`}>{prop.category}</span>
                             <img 
-                                // 👇 Corrected Image Source
                                 src={prop.images && prop.images.length > 0 
                                     ? getImageUrl(prop.images[0])
                                     : 'https://via.placeholder.com/300'} 
@@ -127,7 +130,7 @@ const Properties = () => {
                             <h3>{prop.title}</h3>
                             <p className="price">₹{prop.price}</p>
                             <p className="detail">📍 {prop.location}</p>
-                            <p className="detail">🛏 {prop.bedrooms}</p>
+                            <p className="detail">🛏 {prop.bedrooms} BHK</p>
                             
                             <Link to={`/property/${prop.id}`}>
                                 <button className="view-btn-full">View Details</button>

@@ -7,12 +7,14 @@ const Home = () => {
   const [recentProperties, setRecentProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  // ✅ Backend se Properties lana
+  // 👇 YAHAN HAI MAIN CHANGE (Live Backend URL)
+  const BACKEND_URL = 'https://urbanshift-project.onrender.com';
+
   useEffect(() => {
     const fetchProperties = async () => {
       try {
-        const res = await axios.get('http://127.0.0.1:8000/api/properties/');
-        // Sirf latest 3 properties dikhayenge
+        // 👇 Localhost hata kar Live URL lagaya
+        const res = await axios.get(`${BACKEND_URL}/api/properties/`);
         setRecentProperties(res.data.slice(0, 3));
       } catch (err) {
         console.error("Error fetching properties", err);
@@ -30,7 +32,8 @@ const Home = () => {
         if (imageObj.image.startsWith('http')) {
             return imageObj.image;
         }
-        return `http://127.0.0.1:8000${imageObj.image}`;
+        // 👇 Yahan bhi Live URL use karein
+        return `${BACKEND_URL}${imageObj.image}`;
     }
     return imageObj.image_url || 'https://via.placeholder.com/300';
   };
@@ -38,7 +41,7 @@ const Home = () => {
   return (
     <div className="home-container" style={{ backgroundColor: 'var(--bg-primary)', minHeight: '100vh' }}>
       
-      {/* --- HERO SECTION (Iska background image/dark hi rahega usually) --- */}
+      {/* HERO SECTION */}
       <div className="hero-section">
         <div className="overlay"></div>
         <div className="hero-content">
@@ -48,25 +51,18 @@ const Home = () => {
           <p className="hero-subtitle">
             India's first platform connecting you to verified Rental Homes <br/> and trusted Packers & Movers in one place.
           </p>
-          
           <div className="button-group">
-            <Link to="/properties" className="btn-3d-orange main-btn">
-                🏠 Find a Home
-            </Link>
-            <Link to="/packers" className="btn-3d-orange main-btn secondary-btn">
-                🚚 Book Movers
-            </Link>
+            <Link to="/properties" className="btn-3d-orange main-btn">🏠 Find a Home</Link>
+            <Link to="/packers" className="btn-3d-orange main-btn secondary-btn">🚚 Book Movers</Link>
           </div>
         </div>
       </div>
 
-      {/* --- 🔥 LATEST PROPERTIES SECTION --- */}
-      {/* 👇 FIXED: Background color ab Theme ke hisab se change hoga */}
+      {/* LATEST PROPERTIES SECTION */}
       <div className="latest-properties-section" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', padding: '50px 0' }}>
         <h2 className="section-title" style={{ color: 'var(--text-primary)' }}>Latest <span className="highlight-text">Listings</span></h2>
         
         {isLoading ? (
-            // 👇 FIXED: Color 'white' hata diya, ab theme color lega
             <p style={{textAlign:'center', color:'var(--text-primary)'}}>Loading amazing homes...</p>
         ) : recentProperties.length === 0 ? (
             <p style={{textAlign:'center', color:'var(--text-secondary)'}}>No properties listed yet. Be the first!</p>
@@ -75,9 +71,7 @@ const Home = () => {
                 {recentProperties.map((prop) => (
                     <div key={prop.id} className="card-3d property-card-home" style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}>
                         <img 
-                            src={prop.images && prop.images.length > 0 
-                                ? getImageUrl(prop.images[0])
-                                : 'https://via.placeholder.com/300'} 
+                            src={prop.images && prop.images.length > 0 ? getImageUrl(prop.images[0]) : 'https://via.placeholder.com/300'} 
                             alt={prop.title} 
                             className="prop-img-home"
                             onError={(e) => { e.target.src = 'https://via.placeholder.com/300'; }} 
@@ -98,24 +92,20 @@ const Home = () => {
         </div>
       </div>
 
-      {/* --- FEATURES SECTION --- */}
-      {/* 👇 FIXED: Background aur Text color dynamic kar diye */}
+      {/* FEATURES SECTION */}
       <div className="features-section" style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--text-primary)', paddingBottom: '50px' }}>
         <h2 className="section-title" style={{ color: 'var(--text-primary)' }}>Why Choose Urban<span className="highlight-text">Shift</span>?</h2>
-        
         <div className="cards-container">
           <div className="card-3d feature-card" style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}>
             <div className="icon">🏡</div>
             <h3 className="card-title" style={{ color: 'var(--text-primary)' }}>Verified Listings</h3>
             <p className="card-text" style={{ color: 'var(--text-secondary)' }}>Direct connections with verified property owners. No fake listings, no hidden brokers.</p>
           </div>
-
           <div className="card-3d feature-card" style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}>
             <div className="icon">📦</div>
             <h3 className="card-title" style={{ color: 'var(--text-primary)' }}>Safe Relocation</h3>
             <p className="card-text" style={{ color: 'var(--text-secondary)' }}>Top-rated Packers & Movers ensuring your belongings reach safely and on time.</p>
           </div>
-
           <div className="card-3d feature-card" style={{ backgroundColor: 'var(--bg-secondary)', border: '1px solid var(--border-color)' }}>
             <div className="icon">🛡️</div>
             <h3 className="card-title" style={{ color: 'var(--text-primary)' }}>Secure & Trusted</h3>
