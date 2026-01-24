@@ -15,7 +15,7 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
-    'jazzmin',
+    'jazzmin',  # ✅ Jazzmin MUST be at the top
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -34,7 +34,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',  # ✅ CORS Sabse upar
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -87,29 +87,32 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# --- STATIC FILES CONFIGURATION ---
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Media Files (Images Upload)
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
+
+# Media Files
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# ✅ Custom User Model
+# Custom User Model
 AUTH_USER_MODEL = 'users.User'
 
-# ✅ CORS Configuration
+# CORS Configuration
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 
-# 👇 ✅ REST FRAMEWORK CONFIGURATION (Ye Missing Tha!)
-# Iske bina server ko pata nahi chalta ki Token kaise check karna hai
+# REST FRAMEWORK CONFIGURATION
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -119,43 +122,53 @@ REST_FRAMEWORK = {
     ],
 }
 
-# ✅ JWT SETTINGS
+# JWT SETTINGS
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(days=1), # Token 1 din tak chalega
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
 
-# 👇 PURANA 'JAZZMIN_UI_TWEAKS' HATAYEIN AUR YE NAYA WALA PASTE KAREIN
+# ==========================================
+# 🎨 JAZZMIN SETTINGS (SINGLE & MERGED)
+# ==========================================
+
+JAZZMIN_SETTINGS = {
+    # 1. Branding
+    "site_title": "UrbanShift Admin",
+    "site_header": "UrbanShift",
+    "site_brand": "UrbanShift",
+    "welcome_sign": "Welcome to UrbanShift HQ",
+    "copyright": "UrbanShift Ltd",
+    
+    # 2. Logo Settings (Admin Panel)
+    "site_logo": "img/logo.png",
+    "site_logo_classes": "img-fluid", 
+
+    # 3. Custom CSS (3D Theme)
+    "custom_css": "css/admin_custom.css",
+    "custom_js": "js/admin_custom.js",
+
+    # 4. Theme Switcher (UI Builder)
+    "show_ui_builder": True,  # ✅ Ye apko Theme change karne ka option dega
+
+    # 5. Top Menu
+    "topmenu_links": [
+        {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
+        {"name": "View Site", "url": "http://localhost:3000", "new_window": True},
+    ],
+
+    # 6. Side Menu Icons
+    "order_with_respect_to": ["properties", "users", "auth"],
+    "icons": {
+        "auth": "fas fa-users-cog",
+        "auth.user": "fas fa-user",
+        "auth.Group": "fas fa-users",
+        "properties.Property": "fas fa-home", 
+        "properties.Wishlist": "fas fa-heart",
+    },
+}
 
 JAZZMIN_UI_TWEAKS = {
-    # ✅ THEME: 'Cyborg' sabse best Deep Black theme hai (Site jaisa)
-    "theme": "cyborg", 
-    
-    # ✅ Colors Customization (UrbanShift Branding)
-    "navbar": "navbar-dark",          # Top Bar Black
-    "brand_colour": "navbar-dark",    # Logo Background Black
-    "sidebar": "sidebar-dark-warning", # Sidebar Black + Orange Active Links
-    "accent": "accent-warning",       # Highlights Orange honge
-    
-    # ✅ Text & Layout
-    "navbar_small_text": False,
-    "footer_small_text": False,
-    "body_small_text": False,
-    "brand_small_text": False,
-    "no_navbar_border": True,         # Border hata diya clean look ke liye
-    "navbar_fixed": False,
-    "layout_boxed": False,
-    "footer_fixed": False,
-    "sidebar_fixed": False,
-    "sidebar_nav_small_text": False,
-    
-    # ✅ Buttons Styling (Site se match karne ke liye)
-    "button_classes": {
-        "primary": "btn-primary",    # Blue (Default action)
-        "secondary": "btn-secondary",
-        "info": "btn-info",
-        "warning": "btn-warning",    # Orange (Important action)
-        "danger": "btn-danger",      # Red (Delete)
-        "success": "btn-success"     # Green (Save)
-    }
+    "theme": "default", # Custom CSS ko control lene do
+    "dark_mode_theme": "darkly",
 }

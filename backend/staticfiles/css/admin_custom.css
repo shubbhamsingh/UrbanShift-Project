@@ -1,0 +1,101 @@
+/* =========================================
+   UrbanShift ULTIMATE FINAL THEME
+   Fixes: Buttons, White Cards, 3D Sidebar
+========================================= */
+
+/* --- 1. FONTS & BASICS --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+* {
+    font-family: 'Poppins', sans-serif !important;
+}
+
+/* --- 2. BUTTONS FIX (Add = Clean, Change = Orange) --- */
+/* "Add" Button (Ab Teal nahi, Clean Dark Grey/White Hoga) */
+.btn-success {
+    background-color: #2c2c2c !important; /* Dark Grey Background */
+    border: 1px solid #555 !important;
+    color: #ffffff !important; /* White Text */
+    font-weight: 500 !important;
+    box-shadow: none !important;
+}
+.btn-success:hover {
+    background-color: #444 !important;
+    border-color: #fff !important;
+}
+
+/* "Change" Button (Orange Pop) */
+.btn-warning {
+    background: linear-gradient(135deg, #ff9f1c 0%, #e68a00 100%) !important;
+    border: none !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    box-shadow: 0 4px 10px rgba(255, 159, 28, 0.3) !important;
+}
+
+/* --- 3. RECENT ACTIONS (White Cards Fix) --- */
+/* Ye code un safed cards ko dark karega */
+.timeline > div > .timeline-item {
+    background-color: #1e1e1e !important; /* Dark Card Background */
+    color: #e0e0e0 !important;
+    border: 1px solid #333 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3) !important; /* 3D Effect */
+}
+
+.timeline > div > .timeline-item > .time {
+    color: #ff9f1c !important; /* Clock icon orange */
+}
+
+.timeline-header, .timeline-header a {
+    color: #fff !important;
+    border-bottom: 1px solid #333 !important;
+}
+
+.timeline-body {
+    color: #bbb !important;
+}
+
+/* --- 4. SIDEBAR & LOGO (3D Effect) --- */
+.main-sidebar {
+    background-color: #0d0d0d !important;
+    /* Strong Shadow for 3D floating look */
+    box-shadow: 10px 0 30px rgba(0,0,0,0.6) !important; 
+    border-right: none !important;
+    z-index: 1000 !important;
+}
+
+/* Logo Area Styling */
+.brand-link {
+    background-color: #000000 !important;
+    border-bottom: 2px solid #ff9f1c !important;
+    padding: 15px !important;
+    display: flex;
+    align-items: center;
+}
+
+/* Text "UrbanShift" ko sahi dikhane ke liye */
+.brand-link .brand-text {
+    color: #ff9f1c !important;
+    font-size: 1.5rem !important;
+    font-weight: 800 !important;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-left: 10px;
+    text-shadow: 0 0 10px rgba(255, 159, 28, 0.5); /* Glow Effect */
+}
+
+/* Agar Logo image toot rahi hai to use hide karke sirf text dikhate hain */
+/* img.brand-image { display: none !important; }  <-- Ise tab uncomment karein agar logo image fix na ho */
+
+/* --- 5. DASHBOARD CARDS (Already Dark, adding spacing) --- */
+.card {
+    background-color: #1e1e1e !important;
+    border: 1px solid #333 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.4) !important;
+}
+.card-header {
+    background-color: transparent !important;
+    border-bottom: 1px solid #333 !important;
+}

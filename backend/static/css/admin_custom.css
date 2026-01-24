@@ -1,92 +1,151 @@
-/* --- UrbanShift Admin Custom Theme --- */
+/* =========================================
+   UrbanShift ULTIMATE FIX V3
+   Target: Control Sidebar (Scroll) & Breadcrumbs
+========================================= */
 
-/* 1. Entire Background Deep Black */
-body, .content-wrapper, .main-footer, .main-header {
-    background-color: #0d0d0d !important; /* Deepest Black */
-    color: #ffffff !important;
+/* --- 1. FONTS --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif !important;
 }
 
-/* 2. Sidebar (Menu) Black */
+/* Icons Box Fix */
+.fas, .fab, .far, .fa, .fa-home, .fa-heart, .fa-user, .fa-users-cog {
+    font-family: "Font Awesome 5 Free" !important;
+}
+
+/* --- 2. 🛑 SCROLL & SLIDE FIX: CONTROL SIDEBAR --- */
+/* Panel Default State (Hidden off-screen) */
+.control-sidebar, .control-sidebar-dark, aside.control-sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    right: -350px !important; /* Screen ke bahar chupa diya */
+    width: 300px !important;
+    height: 100vh !important;
+    overflow-y: auto !important;
+    z-index: 9999 !important;
+    background-color: #1a1a1a !important; 
+    border-left: 1px solid #ff9f1c !important;
+    transition: right 0.3s ease-in-out !important; /* Smooth Animation */
+    display: block !important;
+}
+
+/* Jab Panel Open ho (Django ye class body par lagata hai) */
+body.control-sidebar-slide-open .control-sidebar,
+body.control-sidebar-open .control-sidebar {
+    right: 0 !important; /* Ab screen par le aao */
+}
+
+/* Scrollbar Styling */
+.control-sidebar::-webkit-scrollbar { width: 8px; }
+.control-sidebar::-webkit-scrollbar-thumb { background-color: #ff9f1c; border-radius: 4px; }
+
+/* --- 3. BREADCRUMB FIX (White Box Hatana) --- */
+/* Pura Header Area Transparent */
+.content-header, .content-header .container-fluid {
+    background-color: transparent !important;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Dashboard Text Visibility */
+.content-header h1 {
+    color: #ffffff !important; /* "Dashboard" Title White */
+    text-shadow: none !important;
+}
+
+/* Breadcrumb Links (Home / Dashboard) */
+.breadcrumb {
+    background-color: transparent !important; /* Box hataya */
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.breadcrumb-item a {
+    color: #aaaaaa !important; /* "Home" Link Grey */
+    text-decoration: none !important;
+}
+
+.breadcrumb-item.active {
+    color: #ff9f1c !important; /* Active Page Orange */
+    font-weight: 600 !important;
+}
+
+/* --- 4. GLOBAL THEME COLORS --- */
+html, body, .content-wrapper, .main-footer, .main-header {
+    background-color: #121212 !important; /* Deep Black */
+    color: #e0e0e0 !important;
+}
+
+/* --- 5. SIDEBAR (Left) & LOGO --- */
 .main-sidebar {
-    background-color: #000000 !important; /* Pure Black Sidebar */
-    border-right: 1px solid #333;
+    background-color: #000000 !important;
+    border-right: 1px solid #222;
 }
 
-/* 3. Brand Logo Area */
 .brand-link {
     background-color: #000000 !important;
-    border-bottom: 1px solid #ff9f1c !important; /* Orange Border */
+    border-bottom: 2px solid #ff9f1c !important;
 }
 
 .brand-text {
-    color: #ff9f1c !important; /* UrbanShift Orange */
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-/* 4. Menu Links */
-.nav-link {
-    color: #cccccc !important;
-}
-
-.nav-link.active {
-    background-color: #ff9f1c !important; /* Active Link Orange */
-    color: #000 !important; /* Text Black on Orange */
-    font-weight: bold;
-    border-radius: 5px;
-}
-
-.nav-link:hover {
     color: #ff9f1c !important;
+    font-weight: bold !important;
 }
 
-/* 5. Headers & Cards */
-.card {
-    background-color: #1a1a1a !important; /* Slightly lighter black for cards */
-    border: 1px solid #333;
+/* --- 6. BUTTONS --- */
+.btn-success {
+    background-color: #333 !important;
+    border: 1px solid #555 !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    box-shadow: none !important;
+}
+
+.btn-warning, .btn-primary { 
+    background: linear-gradient(135deg, #ff9f1c 0%, #e68a00 100%) !important;
+    border: none !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+}
+
+/* --- 7. CARDS & TABLES --- */
+.card, .timeline-item {
+    background-color: #1e1e1e !important;
+    border: 1px solid #333 !important;
+    color: #e0e0e0 !important;
 }
 
 .card-header {
-    background-color: #111 !important;
-    border-bottom: 2px solid #ff9f1c !important; /* Orange line under headers */
+    background-color: transparent !important;
+    border-bottom: 1px solid #333 !important;
+}
+
+.table { color: #e0e0e0 !important; }
+.table thead th {
     color: #ff9f1c !important;
+    border-bottom: 1px solid #333 !important;
 }
+.table tbody tr:hover { background-color: #2c2c2c !important; }
 
-/* 6. Buttons (Orange & Teal) */
-.btn-primary {
-    background-color: #ff9f1c !important;
-    border-color: #ff9f1c !important;
-    color: #000 !important;
-    font-weight: bold;
-}
-
-.btn-primary:hover {
-    background-color: #e68a00 !important;
-}
-
-.btn-success, .btn-info {
-    background-color: #2ec4b6 !important; /* Teal for other actions */
-    border: none;
-    color: #000 !important;
-}
-
-/* 7. Tables */
-table.table {
-    background-color: #1a1a1a !important;
+/* Forms */
+.form-control {
+    background-color: #2c2c2c !important;
+    border: 1px solid #444 !important;
     color: #fff !important;
 }
-
-table.table thead th {
-    color: #ff9f1c !important; /* Table Headers Orange */
-    border-bottom: 1px solid #444;
+.form-control:focus {
+    border-color: #ff9f1c !important;
 }
 
-table.table tbody tr:hover {
-    background-color: #222 !important;
+/* --- 8. NAVBAR VISIBILITY --- */
+.main-header.navbar {
+    background-color: #000000 !important;
+    border-bottom: 1px solid #333 !important;
 }
-
-/* 8. Top Navbar */
-.navbar-dark {
-    background-color: #000 !important;
-    border-bottom: 1px solid #333;
+.main-header .nav-link, .navbar-nav .nav-link {
+    color: #ffffff !important;
 }
