@@ -8,25 +8,31 @@ const CompanyRequests = () => {
   const [newRequests, setNewRequests] = useState([]);
   const BACKEND_URL = 'http://127.0.0.1:8000';
 
-  const fetchRequests = async () => {
-    try {
-        const token = localStorage.getItem('token');
-        if (!token) { navigate('/login'); return; }
-        const res = await axios.get(`${BACKEND_URL}/api/relocation/move-requests/`, { headers: { 'Authorization': `Bearer ${token}` } });
-        
-        // Sirf PENDING (New Jobs) filter karo
-        setNewRequests(res.data.filter(r => r.status === 'PENDING'));
-    } catch (error) { console.error(error); }
-  };
+  useEffect(() => {
+    // 👇 FetchRequests ko useEffect ke andar define kiya taaki Build Error na aaye
+    const fetchRequests = async () => {
+      try {
+          const token = localStorage.getItem('token');
+          if (!token) { navigate('/login'); return; }
+          const res = await axios.get(`${BACKEND_URL}/api/relocation/move-requests/`, { 
+            headers: { 'Authorization': `Bearer ${token}` } 
+          });
+          
+          setNewRequests(res.data.filter(r => r.status === 'PENDING'));
+      } catch (error) { 
+          console.error(error); 
+      }
+    };
 
-  useEffect(() => { fetchRequests(); }, []);
+    fetchRequests();
+  }, [navigate, BACKEND_URL]); // ✅ Added Dependencies
 
   const acceptJob = async (id) => {
     try {
         const token = localStorage.getItem('token');
         await axios.post(`${BACKEND_URL}/api/relocation/move-requests/${id}/update_status/`, { status: 'ACCEPTED' }, { headers: { 'Authorization': `Bearer ${token}` } });
         toast.success("Job Accepted! Check Dashboard.");
-        navigate('/company-dashboard'); // Accept karke dashboard bhej do
+        navigate('/company-dashboard'); 
     } catch (err) { toast.error("Failed to accept."); }
   };
 

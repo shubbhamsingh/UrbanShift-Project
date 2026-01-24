@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate, Link } from 'react-router-dom';
@@ -11,7 +11,8 @@ const CompanyDashboard = () => {
   
   const BACKEND_URL = 'http://127.0.0.1:8000';
 
-  const fetchData = async () => {
+  // 👇 handleStatus me use karne ke liye ise useCallback banaya taaki ye dependency issue na de
+  const fetchData = useCallback(async () => {
     try {
         const token = localStorage.getItem('token');
         if (!token) { navigate('/login'); return; }
@@ -23,7 +24,6 @@ const CompanyDashboard = () => {
         const reqRes = await axios.get(`${BACKEND_URL}/api/relocation/move-requests/`, config);
         setRequests(reqRes.data);
 
-        // Calculate Stats
         const p = reqRes.data.filter(r => r.status === 'PENDING').length;
         const o = reqRes.data.filter(r => r.status === 'ACCEPTED').length;
         const c = reqRes.data.filter(r => ['COMPLETED', 'CANCELLED'].includes(r.status)).length;
@@ -32,9 +32,11 @@ const CompanyDashboard = () => {
     } catch (error) {
         if(error.response && error.response.status === 401) navigate('/login');
     }
-  };
+  }, [navigate, BACKEND_URL]);
 
-  useEffect(() => { fetchData(); }, []);
+  useEffect(() => { 
+    fetchData(); 
+  }, [fetchData]); // ✅ Ab ye dependency error nahi dega
 
   const handleStatus = async (id, status) => {
     try {
@@ -45,14 +47,11 @@ const CompanyDashboard = () => {
     } catch (err) { toast.error("Error updating status"); }
   };
 
-  // 👇 FILTERS: Dashboard par sirf apna kaam dikhega
   const myOngoing = requests.filter(r => r.status === 'ACCEPTED');
   const myHistory = requests.filter(r => ['COMPLETED', 'CANCELLED'].includes(r.status));
 
   return (
     <div style={pageStyle}>
-      
-      {/* HEADER */}
       <div style={headerStyle}>
         <div>
             <h1 style={{margin:0}}>👋 Hello, {user.username}</h1>
@@ -61,13 +60,11 @@ const CompanyDashboard = () => {
         <Link to="/company-requests" style={linkBtn}>🔔 Find New Jobs ({stats.pending})</Link>
       </div>
 
-      {/* STATS */}
       <div style={statsGrid}>
         <div style={statBox}><h3>{stats.ongoing}</h3><p>Ongoing Moves</p></div>
         <div style={statBox}><h3>{stats.completed}</h3><p>Completed Jobs</p></div>
       </div>
 
-      {/* --- MY ONGOING JOBS --- */}
       <h3 style={{color: '#2ecc71', borderBottom:'2px solid #2ecc71', display:'inline-block', marginTop:'30px'}}>🚚 My Ongoing Jobs</h3>
       {myOngoing.length === 0 ? <p style={{color:'#666'}}>No active jobs. Go to Requests to find work.</p> : (
         <div style={gridStyle}>
@@ -82,7 +79,6 @@ const CompanyDashboard = () => {
         </div>
       )}
 
-      {/* --- WORK HISTORY --- */}
       <h3 style={{color: '#3498db', borderBottom:'2px solid #3498db', display:'inline-block', marginTop:'40px'}}>📜 Work History</h3>
       {myHistory.length === 0 ? <p style={{color:'#666'}}>No history yet.</p> : (
         <div style={gridStyle}>
