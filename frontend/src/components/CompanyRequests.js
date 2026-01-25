@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate, Link } from 'react-router-dom';
+import { FaMapMarkerAlt, FaCalendarAlt, FaBoxOpen, FaTruck } from 'react-icons/fa';
 
 const CompanyRequests = () => {
   const navigate = useNavigate();
   const [newRequests, setNewRequests] = useState([]);
 
-  // 👇 1. Smart URL Setup (Local aur Live dono ke liye)
+  // 👇 1. Smart URL Setup
   const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
   const BACKEND_URL = isLocal 
     ? "http://127.0.0.1:8000" 
@@ -19,16 +20,17 @@ const CompanyRequests = () => {
           const token = localStorage.getItem('token');
           if (!token) { navigate('/login'); return; }
 
-          // 👇 Endpoint wahi rakha hai jo Django ViewSet use karta hai
-          const res = await axios.get(`${BACKEND_URL}/api/relocation/move-requests/`, { 
+          // 👇 Sahi Endpoint use kar rahe hain
+          const res = await axios.get(`${BACKEND_URL}/api/relocation/company-requests/`, { 
             headers: { 'Authorization': `Bearer ${token}` } 
           });
           
-          // Sirf PENDING wale dikhao
-          setNewRequests(res.data.filter(r => r.status === 'PENDING'));
+          // Sirf 'PENDING' status wali jobs filter karein
+          const pendingJobs = res.data.filter(r => r.status === 'PENDING');
+          setNewRequests(pendingJobs);
+
       } catch (error) { 
           console.error("Error fetching requests:", error);
-          // Agar 401 (Unauthorized) aaye, to hi logout karein
           if (error.response && error.response.status === 401) {
             toast.error("Session expired. Please login again.");
             navigate('/login');
@@ -68,17 +70,38 @@ const CompanyRequests = () => {
               <p style={{color:'#666'}}>Please check back later.</p>
           </div>
       ) : (
-          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px'}}>
+          <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '20px'}}>
               {newRequests.map(req => (
-                  <div key={req.id} style={{background: '#1e1e1e', padding: '20px', borderRadius: '8px', borderLeft: '5px solid #f1c40f'}}>
-                      {/* 👇 2. Field Names Update kiye (Database ke hisab se) */}
-                      <h3 style={{margin:'0 0 10px 0'}}>📍 {req.source_city} ➝ {req.destination_city}</h3>
-                      <p>📅 Date: {req.moving_date}</p>
-                      <p>🏠 Size: {req.house_size}</p>
-                      <div style={{background:'#333', padding:'10px', borderRadius:'5px', fontSize:'0.9rem', margin:'10px 0'}}>
-                        📦 Items: {req.items_description}
+                  <div key={req.id} style={{background: '#1e1e1e', padding: '20px', borderRadius: '15px', borderLeft: '5px solid #f1c40f', boxShadow: '0 4px 10px rgba(0,0,0,0.3)'}}>
+                      
+                      {/* 👇 Header: Source -> Dest */}
+                      <h3 style={{margin:'0 0 15px 0', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px'}}>
+                        <FaMapMarkerAlt color="#f1c40f"/> {req.source} <span style={{color: '#666'}}>➝</span> {req.destination}
+                      </h3>
+                      
+                      {/* Details Grid */}
+                      <div style={{display: 'flex', gap: '15px', marginBottom: '15px', fontSize: '0.9rem', color: '#ccc'}}>
+                          <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+                              <FaCalendarAlt /> {req.move_date}
+                          </div>
+                          <div style={{display: 'flex', alignItems: 'center', gap: '5px'}}>
+                              <FaTruck /> {req.move_size}
+                          </div>
                       </div>
-                      <button onClick={()=>acceptJob(req.id)} style={{width:'100%', padding:'12px', background:'green', color:'white', border:'none', borderRadius:'5px', cursor:'pointer', fontWeight:'bold', fontSize:'1rem'}}>
+
+                      {/* Customer Name */}
+                      <p style={{color: '#aaa', fontSize: '0.9rem', marginBottom: '10px'}}>
+                          👤 Customer: <strong style={{color: 'white'}}>{req.customer_name}</strong>
+                      </p>
+
+                      {/* Items List */}
+                      <div style={{background:'#2a2a2a', padding:'10px', borderRadius:'8px', fontSize:'0.9rem', marginBottom:'20px', color: '#ddd', display: 'flex', gap: '8px'}}>
+                        <FaBoxOpen style={{marginTop: '3px', flexShrink: 0}} />
+                        <span>{req.items_list || "No items listed"}</span>
+                      </div>
+
+                      {/* Accept Button */}
+                      <button onClick={()=>acceptJob(req.id)} style={{width:'100%', padding:'12px', background:'linear-gradient(135deg, #2ecc71, #27ae60)', color:'white', border:'none', borderRadius:'8px', cursor:'pointer', fontWeight:'bold', fontSize:'1rem', boxShadow: '0 4px 15px rgba(46, 204, 113, 0.4)'}}>
                         ✅ Accept Job
                       </button>
                   </div>

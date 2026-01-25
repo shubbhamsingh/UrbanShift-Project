@@ -21,6 +21,8 @@ import CompanyDashboard from './components/CompanyDashboard';
 import CompanyRequests from './components/CompanyRequests';
 import ForgotPassword from './components/ForgotPassword';
 import MyMoves from './components/MyMoves';
+import Profile from './components/Profile';
+import UserDashboard from './components/UserDashboard';
 
 function App() {
   return (
@@ -61,6 +63,8 @@ function App() {
             <Route path="/company-requests" element={<CompanyRequests />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/my-moves" element={<MyMoves />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/user-dashboard" element={<UserDashboard />} />
 
 
             <Route path="/admin-dashboard" element={<div style={{textAlign: 'center', padding: '50px'}}><h2>Admin Dashboard</h2></div>} />

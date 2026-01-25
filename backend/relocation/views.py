@@ -2,8 +2,9 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q
+import uuid  # 👈 New Import (Fake ID generate karne ke liye)
 from .models import MoveRequest
-from .serializers import MoveRequestSerializer
+from .serializers import MoveRequestSerializer, ReviewSerializer
 
 # 1. Submit Request (Customer ke liye)
 class SubmitMoveRequestView(generics.CreateAPIView):
@@ -63,3 +64,73 @@ class UpdateMoveStatusView(APIView):
             return Response({'status': 'updated'})
 
         return Response({'error': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
+
+# 5. Add Review (Feature)
+class AddReviewView(generics.CreateAPIView):
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            move_request = MoveRequest.objects.get(pk=pk)
+        except MoveRequest.DoesNotExist:
+            return Response({'error': 'Move Request not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # 1. Security Check: Kya ye user wahi customer hai?
+        if move_request.customer != request.user:
+            return Response({'error': 'You are not authorized to review this move.'}, status=status.HTTP_403_FORBIDDEN)
+
+        # 2. Logic Check: Kya move complete ho chuka hai?
+        if move_request.status != 'COMPLETED':
+            return Response({'error': 'You can only review completed moves.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 3. Duplicate Check: Kya pehle se review hai?
+        if hasattr(move_request, 'review'):
+            return Response({'error': 'You have already reviewed this move.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # 4. Save Review
+        serializer = ReviewSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save(
+                move=move_request,
+                reviewer=request.user,
+                company=move_request.company
+            )
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# 👇 6. Process Mock Payment (NEW FEATURE)
+class ProcessPaymentView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        try:
+            move_request = MoveRequest.objects.get(pk=pk)
+        except MoveRequest.DoesNotExist:
+            return Response({'error': 'Move Request not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # 1. Check permissions (Sirf Customer hi pay karega)
+        if move_request.customer != request.user:
+            return Response({'error': 'Not authorized'}, status=status.HTTP_403_FORBIDDEN)
+
+        # 2. Check if already paid
+        if move_request.is_paid:
+            return Response({'message': 'Already paid!'}, status=status.HTTP_200_OK)
+
+        # 3. Mock Payment Logic
+        # (Yahan hum man rahe hain payment successful ho gaya)
+        move_request.is_paid = True
+        move_request.payment_amount = 5000.00  # Filhal hardcode (mock) value
+        
+        # Ek fake transaction ID generate karna
+        fake_txn_id = f"TXN_{uuid.uuid4().hex[:8].upper()}"
+        move_request.transaction_id = fake_txn_id
+        
+        move_request.save()
+
+        return Response({
+            'status': 'Payment Successful',
+            'transaction_id': fake_txn_id,
+            'amount': 5000.00
+        }, status=status.HTTP_200_OK)

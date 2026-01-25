@@ -20,8 +20,9 @@ class RegisterView(generics.CreateAPIView):
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
 
-# 3. User Detail View (Dashboard par data dikhane ke liye zaroori hai)
-class UserDetailView(generics.RetrieveAPIView):
+# 3. User Detail & Update View (Dashboard par data dikhane aur Edit karne ke liye)
+# 👇 CHANGE: RetrieveAPIView -> RetrieveUpdateAPIView (Ab user profile edit kar payega)
+class UserDetailView(generics.RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
 

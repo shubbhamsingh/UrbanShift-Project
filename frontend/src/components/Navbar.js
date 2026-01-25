@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import logo from '../logo.png';
 import { ThemeContext } from '../context/ThemeContext';
 import './Navbar.css';
+import { FaSearch, FaUserCircle, FaThLarge } from 'react-icons/fa'; // Icons Import kiye
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -14,7 +15,7 @@ const Navbar = () => {
   const username = localStorage.getItem('username');
   const userType = localStorage.getItem('userType'); 
 
-  // 👇 Smart URL for Admin Link
+  // Admin URL
   const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
   const ADMIN_URL = isLocal 
     ? "http://127.0.0.1:8000/admin" 
@@ -47,18 +48,11 @@ const Navbar = () => {
         </div>
       </Link>
 
-      {/* --- 📱 MOBILE RIGHT SIDE (Theme Btn + Hamburger) --- */}
+      {/* MOBILE ACTIONS */}
       <div className="mobile-actions">
-        {/* Mobile Theme Button */}
-        <button 
-            onClick={cycleTheme} 
-            className="theme-btn mobile-theme-btn"
-            title={`Current Mode: ${mode.toUpperCase()}`}
-        >
+        <button onClick={cycleTheme} className="theme-btn mobile-theme-btn">
             {getThemeIcon()}
         </button>
-
-        {/* Hamburger Icon */}
         <div className={`hamburger ${isOpen ? 'open' : ''}`} onClick={() => setIsOpen(!isOpen)}>
             <span className="bar"></span>
             <span className="bar"></span>
@@ -69,26 +63,26 @@ const Navbar = () => {
       {/* --- LINKS MENU --- */}
       <div className={`nav-menu ${isOpen ? 'active' : ''}`}>
         
-        {/* Desktop Theme Button */}
-        <button 
-          onClick={cycleTheme} 
-          className="theme-btn desktop-theme-btn"
-          title={`Current Mode: ${mode.toUpperCase()}`}
-        >
+        <button onClick={cycleTheme} className="theme-btn desktop-theme-btn">
             {getThemeIcon()}
         </button>
 
         <Link to="/" className="nav-link" onClick={closeMenu}>Home</Link>
 
-        {/* --- BUYER LINKS --- */}
+        {/* --- BUYER LINKS (Normal User) --- */}
         {userType === 'BUYER' && (
             <>
-                <Link to="/properties" className="nav-link" onClick={closeMenu}>Find Homes</Link>
-                <Link to="/wishlist" className="nav-link" onClick={closeMenu} style={{color: 'var(--accent-orange)'}}>
-                    DreamHome🏠
+                {/* 5. Search Icon Added */}
+                <Link to="/properties" className="nav-link" onClick={closeMenu} style={{display:'flex', alignItems:'center', gap:'5px'}}>
+                    <FaSearch /> Find Homes
                 </Link>
-                <Link to="/packers" className="nav-link" onClick={closeMenu}>Movers</Link>
-                <Link to="/my-moves" className="nav-link" onClick={closeMenu}>My Bookings</Link>
+
+                {/* 3. Combined Button (Bookings + Wishlist) */}
+                <Link to="/user-dashboard" className="nav-link" onClick={closeMenu} style={{display:'flex', alignItems:'center', gap:'5px', color:'var(--accent-orange)'}}>
+                    <FaThLarge /> My Dashboard
+                </Link>
+
+                {/* 2. Movers Removed (My Dashboard me already request button hai) */}
             </>
         )}
 
@@ -108,24 +102,27 @@ const Navbar = () => {
             </>
         )}
 
-        {/* --- ⚙️ ADMIN LINK (Fixed for Shubham_Singh) --- */}
+        {/* --- ADMIN LINK --- */}
         {(userType === 'ADMIN' || username === 'Shubham_Singh' || username === 'admin') && (
-            <a 
-                href={ADMIN_URL} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="nav-link" 
-                onClick={closeMenu}
-                style={{color: '#ff4d4d', fontWeight: 'bold'}}
-            >
+            <a href={ADMIN_URL} target="_blank" rel="noopener noreferrer" className="nav-link" onClick={closeMenu} style={{color: '#ff4d4d', fontWeight: 'bold'}}>
                 ⚙️ Admin Panel
             </a>
         )}
 
-        {/* AUTH BUTTONS */}
+        {/* AUTH SECTION */}
         {token ? (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '15px', flexDirection: 'inherit' }}>
-            <span style={{ fontWeight: '600', color: 'var(--accent-teal)', fontSize: '14px' }}>Hi, {username}</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexDirection: 'inherit' }}>
+            
+            {/* 1. User Name Removed, Only Icon Added */}
+            <Link 
+                to="/profile" 
+                onClick={closeMenu} 
+                title={`Hi, ${username}`} // Hover karne par naam dikhega
+                style={{ color: 'var(--accent-teal)', display: 'flex', alignItems: 'center', transition: '0.2s' }}
+            >
+                <FaUserCircle size={32} /> {/* Big Icon */}
+            </Link>
+
             <button onClick={handleLogout} className="btn-logout">Logout</button>
           </div>
         ) : (
