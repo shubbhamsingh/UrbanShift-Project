@@ -9,9 +9,12 @@ const CompanyDashboard = () => {
   const [user, setUser] = useState({ username: 'Company' });
   const [stats, setStats] = useState({ pending: 0, ongoing: 0, completed: 0 });
   
-  const BACKEND_URL = 'http://127.0.0.1:8000';
+  // 👇 Smart URL Setup
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const BACKEND_URL = isLocal 
+    ? "http://127.0.0.1:8000" 
+    : "https://urbanshift-project.onrender.com";
 
-  // 👇 handleStatus me use karne ke liye ise useCallback banaya taaki ye dependency issue na de
   const fetchData = useCallback(async () => {
     try {
         const token = localStorage.getItem('token');
@@ -21,9 +24,12 @@ const CompanyDashboard = () => {
         const userRes = await axios.get(`${BACKEND_URL}/api/users/me/`, config);
         setUser(userRes.data);
 
-        const reqRes = await axios.get(`${BACKEND_URL}/api/relocation/move-requests/`, config);
+        // 👇 Company ke liye API endpoint
+        const reqRes = await axios.get(`${BACKEND_URL}/api/relocation/company-requests/`, config);
         setRequests(reqRes.data);
 
+        // Stats Calculate karna (Ab ye sahi chalega kyunki company-requests me sab data aata hai)
+        // Note: Backend 'company-requests/' view me sirf PENDING aur accepted by company bhej raha hai.
         const p = reqRes.data.filter(r => r.status === 'PENDING').length;
         const o = reqRes.data.filter(r => r.status === 'ACCEPTED').length;
         const c = reqRes.data.filter(r => ['COMPLETED', 'CANCELLED'].includes(r.status)).length;
@@ -36,7 +42,7 @@ const CompanyDashboard = () => {
 
   useEffect(() => { 
     fetchData(); 
-  }, [fetchData]); // ✅ Ab ye dependency error nahi dega
+  }, [fetchData]);
 
   const handleStatus = async (id, status) => {
     try {
@@ -70,9 +76,11 @@ const CompanyDashboard = () => {
         <div style={gridStyle}>
             {myOngoing.map(req => (
                 <div key={req.id} style={{...cardStyle, borderLeft: '5px solid #2ecc71'}}>
+                        {/* 👇 Updated Field Names */}
                         <h4>📍 {req.source} ➝ {req.destination}</h4>
                         <p>👤 {req.customer_name} | 📞 {req.customer_phone || 'Hidden'}</p>
                         <p style={{fontSize:'0.9rem'}}>📅 {req.move_date}</p>
+                        <p style={{fontSize:'0.9rem', color: '#ccc'}}>📦 {req.items_list}</p>
                         <button onClick={()=>handleStatus(req.id, 'COMPLETED')} style={completeBtn}>🏁 Mark Completed</button>
                 </div>
             ))}
@@ -85,6 +93,7 @@ const CompanyDashboard = () => {
             {myHistory.map(req => (
                 <div key={req.id} style={{...cardStyle, borderLeft: '5px solid #3498db', opacity: 0.6}}>
                         <h4>📍 {req.source} ➝ {req.destination}</h4>
+                        <p style={{fontSize:'0.9rem'}}>📅 {req.move_date}</p>
                         <span style={{background: req.status==='COMPLETED'?'blue':'red', padding:'2px 6px', borderRadius:'4px', fontSize:'0.8rem', color:'white'}}>
                         {req.status}
                         </span>
