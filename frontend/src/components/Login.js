@@ -1,16 +1,20 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; 
+import { Link, useNavigate } from 'react-router-dom'; // useNavigate add kiya (better redirection)
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
 
 const Login = () => {
+  const navigate = useNavigate(); // Hook for navigation
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [showPass, setShowPass] = useState(false); 
 
-  // 👇 LIVE BACKEND URL
-  const BACKEND_URL = 'https://urbanshift-project.onrender.com';
+  // 👇 SMART URL SETUP (Automatic Detection)
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const BACKEND_URL = isLocal 
+    ? "http://127.0.0.1:8000" 
+    : "https://urbanshift-project.onrender.com";
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -21,7 +25,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // ✅ Updated URL
+      // ✅ Uses Dynamic URL
       const response = await axios.post(`${BACKEND_URL}/api/users/login/`, formData);
       
       localStorage.setItem('token', response.data.access);
@@ -30,9 +34,12 @@ const Login = () => {
       
       toast.success(`Welcome back, ${response.data.username}! 👋`);
       
+      // Thoda delay taaki toast dikhe, phir redirect
       setTimeout(() => {
-          window.location.href = '/'; 
-      }, 1500);
+          // window.location.href ki jagah navigate use kar rahe hain (faster)
+          navigate('/');
+          window.location.reload(); // State refresh karne ke liye reload zaroori hai
+      }, 1000);
       
     } catch (error) {
       console.error("Login Error:", error);

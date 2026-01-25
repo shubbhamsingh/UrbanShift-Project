@@ -14,6 +14,12 @@ const Navbar = () => {
   const username = localStorage.getItem('username');
   const userType = localStorage.getItem('userType'); 
 
+  // 👇 Smart URL for Admin Link
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const ADMIN_URL = isLocal 
+    ? "http://127.0.0.1:8000/admin" 
+    : "https://urbanshift-project.onrender.com/admin";
+
   const handleLogout = () => {
     localStorage.clear();
     navigate('/login');
@@ -43,7 +49,7 @@ const Navbar = () => {
 
       {/* --- 📱 MOBILE RIGHT SIDE (Theme Btn + Hamburger) --- */}
       <div className="mobile-actions">
-        {/* Mobile Theme Button (Only visible on mobile) */}
+        {/* Mobile Theme Button */}
         <button 
             onClick={cycleTheme} 
             className="theme-btn mobile-theme-btn"
@@ -63,7 +69,7 @@ const Navbar = () => {
       {/* --- LINKS MENU --- */}
       <div className={`nav-menu ${isOpen ? 'active' : ''}`}>
         
-        {/* Desktop Theme Button (Hidden on Mobile) */}
+        {/* Desktop Theme Button */}
         <button 
           onClick={cycleTheme} 
           className="theme-btn desktop-theme-btn"
@@ -82,6 +88,7 @@ const Navbar = () => {
                     DreamHome🏠
                 </Link>
                 <Link to="/packers" className="nav-link" onClick={closeMenu}>Movers</Link>
+                <Link to="/my-moves" className="nav-link" onClick={closeMenu}>My Bookings</Link>
             </>
         )}
 
@@ -101,7 +108,19 @@ const Navbar = () => {
             </>
         )}
 
-        {userType === 'ADMIN' && <Link to="/admin-dashboard" className="nav-link" onClick={closeMenu}>Admin</Link>}
+        {/* --- ⚙️ ADMIN LINK (Fixed for Shubham_Singh) --- */}
+        {(userType === 'ADMIN' || username === 'Shubham_Singh' || username === 'admin') && (
+            <a 
+                href={ADMIN_URL} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="nav-link" 
+                onClick={closeMenu}
+                style={{color: '#ff4d4d', fontWeight: 'bold'}}
+            >
+                ⚙️ Admin Panel
+            </a>
+        )}
 
         {/* AUTH BUTTONS */}
         {token ? (

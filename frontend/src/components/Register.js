@@ -10,8 +10,11 @@ import 'react-phone-input-2/lib/style.css';
 const Register = () => {
   const navigate = useNavigate();
   
-  // 👇 LIVE BACKEND URL
-  const BACKEND_URL = 'https://urbanshift-project.onrender.com';
+  // 👇 SMART URL SETUP (Automatic Detection)
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const BACKEND_URL = isLocal 
+    ? "http://127.0.0.1:8000" 
+    : "https://urbanshift-project.onrender.com";
 
   const [formData, setFormData] = useState({
     username: '',
@@ -66,6 +69,7 @@ const Register = () => {
     }
 
     try {
+      // ✅ Uses Dynamic URL
       await axios.post(`${BACKEND_URL}/api/users/register/`, {
         username: formData.username,
         email: formData.email,
@@ -190,7 +194,7 @@ const Register = () => {
             </select>
           </div>
 
-          {/* 👇 FIXED: PHONE INPUT (Styles ab index.css se aayenge) */}
+          {/* PHONE INPUT */}
           <div style={inputGroup}>
             <label>Mobile Number</label>
             <PhoneInput
