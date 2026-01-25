@@ -5,16 +5,21 @@ import { toast } from 'react-toastify';
 
 const BookMovers = () => {
   const navigate = useNavigate();
+  
+  // 👇 1. State keys ko Django Model fields ke saath match kiya (Zaroori hai!)
   const [formData, setFormData] = useState({
-    source: '',
-    destination: '',
-    move_date: '',
-    move_size: '1BHK',
-    items_list: ''
+    source_city: '',
+    destination_city: '',
+    moving_date: '',
+    house_size: '1BHK',
+    items_description: ''
   });
 
-  // 👇 Testing ke liye Localhost use karein (Render par ye feature abhi nahi hai)
-  const BACKEND_URL = 'http://127.0.0.1:8000'; 
+  // 👇 2. Smart URL Setup (Local aur Live dono ke liye)
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const BACKEND_URL = isLocal 
+    ? "http://127.0.0.1:8000" 
+    : "https://urbanshift-project.onrender.com";
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,11 +36,13 @@ const BookMovers = () => {
     }
 
     try {
-      await axios.post(`${BACKEND_URL}/api/relocation/move-requests/`, formData, {
+      // 👇 3. Endpoint '/api/relocation/submit/' kar diya (urls.py ke hisab se)
+      await axios.post(`${BACKEND_URL}/api/relocation/submit/`, formData, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
-      toast.success("Request Sent! Movers will contact you shortly. ✅");
-      navigate('/'); // Home par bhej do
+      
+      toast.success("Request Sent! Check status in 'My Bookings' ✅");
+      navigate('/my-moves'); // User ko ab seedha My Moves page par bhejo
     } catch (error) {
       console.error(error);
       toast.error("Failed to send request. Try again.");
@@ -52,22 +59,23 @@ const BookMovers = () => {
           
           <div style={inputGroup}>
             <label>Moving From (Source)</label>
-            <input name="source" type="text" placeholder="e.g. Malviya Nagar, Jaipur" onChange={handleChange} required style={inputStyle} />
+            {/* name="source" ko badal kar name="source_city" kiya */}
+            <input name="source_city" type="text" placeholder="e.g. Malviya Nagar, Jaipur" onChange={handleChange} required style={inputStyle} />
           </div>
 
           <div style={inputGroup}>
             <label>Moving To (Destination)</label>
-            <input name="destination" type="text" placeholder="e.g. Whitefield, Bangalore" onChange={handleChange} required style={inputStyle} />
+            <input name="destination_city" type="text" placeholder="e.g. Whitefield, Bangalore" onChange={handleChange} required style={inputStyle} />
           </div>
 
           <div style={rowStyle}>
             <div style={{flex:1}}>
                 <label>Move Date</label>
-                <input name="move_date" type="date" onChange={handleChange} required style={inputStyle} />
+                <input name="moving_date" type="date" onChange={handleChange} required style={inputStyle} />
             </div>
             <div style={{flex:1}}>
                 <label>House Size</label>
-                <select name="move_size" onChange={handleChange} style={inputStyle}>
+                <select name="house_size" onChange={handleChange} style={inputStyle}>
                     <option>1BHK</option>
                     <option>2BHK</option>
                     <option>3BHK</option>
@@ -79,7 +87,7 @@ const BookMovers = () => {
 
           <div style={inputGroup}>
             <label>List Major Items (Optional)</label>
-            <textarea name="items_list" rows="3" placeholder="e.g. 1 Bed, 1 Fridge, 2 ACs..." onChange={handleChange} style={inputStyle}></textarea>
+            <textarea name="items_description" rows="3" placeholder="e.g. 1 Bed, 1 Fridge, 2 ACs..." onChange={handleChange} style={inputStyle}></textarea>
           </div>
 
           <button type="submit" style={btnStyle}>🚀 Send Request</button>

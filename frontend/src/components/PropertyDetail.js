@@ -16,13 +16,16 @@ const PropertyDetail = () => {
   
   const [showContact, setShowContact] = useState(false);
 
-  // 👇 LIVE SERVER URL
-  const BACKEND_URL = 'https://urbanshift-project.onrender.com';
+  // 👇 Smart URL Setup (Local aur Live dono ke liye)
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const BACKEND_URL = isLocal 
+    ? "http://127.0.0.1:8000" 
+    : "https://urbanshift-project.onrender.com";
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 👇 Use BACKEND_URL
+        // 👇 Uses dynamic BACKEND_URL
         const res = await axios.get(`${BACKEND_URL}/api/properties/${id}/`);
         setProperty(res.data);
         setLoading(false); 
@@ -30,7 +33,6 @@ const PropertyDetail = () => {
         const token = localStorage.getItem('token');
         if (token) {
             try {
-                // 👇 Use BACKEND_URL
                 const wishlistRes = await axios.get(`${BACKEND_URL}/api/properties/wishlist/`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -47,7 +49,7 @@ const PropertyDetail = () => {
       }
     };
     fetchData();
-  }, [id]);
+  }, [id, BACKEND_URL]); // Added BACKEND_URL to dependency
 
   const handleWishlistToggle = async () => {
     const token = localStorage.getItem('token');
@@ -57,12 +59,13 @@ const PropertyDetail = () => {
         return;
     }
     try {
-        // 👇 Use BACKEND_URL
-        const res = await axios.post(`${BACKEND_URL}/api/properties/${id}/toggle-wishlist/`, {}, {
+        await axios.post(`${BACKEND_URL}/api/properties/${id}/toggle-wishlist/`, {}, {
             headers: { Authorization: `Bearer ${token}` }
         });
-        setIsWishlisted(res.data.liked); 
-        if (res.data.liked) toast.success("Added to DreamHome ❤️");
+        // Toggle UI state based on previous state (optimistic update) or response
+        setIsWishlisted(!isWishlisted); 
+        
+        if (!isWishlisted) toast.success("Added to DreamHome ❤️");
         else toast.info("Removed from DreamHome 💔");
     } catch (err) {
         toast.error("Something went wrong!");
@@ -73,7 +76,7 @@ const PropertyDetail = () => {
     if (!imageObj) return 'https://via.placeholder.com/600';
     if (imageObj.image) {
         if (imageObj.image.startsWith('http')) return imageObj.image;
-        // 👇 Use BACKEND_URL for relative paths
+        // 👇 Relative path + Dynamic URL
         return `${BACKEND_URL}${imageObj.image}`;
     }
     return imageObj.image_url || 'https://via.placeholder.com/600';

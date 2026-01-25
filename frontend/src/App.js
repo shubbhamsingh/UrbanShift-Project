@@ -20,6 +20,7 @@ import BookMovers from './components/BookMovers';
 import CompanyDashboard from './components/CompanyDashboard';
 import CompanyRequests from './components/CompanyRequests';
 import ForgotPassword from './components/ForgotPassword';
+import MyMoves from './components/MyMoves';
 
 function App() {
   return (
@@ -59,6 +60,7 @@ function App() {
             <Route path="/company-dashboard" element={<CompanyDashboard />} />
             <Route path="/company-requests" element={<CompanyRequests />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/my-moves" element={<MyMoves />} />
 
 
             <Route path="/admin-dashboard" element={<div style={{textAlign: 'center', padding: '50px'}}><h2>Admin Dashboard</h2></div>} />

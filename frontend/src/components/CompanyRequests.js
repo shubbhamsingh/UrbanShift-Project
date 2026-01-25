@@ -6,34 +6,52 @@ import { useNavigate, Link } from 'react-router-dom';
 const CompanyRequests = () => {
   const navigate = useNavigate();
   const [newRequests, setNewRequests] = useState([]);
-  const BACKEND_URL = 'http://127.0.0.1:8000';
+
+  // 👇 1. Smart URL Setup (Local aur Live dono ke liye)
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const BACKEND_URL = isLocal 
+    ? "http://127.0.0.1:8000" 
+    : "https://urbanshift-project.onrender.com";
 
   useEffect(() => {
-    // 👇 FetchRequests ko useEffect ke andar define kiya taaki Build Error na aaye
     const fetchRequests = async () => {
       try {
           const token = localStorage.getItem('token');
           if (!token) { navigate('/login'); return; }
+
+          // 👇 Endpoint wahi rakha hai jo Django ViewSet use karta hai
           const res = await axios.get(`${BACKEND_URL}/api/relocation/move-requests/`, { 
             headers: { 'Authorization': `Bearer ${token}` } 
           });
           
+          // Sirf PENDING wale dikhao
           setNewRequests(res.data.filter(r => r.status === 'PENDING'));
       } catch (error) { 
-          console.error(error); 
+          console.error("Error fetching requests:", error);
+          // Agar 401 (Unauthorized) aaye, to hi logout karein
+          if (error.response && error.response.status === 401) {
+            toast.error("Session expired. Please login again.");
+            navigate('/login');
+          }
       }
     };
 
     fetchRequests();
-  }, [navigate, BACKEND_URL]); // ✅ Added Dependencies
+  }, [navigate, BACKEND_URL]);
 
   const acceptJob = async (id) => {
     try {
         const token = localStorage.getItem('token');
-        await axios.post(`${BACKEND_URL}/api/relocation/move-requests/${id}/update_status/`, { status: 'ACCEPTED' }, { headers: { 'Authorization': `Bearer ${token}` } });
+        await axios.post(`${BACKEND_URL}/api/relocation/move-requests/${id}/update_status/`, 
+            { status: 'ACCEPTED' }, 
+            { headers: { 'Authorization': `Bearer ${token}` } }
+        );
         toast.success("Job Accepted! Check Dashboard.");
         navigate('/company-dashboard'); 
-    } catch (err) { toast.error("Failed to accept."); }
+    } catch (err) { 
+        console.error(err);
+        toast.error("Failed to accept."); 
+    }
   };
 
   return (
@@ -53,11 +71,12 @@ const CompanyRequests = () => {
           <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px'}}>
               {newRequests.map(req => (
                   <div key={req.id} style={{background: '#1e1e1e', padding: '20px', borderRadius: '8px', borderLeft: '5px solid #f1c40f'}}>
-                      <h3 style={{margin:'0 0 10px 0'}}>📍 {req.source} ➝ {req.destination}</h3>
-                      <p>📅 Date: {req.move_date}</p>
-                      <p>🏠 Size: {req.move_size}</p>
+                      {/* 👇 2. Field Names Update kiye (Database ke hisab se) */}
+                      <h3 style={{margin:'0 0 10px 0'}}>📍 {req.source_city} ➝ {req.destination_city}</h3>
+                      <p>📅 Date: {req.moving_date}</p>
+                      <p>🏠 Size: {req.house_size}</p>
                       <div style={{background:'#333', padding:'10px', borderRadius:'5px', fontSize:'0.9rem', margin:'10px 0'}}>
-                        📦 Items: {req.items_list}
+                        📦 Items: {req.items_description}
                       </div>
                       <button onClick={()=>acceptJob(req.id)} style={{width:'100%', padding:'12px', background:'green', color:'white', border:'none', borderRadius:'5px', cursor:'pointer', fontWeight:'bold', fontSize:'1rem'}}>
                         ✅ Accept Job

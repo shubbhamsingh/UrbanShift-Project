@@ -8,8 +8,11 @@ const SellerDashboard = () => {
   const [properties, setProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  // 👇 LIVE SERVER URL
-  const BACKEND_URL = 'https://urbanshift-project.onrender.com';
+  // 👇 1. Smart URL Setup (Local aur Live dono ke liye)
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const BACKEND_URL = isLocal 
+    ? "http://127.0.0.1:8000" 
+    : "https://urbanshift-project.onrender.com";
 
   // 👤 User State 
   const [user, setUser] = useState({
@@ -23,13 +26,17 @@ const SellerDashboard = () => {
         const token = localStorage.getItem('token'); 
         if (!token) return;
 
-        // 👇 Use BACKEND_URL
         const response = await axios.get(`${BACKEND_URL}/api/users/me/`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         setUser(response.data);
     } catch (error) {
         console.error("Error fetching user details:", error);
+        // Agar Unauthorized hai to logout kar do
+        if(error.response && error.response.status === 401){
+            localStorage.removeItem('token');
+            navigate('/login');
+        }
     }
   };
 
@@ -37,7 +44,6 @@ const SellerDashboard = () => {
   const fetchMyProperties = async () => {
     try {
       const token = localStorage.getItem('token'); 
-      // 👇 Use BACKEND_URL
       const response = await axios.get(`${BACKEND_URL}/api/properties/my-properties/`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -58,7 +64,6 @@ const SellerDashboard = () => {
 
     try {
         const token = localStorage.getItem('token');
-        // 👇 Use BACKEND_URL
         await axios.post(`${BACKEND_URL}/api/users/upload-verification/`, formData, {
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -79,7 +84,6 @@ const SellerDashboard = () => {
 
     try {
       const token = localStorage.getItem('token'); 
-      // 👇 Use BACKEND_URL
       await axios.delete(`${BACKEND_URL}/api/properties/${id}/`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
@@ -97,11 +101,11 @@ const SellerDashboard = () => {
     if (!imageObj) return 'https://via.placeholder.com/300';
     
     if (imageObj.image) {
-        // Agar full URL hai
+        // Agar full URL hai (e.g. Cloudinary/S3)
         if (imageObj.image.startsWith('http')) {
             return imageObj.image;
         }
-        // Agar relative URL hai to Live Backend URL jodo
+        // Agar relative URL hai to BACKEND_URL jodo
         return `${BACKEND_URL}${imageObj.image}`;
     }
     return imageObj.image_url || 'https://via.placeholder.com/300';
@@ -118,7 +122,6 @@ const SellerDashboard = () => {
 
     fetchUserDetails(); 
     fetchMyProperties(); 
-
   }, [navigate]);
 
   return (
@@ -181,7 +184,6 @@ const SellerDashboard = () => {
             {properties.map((property) => (
                 <div key={property.id} style={propertyCardStyle}>
                     <img 
-                        // 👇 Ab Helper function use kar rahe hain
                         src={property.images && property.images.length > 0 
                             ? getImageUrl(property.images[0])
                             : 'https://via.placeholder.com/300'} 

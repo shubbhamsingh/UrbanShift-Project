@@ -7,8 +7,11 @@ const AddProperty = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   
-  // 👇 LIVE SERVER URL
-  const BACKEND_URL = 'https://urbanshift-project.onrender.com';
+  // 👇 Smart URL Setup (Local aur Live dono ke liye)
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const BACKEND_URL = isLocal 
+    ? "http://127.0.0.1:8000" 
+    : "https://urbanshift-project.onrender.com";
 
   const [formData, setFormData] = useState({
     title: '',

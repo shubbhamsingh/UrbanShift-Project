@@ -13,14 +13,17 @@ const Properties = () => {
   const [category, setCategory] = useState('ALL');
   const [maxPrice, setMaxPrice] = useState(50000); 
 
-  // 👇 LIVE BACKEND URL (Change Localhost to Render)
-  const BACKEND_URL = 'https://urbanshift-project.onrender.com';
+  // 👇 Smart URL Setup (Local aur Live dono ke liye)
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const BACKEND_URL = isLocal 
+    ? "http://127.0.0.1:8000" 
+    : "https://urbanshift-project.onrender.com";
 
   // ✅ 1. Fetch Data
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // 👇 Localhost removed, using Live URL
+        // 👇 Uses dynamic BACKEND_URL
         const res = await axios.get(`${BACKEND_URL}/api/properties/`);
         setProperties(res.data);
         setFilteredProps(res.data); 
@@ -31,7 +34,7 @@ const Properties = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [BACKEND_URL]); // Added dependency
 
   // ✅ 2. Filter Logic
   useEffect(() => {
@@ -62,7 +65,7 @@ const Properties = () => {
         if (imageObj.image.startsWith('http')) {
             return imageObj.image;
         }
-        // 👇 Relative path ke sath Live URL joda
+        // 👇 Relative path ke sath Dynamic BACKEND_URL joda
         return `${BACKEND_URL}${imageObj.image}`;
     }
     return imageObj.image_url || 'https://via.placeholder.com/300';

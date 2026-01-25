@@ -1,10 +1,11 @@
-from rest_framework import viewsets, permissions
+from rest_framework import viewsets, permissions, generics
 from rest_framework.response import Response
 from rest_framework.decorators import action
-from django.db.models import Q  # 👈 Ye import zaroori hai privacy ke liye
+from django.db.models import Q 
 from .models import MoveRequest
 from .serializers import MoveRequestSerializer
 
+# 1. Main ViewSet (Create, Update, Delete ke liye)
 class MoveRequestViewSet(viewsets.ModelViewSet):
     serializer_class = MoveRequestSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -14,19 +15,15 @@ class MoveRequestViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        
-        # Check user type safely
         user_type = getattr(user, 'user_type', None)
 
         if user_type == 'COMPANY':
-            # 👇 PRIVACY FIX: 
-            # 1. Ya to request PENDING ho (Marketplace)
-            # 2. YA fir wo request ISI company ne accept ki ho (My Jobs)
+            # Company ko Pending aur apni Accepted requests dikhengi
             return MoveRequest.objects.filter(
                 Q(status='PENDING') | Q(company=user)
             ).order_by('-created_at')
         
-        # Customer ko sirf apna data dikhega
+        # Customer ko apna data dikhega
         return MoveRequest.objects.filter(customer=user).order_by('-created_at')
 
     @action(detail=True, methods=['post'])
@@ -40,12 +37,18 @@ class MoveRequestViewSet(viewsets.ModelViewSet):
 
         if new_status in ['ACCEPTED', 'COMPLETED', 'CANCELLED']:
             move_request.status = new_status
-            
-            # Agar ACCEPT kiya, to Company ka Thappa laga do
             if new_status == 'ACCEPTED':
                 move_request.company = request.user
-            
             move_request.save()
             return Response({'status': 'updated'})
         
         return Response({'error': 'Invalid status'}, status=400)
+
+# 2. Specific View (Sirf "My Moves" page ke liye)
+class UserMoveRequestsView(generics.ListAPIView):
+    serializer_class = MoveRequestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # ✅ FIX: 'user' ki jagah 'customer' use kiya hai
+        return MoveRequest.objects.filter(customer=self.request.user).order_by('-created_at')
