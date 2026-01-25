@@ -1,15 +1,24 @@
 from pathlib import Path
 import os
 from datetime import timedelta
+import dj_database_url  # 👈 Database connect karne ke liye
+from dotenv import load_dotenv  # 👈 .env file padhne ke liye
+
+# .env file load karein
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-change-me-urbanshift-dev-key'
+# ==========================================
+# 🔐 SECURITY SETTINGS (SECURE)
+# ==========================================
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Secret Key ab .env se aayegi (Agar nahi mili to default insecure wali use karega - sirf dev ke liye)
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-urbanshift-dev-key')
+
+# Debug Mode: .env me 'False' set karein Production ke liye
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
 
@@ -34,9 +43,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # ✅ Cors sabse upar hona chahiye
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware', # ✅ Static files serve karne ke liye
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -65,12 +74,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-# Database
+# ==========================================
+# 🗄️ DATABASE CONFIGURATION (SMART SWITCH)
+# ==========================================
+
+# Ye automatically check karega:
+# 1. Agar Render par DATABASE_URL mila -> PostgreSQL use karega.
+# 2. Agar nahi mila (Localhost) -> SQLite use karega.
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',
+        conn_max_age=600
+    )
 }
 
 # Password validation
@@ -105,12 +121,24 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Custom User Model
 AUTH_USER_MODEL = 'users.User'
 
-# CORS Configuration
+# ==========================================
+# 🌍 CORS & CSRF CONFIGURATION
+# ==========================================
+
+CORS_ALLOW_ALL_ORIGINS = True  # Testing ke liye open rakha hai
+
+# ✅ Vercel aur Localhost dono allow kiye
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://urban-shift-project.vercel.app", 
 ]
-CORS_ALLOW_ALL_ORIGINS = True
+
+# ✅ CSRF Trusted Origins (Ye Login/POST requests ke liye zaroori hai)
+CSRF_TRUSTED_ORIGINS = [
+    "https://urbanshift-project.onrender.com", # Backend Domain
+    "https://urban-shift-project.vercel.app",  # Frontend Domain
+]
 
 # REST FRAMEWORK CONFIGURATION
 REST_FRAMEWORK = {
@@ -129,35 +157,30 @@ SIMPLE_JWT = {
 }
 
 # ==========================================
-# 🎨 JAZZMIN SETTINGS (SINGLE & MERGED)
+# 🎨 JAZZMIN SETTINGS
 # ==========================================
 
 JAZZMIN_SETTINGS = {
-    # 1. Branding
     "site_title": "UrbanShift Admin",
     "site_header": "UrbanShift",
     "site_brand": "UrbanShift",
     "welcome_sign": "Welcome to UrbanShift HQ",
     "copyright": "UrbanShift Ltd",
     
-    # 2. Logo Settings (Admin Panel)
     "site_logo": "img/logo.png",
     "site_logo_classes": "img-fluid", 
 
-    # 3. Custom CSS (3D Theme)
     "custom_css": "css/admin_custom.css",
     "custom_js": "js/admin_custom.js",
 
-    # 4. Theme Switcher (UI Builder)
-    "show_ui_builder": True,  # ✅ Ye apko Theme change karne ka option dega
+    "show_ui_builder": True,
 
-    # 5. Top Menu
     "topmenu_links": [
         {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
-        {"name": "View Site", "url": "http://localhost:3000", "new_window": True},
+        # ✅ Admin Panel se Live Site ka link
+        {"name": "View Site", "url": "https://urban-shift-project.vercel.app", "new_window": True},
     ],
 
-    # 6. Side Menu Icons
     "order_with_respect_to": ["properties", "users", "auth"],
     "icons": {
         "auth": "fas fa-users-cog",
@@ -169,6 +192,6 @@ JAZZMIN_SETTINGS = {
 }
 
 JAZZMIN_UI_TWEAKS = {
-    "theme": "default", # Custom CSS ko control lene do
+    "theme": "default",
     "dark_mode_theme": "darkly",
 }

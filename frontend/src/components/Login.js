@@ -2,12 +2,15 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom'; 
 import axios from 'axios';
 import { toast } from 'react-toastify';
-import { FaEye, FaEyeSlash } from 'react-icons/fa'; // 👁️ Icons Import
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
 
 const Login = () => {
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
-  const [showPass, setShowPass] = useState(false); // 👈 Password toggle state
+  const [showPass, setShowPass] = useState(false); 
+
+  // 👇 LIVE BACKEND URL
+  const BACKEND_URL = 'https://urbanshift-project.onrender.com';
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -18,7 +21,8 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/users/login/', formData);
+      // ✅ Updated URL
+      const response = await axios.post(`${BACKEND_URL}/api/users/login/`, formData);
       
       localStorage.setItem('token', response.data.access);
       localStorage.setItem('userType', response.data.user_type);
@@ -61,14 +65,12 @@ const Login = () => {
                     style={inputStyle} 
                     required 
                 />
-                {/* 👁️ Show/Hide Toggle */}
                 <span onClick={() => setShowPass(!showPass)} style={eyeIconStyle}>
                     {showPass ? <FaEyeSlash /> : <FaEye />}
                 </span>
             </div>
           </div>
 
-          {/* 🔗 Forgot Password Link */}
           <div style={{ textAlign: 'right', marginBottom: '15px' }}>
             <Link to="/forgot-password" style={{ fontSize: '0.9rem', color: '#ff7e5f', textDecoration: 'none' }}>
                 Forgot Password?

@@ -4,9 +4,15 @@ import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FaEye, FaEyeSlash, FaCheckCircle, FaCircle, FaTimesCircle } from 'react-icons/fa'; 
 
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css'; 
+
 const Register = () => {
   const navigate = useNavigate();
   
+  // 👇 LIVE BACKEND URL
+  const BACKEND_URL = 'https://urbanshift-project.onrender.com';
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -19,7 +25,6 @@ const Register = () => {
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
 
-  // पासवर्ड की शर्तों का स्टेट
   const [criteria, setCriteria] = useState({
     length: false,
     upper: false,
@@ -43,6 +48,10 @@ const Register = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handlePhoneChange = (value) => {
+    setFormData({ ...formData, phone_number: value });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -57,7 +66,7 @@ const Register = () => {
     }
 
     try {
-      await axios.post('http://127.0.0.1:8000/api/users/register/', {
+      await axios.post(`${BACKEND_URL}/api/users/register/`, {
         username: formData.username,
         email: formData.email,
         password: formData.password,
@@ -78,7 +87,6 @@ const Register = () => {
     }
   };
 
-  // स्टेटस दिखाने का छोटा फंक्शन
   const renderStatus = (isValid, text) => (
     <span style={{ 
         color: isValid ? '#2ecc71' : '#666', 
@@ -109,7 +117,6 @@ const Register = () => {
             <input type="email" name="email" onChange={handleChange} required style={inputStyle} placeholder="name@example.com" />
           </div>
 
-          {/* 🔒 PASSWORD FIELD */}
           <div style={inputGroup}>
             <label>Password</label>
             <div style={{position: 'relative'}}>
@@ -136,7 +143,6 @@ const Register = () => {
             )}
           </div>
 
-          {/* 🔒 CONFIRM PASSWORD FIELD */}
           <div style={inputGroup}>
             <label>Confirm Password</label>
             <div style={{position: 'relative'}}>
@@ -158,7 +164,6 @@ const Register = () => {
                 </span>
             </div>
             
-            {/* 🛡️ Real-time Matching Indicator */}
             {formData.confirm_password && (
                 <div style={{ 
                     fontSize: '0.8rem', 
@@ -176,7 +181,6 @@ const Register = () => {
             )}
           </div>
 
-          {/* ... Rest of the form remains same ... */}
           <div style={inputGroup}>
             <label>I am a:</label>
             <select name="user_type" onChange={handleChange} style={inputStyle}>
@@ -186,14 +190,21 @@ const Register = () => {
             </select>
           </div>
 
+          {/* 👇 FIXED: PHONE INPUT (Styles ab index.css se aayenge) */}
           <div style={inputGroup}>
             <label>Mobile Number</label>
-            <input type="tel" name="phone_number" onChange={handleChange} style={inputStyle} placeholder="+91 XXXXX XXXXX" />
+            <PhoneInput
+              country={'in'}
+              value={formData.phone_number}
+              onChange={handlePhoneChange}
+              enableSearch={true}
+            />
           </div>
 
           <button type="submit" style={btnStyle}>Create Account</button>
+          
           <p style={{textAlign:'center', marginTop:'15px', color:'var(--text-secondary)'}}>
-              Already have an account? <Link to="/login" style={{color:'var(--accent-color)'}}>Login here</Link>
+              Already have an account? <Link to="/login" style={{color:'#3498db', fontWeight:'bold', textDecoration:'none', marginLeft:'5px'}}>Login here</Link>
           </p>
         </form>
       </div>
@@ -201,7 +212,7 @@ const Register = () => {
   );
 };
 
-// Styles (same as before)
+// --- STYLES ---
 const containerStyle = { minHeight: '90vh', display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'var(--bg-color)', padding: '20px' };
 const formCardStyle = { width: '100%', maxWidth: '450px', padding: '30px', background: 'var(--card-bg)', borderRadius: '15px', border: '1px solid var(--border-color)' };
 const inputGroup = { marginBottom: '15px', display: 'flex', flexDirection: 'column', gap: '5px', color: 'var(--text-primary)' };

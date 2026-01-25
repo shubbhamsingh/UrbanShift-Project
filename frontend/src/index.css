@@ -155,3 +155,49 @@ a { text-decoration: none; color: inherit; transition: 0.3s; }
 .Toastify__close-button {
   color: var(--text-primary) !important;
 }
+
+/* --- PHONE INPUT DARK MODE FIX --- */
+
+/* 1. Input Box Background */
+.react-tel-input .form-control {
+    background-color: var(--bg-color) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 2. Flag Dropdown Button */
+.react-tel-input .flag-dropdown {
+    background-color: var(--bg-color) !important;
+    border-color: var(--border-color) !important;
+}
+.react-tel-input .selected-flag:hover, 
+.react-tel-input .selected-flag:focus {
+    background-color: #333 !important;
+}
+
+/* 3. The Dropdown List (Main Fix) */
+.react-tel-input .country-list {
+    background-color: #1e1e1e !important; /* Dark Grey Background */
+    color: white !important;              /* White Text */
+    border: 1px solid #444 !important;
+}
+
+/* 4. List Items (Countries) */
+.react-tel-input .country-list .country {
+    background-color: #1e1e1e !important;
+}
+.react-tel-input .country-list .country:hover, 
+.react-tel-input .country-list .country.highlight {
+    background-color: #333 !important; /* Hover Effect */
+}
+
+/* 5. Search Box inside Dropdown */
+.react-tel-input .country-list .search {
+    background-color: #1e1e1e !important;
+}
+.react-tel-input .country-list .search-box {
+    background-color: #2c2c2c !important;
+    color: white !important;
+    border: 1px solid #555 !important;
+    margin-bottom: 5px !important;
+}
