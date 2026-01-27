@@ -30,25 +30,26 @@ const PurchasedHomes = () => {
   const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
   const BACKEND_URL = isLocal ? "http://127.0.0.1:8000" : "https://urbanshift-project.onrender.com";
 
+  // ✅ FIX: fetchPurchasedHomes ko useEffect ke andar move kiya
   useEffect(() => {
-    fetchPurchasedHomes();
-  }, []);
+    const fetchPurchasedHomes = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        // Backend me humne 'my-purchases' endpoint banaya tha
+        const res = await axios.get(`${BACKEND_URL}/api/properties/my-purchases/`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setHomes(res.data);
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load purchased homes");
+        setLoading(false);
+      }
+    };
 
-  const fetchPurchasedHomes = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      // Backend me humne 'my-purchases' endpoint banaya tha
-      const res = await axios.get(`${BACKEND_URL}/api/properties/my-purchases/`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setHomes(res.data);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load purchased homes");
-      setLoading(false);
-    }
-  };
+    fetchPurchasedHomes();
+  }, [BACKEND_URL]); // Dependency added
 
   const getImageUrl = (imageObj) => {
       if (!imageObj) return "https://via.placeholder.com/400x300?text=No+Image";

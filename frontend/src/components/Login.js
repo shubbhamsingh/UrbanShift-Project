@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; 
+import { Link } from 'react-router-dom'; // ✅ useNavigate hata diya
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
 
 const Login = () => {
-  const navigate = useNavigate(); 
+  // ✅ const navigate = useNavigate(); // Ye line hata di gayi hai (Unused thi)
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [showPass, setShowPass] = useState(false); 

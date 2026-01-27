@@ -20,40 +20,6 @@ const SellerDashboard = () => {
       is_verified: false 
   });
 
-  // ✅ 1. FUNCTION: Fetch User Details
-  const fetchUserDetails = async () => {
-    try {
-        const token = localStorage.getItem('token'); 
-        if (!token) return;
-
-        const response = await axios.get(`${BACKEND_URL}/api/users/me/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        setUser(response.data);
-    } catch (error) {
-        console.error("Error fetching user details:", error);
-        if(error.response && error.response.status === 401){
-            localStorage.removeItem('token');
-            navigate('/login');
-        }
-    }
-  };
-
-  // ✅ 2. FUNCTION: Fetch Properties
-  const fetchMyProperties = async () => {
-    try {
-      const token = localStorage.getItem('token'); 
-      const response = await axios.get(`${BACKEND_URL}/api/properties/my-properties/`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      setProperties(response.data);
-    } catch (error) {
-      console.error("Error fetching properties:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   // ✅ 3. FUNCTION: Upload Verification Document
   const handleFileUpload = async (file) => {
     if (!file) return;
@@ -70,7 +36,8 @@ const SellerDashboard = () => {
             }
         });
         toast.success("Document Uploaded! Admin will verify you shortly. 🕒");
-        fetchUserDetails();
+        // Reload page to refresh user details
+        window.location.reload();
     } catch (error) {
         console.error(error);
         toast.error("Upload Failed! Check connection.");
@@ -113,6 +80,7 @@ const SellerDashboard = () => {
     return 'https://via.placeholder.com/300';
   };
 
+  // ✅ FIX: fetchUserDetails and fetchMyProperties moved inside useEffect
   useEffect(() => {
     const token = localStorage.getItem('token'); 
     
@@ -122,9 +90,37 @@ const SellerDashboard = () => {
         return;
     }
 
+    const fetchUserDetails = async () => {
+        try {
+            const response = await axios.get(`${BACKEND_URL}/api/users/me/`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            setUser(response.data);
+        } catch (error) {
+            console.error("Error fetching user details:", error);
+            if(error.response && error.response.status === 401){
+                localStorage.removeItem('token');
+                navigate('/login');
+            }
+        }
+    };
+    
+    const fetchMyProperties = async () => {
+        try {
+          const response = await axios.get(`${BACKEND_URL}/api/properties/my-properties/`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+          setProperties(response.data);
+        } catch (error) {
+          console.error("Error fetching properties:", error);
+        } finally {
+          setIsLoading(false);
+        }
+    };
+
     fetchUserDetails(); 
     fetchMyProperties(); 
-  }, [navigate]);
+  }, [navigate, BACKEND_URL]); // Dependencies added
 
   return (
     <div style={pageContainerStyle}>

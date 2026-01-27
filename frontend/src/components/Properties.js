@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { FaSearch, FaFilter, FaMapMarkerAlt, FaBed, FaRupeeSign } from 'react-icons/fa';
+import { FaSearch, FaMapMarkerAlt, FaBed, FaRupeeSign } from 'react-icons/fa'; // ✅ FaFilter hata diya
 
 // ✅ Theme Context Import
 import { ThemeContext } from '../context/ThemeContext';
@@ -28,24 +28,24 @@ const Properties = () => {
     ? "http://127.0.0.1:8000" 
     : "https://urbanshift-project.onrender.com";
 
+  // ✅ FIX: fetchProperties ko useEffect ke andar define kiya
   useEffect(() => {
-    fetchProperties();
-  }, []);
+    const fetchProperties = async () => {
+      try {
+        const res = await axios.get(`${BACKEND_URL}/api/properties/`);
+        // Sirf wo dikhao jo SOLD nahi hain
+        const availableProps = res.data.filter(p => !p.is_sold);
+        setProperties(availableProps);
+        setFilteredProperties(availableProps);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching properties:", error);
+        setLoading(false);
+      }
+    };
 
-  // ✅ Fetch All Properties
-  const fetchProperties = async () => {
-    try {
-      const res = await axios.get(`${BACKEND_URL}/api/properties/`);
-      // Sirf wo dikhao jo SOLD nahi hain
-      const availableProps = res.data.filter(p => !p.is_sold);
-      setProperties(availableProps);
-      setFilteredProperties(availableProps);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching properties:", error);
-      setLoading(false);
-    }
-  };
+    fetchProperties();
+  }, [BACKEND_URL]); // Dependency me BACKEND_URL daal diya (best practice)
 
   // ✅ Filter Logic (Real-time)
   useEffect(() => {
@@ -228,8 +228,6 @@ const selectStyle = {
 const gridStyle = { 
     display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '25px' 
 };
-// Removed cardStyle from here because it's now applied inline for dynamic colors
-
 // Default Card Style for structure
 const cardStyle = { 
     borderRadius: '15px', overflow: 'hidden', 

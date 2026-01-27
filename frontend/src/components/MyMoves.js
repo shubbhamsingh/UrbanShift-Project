@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react'; // ✅ useCallback import kiya
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
@@ -30,11 +30,8 @@ const MyMoves = ({ filterType = 'all' }) => {
     ? "http://127.0.0.1:8000" 
     : "https://urbanshift-project.onrender.com";
 
-  useEffect(() => {
-    fetchMyMoves();
-  }, []);
-
-  const fetchMyMoves = async () => {
+  // ✅ FIX: fetchMyMoves ko useCallback me dala taaki ise useEffect aur buttons dono jagah use kar sakein
+  const fetchMyMoves = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       const res = await axios.get(`${BASE_URL}/api/relocation/my-moves/`, {
@@ -47,7 +44,12 @@ const MyMoves = ({ filterType = 'all' }) => {
       toast.error("Failed to load your bookings");
       setLoading(false);
     }
-  };
+  }, [BASE_URL]); // Dependency added
+
+  // ✅ useEffect ab fetchMyMoves par depend karega
+  useEffect(() => {
+    fetchMyMoves();
+  }, [fetchMyMoves]);
 
   // --- PAYMENT HANDLER ---
   const handlePayment = async (moveId) => {

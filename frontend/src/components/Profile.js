@@ -11,7 +11,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false); // Toggle between View & Edit
 
-  // ✅ Theme Logic (New Addition)
+  // ✅ Theme Logic
   const { mode } = useContext(ThemeContext);
   const isDark = mode === 'dark' || (
       mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -30,29 +30,30 @@ const Profile = () => {
     ? "http://127.0.0.1:8000" 
     : "https://urbanshift-project.onrender.com";
 
+  // ✅ FIX: fetchProfile ko useEffect ke andar move kiya
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get(`${BACKEND_URL}/api/users/me/`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setUser(res.data);
+        setFormData({
+          username: res.data.username,
+          phone: res.data.phone || '',
+          password: ''
+        });
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+        toast.error("Failed to load profile");
+        setLoading(false);
+      }
+    };
 
-  const fetchProfile = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const res = await axios.get(`${BACKEND_URL}/api/users/me/`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setUser(res.data);
-      setFormData({
-        username: res.data.username,
-        phone: res.data.phone || '',
-        password: ''
-      });
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to load profile");
-      setLoading(false);
-    }
-  };
+    fetchProfile();
+  }, [BACKEND_URL]); // Dependency added
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -96,10 +97,10 @@ const Profile = () => {
       iconColor: isDark ? '#888' : '#666',
       shadow: isDark 
         ? '10px 10px 30px #0a0a0a, -10px -10px 30px #2a2a2a' 
-        : '0 10px 40px rgba(0,0,0,0.08)' // Softer shadow for light mode
+        : '0 10px 40px rgba(0,0,0,0.08)'
   };
 
-  // --- STYLES (Moved inside to access colors) ---
+  // --- STYLES ---
   const styles = {
     container: {
       minHeight: '85vh',
