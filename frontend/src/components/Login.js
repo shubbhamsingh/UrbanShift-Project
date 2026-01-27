@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // useNavigate add kiya (better redirection)
+import { Link, useNavigate } from 'react-router-dom'; 
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
 
 const Login = () => {
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate(); 
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [showPass, setShowPass] = useState(false); 
@@ -28,17 +28,25 @@ const Login = () => {
       // ✅ Uses Dynamic URL
       const response = await axios.post(`${BACKEND_URL}/api/users/login/`, formData);
       
+      // Data Save karein
       localStorage.setItem('token', response.data.access);
       localStorage.setItem('userType', response.data.user_type);
       localStorage.setItem('username', response.data.username);
       
       toast.success(`Welcome back, ${response.data.username}! 👋`);
       
-      // Thoda delay taaki toast dikhe, phir redirect
+      // ✅ ROLE BASED REDIRECT LOGIC
+      const userType = response.data.user_type;
+
       setTimeout(() => {
-          // window.location.href ki jagah navigate use kar rahe hain (faster)
-          navigate('/');
-          window.location.reload(); // State refresh karne ke liye reload zaroori hai
+          // Agar Seller ya Company hai to Dashboard, nahi to Home
+          if (userType === 'SELLER' || userType === 'COMPANY') {
+              // Note: Make sure '/dashboard' route exists in App.js
+              window.location.href = '/dashboard'; 
+          } else {
+              window.location.href = '/'; 
+          }
+          // Note: window.location.href use kiya taaki page refresh ho aur Navbar update ho jaye
       }, 1000);
       
     } catch (error) {

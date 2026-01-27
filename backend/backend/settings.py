@@ -14,10 +14,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # 🔐 SECURITY SETTINGS (SECURE)
 # ==========================================
 
-# Secret Key ab .env se aayegi (Agar nahi mili to default insecure wali use karega - sirf dev ke liye)
+# Secret Key ab .env se aayegi
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-urbanshift-dev-key')
 
-# Debug Mode: .env me 'False' set karein Production ke liye
+# Debug Mode
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = ['*']
@@ -78,10 +78,6 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # 🗄️ DATABASE CONFIGURATION (SMART SWITCH)
 # ==========================================
 
-# Ye automatically check karega:
-# 1. Agar Render par DATABASE_URL mila -> PostgreSQL use karega.
-# 2. Agar nahi mila (Localhost) -> SQLite use karega.
-
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///db.sqlite3',
@@ -127,17 +123,15 @@ AUTH_USER_MODEL = 'users.User'
 
 CORS_ALLOW_ALL_ORIGINS = True  # Testing ke liye open rakha hai
 
-# ✅ Vercel aur Localhost dono allow kiye
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "https://urban-shift-project.vercel.app", 
 ]
 
-# ✅ CSRF Trusted Origins (Ye Login/POST requests ke liye zaroori hai)
 CSRF_TRUSTED_ORIGINS = [
-    "https://urbanshift-project.onrender.com", # Backend Domain
-    "https://urban-shift-project.vercel.app",  # Frontend Domain
+    "https://urbanshift-project.onrender.com", 
+    "https://urban-shift-project.vercel.app",
 ]
 
 # REST FRAMEWORK CONFIGURATION
@@ -155,6 +149,12 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
+
+# ==========================================
+# 📧 BREVO API CONFIGURATION
+# ==========================================
+# Credentials .env file se load honge
+BREVO_API_KEY = os.environ.get('BREVO_API_KEY')
 
 # ==========================================
 # 🎨 JAZZMIN SETTINGS
@@ -177,7 +177,6 @@ JAZZMIN_SETTINGS = {
 
     "topmenu_links": [
         {"name": "Home",  "url": "admin:index", "permissions": ["auth.view_user"]},
-        # ✅ Admin Panel se Live Site ka link
         {"name": "View Site", "url": "https://urban-shift-project.vercel.app", "new_window": True},
     ],
 

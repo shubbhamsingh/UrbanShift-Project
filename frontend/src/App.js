@@ -54,7 +54,9 @@ function App() {
             
             <Route path="/properties" element={<Properties />} /> 
             <Route path="/add-property" element={<AddProperty />} />
-            <Route path="/property/:id" element={<PropertyDetail />} />
+            
+            {/* 👇 FIX: 'property' ko 'properties' kar diya (Plural) */}
+            <Route path="/properties/:id" element={<PropertyDetail />} />
 
             <Route path="/seller-dashboard" element={<SellerDashboard />} />
             <Route path="/wishlist" element={<Wishlist />} />

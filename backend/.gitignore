@@ -8,3 +8,13 @@ db.sqlite3
 # Virtual Environment
 venv/
 env/
+
+# Media Files (User uploads GitHub par nahi jaane chahiye)
+media/
+staticfiles/
+
+# React / Frontend (Ye sabse zaroori hai!)
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env

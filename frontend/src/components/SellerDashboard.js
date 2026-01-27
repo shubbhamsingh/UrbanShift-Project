@@ -8,7 +8,7 @@ const SellerDashboard = () => {
   const [properties, setProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  // 👇 1. Smart URL Setup (Local aur Live dono ke liye)
+  // 👇 Smart URL Setup
   const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
   const BACKEND_URL = isLocal 
     ? "http://127.0.0.1:8000" 
@@ -32,7 +32,6 @@ const SellerDashboard = () => {
         setUser(response.data);
     } catch (error) {
         console.error("Error fetching user details:", error);
-        // Agar Unauthorized hai to logout kar do
         if(error.response && error.response.status === 401){
             localStorage.removeItem('token');
             navigate('/login');
@@ -96,19 +95,22 @@ const SellerDashboard = () => {
     }
   };
 
-  // 🖼️ SMART IMAGE HELPER (Images Fixed)
+  // 🖼️ SMART IMAGE HELPER (FIXED FOR URLS 🛠️)
   const getImageUrl = (imageObj) => {
     if (!imageObj) return 'https://via.placeholder.com/300';
     
+    // 1. Agar Backend se direct URL aaya hai (jo ab serializer bhejega)
+    if (imageObj.image_url) {
+        return imageObj.image_url;
+    }
+
+    // 2. Agar Uploaded Image hai
     if (imageObj.image) {
-        // Agar full URL hai (e.g. Cloudinary/S3)
-        if (imageObj.image.startsWith('http')) {
-            return imageObj.image;
-        }
-        // Agar relative URL hai to BACKEND_URL jodo
+        if (imageObj.image.startsWith('http')) return imageObj.image;
         return `${BACKEND_URL}${imageObj.image}`;
     }
-    return imageObj.image_url || 'https://via.placeholder.com/300';
+    
+    return 'https://via.placeholder.com/300';
   };
 
   useEffect(() => {
@@ -193,7 +195,7 @@ const SellerDashboard = () => {
                     />
                     <div style={{padding: '15px'}}>
                         <h4 style={{margin: '0 0 10px 0', color: 'var(--text-primary)'}}>{property.title}</h4>
-                        <p style={{color: 'var(--accent-teal)', fontWeight:'bold'}}>₹{property.price}/mo</p>
+                        <p style={{color: 'var(--accent-teal)', fontWeight:'bold'}}>₹{parseFloat(property.price).toLocaleString('en-IN')}/mo</p>
                         <p style={{color: 'var(--text-secondary)', fontSize:'0.9rem'}}>📍 {property.location}</p>
                         
                         <button 

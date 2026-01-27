@@ -1,18 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { FaTruck, FaMapMarkerAlt, FaCalendarAlt, FaBoxOpen } from 'react-icons/fa';
+
+// ✅ Theme Context Import
+import { ThemeContext } from '../context/ThemeContext';
 
 const BookMovers = () => {
   const navigate = useNavigate();
-  
-  // 👇 FIX: Field names wahi rakhein jo Django Models me hain
+
+  // ✅ Theme Logic
+  const { mode } = useContext(ThemeContext);
+  const isDark = mode === 'dark' || (
+      mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches
+  );
+
+  // Field names wahi hain jo Django Models me hain
   const [formData, setFormData] = useState({
-    source: '',           // 'source_city' hata diya
-    destination: '',      // 'destination_city' hata diya
-    move_date: '',        // 'moving_date' hata diya
-    move_size: '1BHK',    // 'house_size' hata diya
-    items_list: ''        // 'items_description' hata diya
+    source: '',           
+    destination: '',      
+    move_date: '',        
+    move_size: '1BHK',    
+    items_list: ''        
   });
 
   // 👇 Smart URL Setup
@@ -36,17 +46,15 @@ const BookMovers = () => {
     }
 
     try {
-      // Endpoint '/move-requests/' hi rahega
       await axios.post(`${BACKEND_URL}/api/relocation/move-requests/`, formData, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
       toast.success("Request Sent! Check status in 'My Bookings' ✅");
-      navigate('/my-moves'); 
+      navigate('/user-dashboard'); // Dashboard par bhej diya
     } catch (error) {
-      console.error("Submission Error:", error.response?.data); // Error console me dikhega
+      console.error("Submission Error:", error.response?.data);
       
-      // Agar server specific error bataye (Jaise "Source is required")
       if (error.response && error.response.data) {
           const errorMsg = Object.values(error.response.data).flat().join(', ');
           toast.error(`Error: ${errorMsg}`);
@@ -56,36 +64,144 @@ const BookMovers = () => {
     }
   };
 
+  // --- DYNAMIC COLORS ---
+  const colors = {
+      bg: isDark ? '#121212' : '#f4f6f8',
+      cardBg: isDark ? '#1e1e1e' : '#ffffff',
+      text: isDark ? '#ffffff' : '#333333',
+      subText: isDark ? '#bbbbbb' : '#666666',
+      inputBg: isDark ? '#2c2c2c' : '#f9f9f9',
+      border: isDark ? '#333' : '#ddd',
+      shadow: isDark ? '0 10px 30px rgba(0,0,0,0.5)' : '0 10px 30px rgba(0,0,0,0.1)',
+      icon: isDark ? '#FF9966' : '#FF5E62'
+  };
+
+  // --- STYLES (Moved inside) ---
+  const styles = {
+    container: { 
+        padding: '40px 20px', 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        background: colors.bg, 
+        minHeight:'90vh',
+        transition: '0.3s'
+    },
+    formCard: { 
+        width: '100%', 
+        maxWidth: '550px', 
+        background: colors.cardBg, 
+        padding: '40px', 
+        borderRadius: '20px', 
+        boxShadow: colors.shadow, 
+        border: `1px solid ${colors.border}`,
+        transition: '0.3s'
+    },
+    header: { 
+        color: colors.text, 
+        textAlign:'center', 
+        fontSize: '1.8rem', 
+        marginBottom: '10px' 
+    },
+    subHeader: { 
+        textAlign:'center', 
+        color: colors.subText, 
+        marginBottom:'30px', 
+        fontSize: '0.95rem' 
+    },
+    inputGroup: { 
+        marginBottom: '20px', 
+        display:'flex', 
+        flexDirection:'column', 
+        gap:'8px', 
+        color: colors.text, 
+        fontWeight:'600' 
+    },
+    labelIcon: { 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '8px', 
+        color: colors.subText, 
+        fontSize: '0.9rem' 
+    },
+    rowStyle: { display:'flex', gap:'20px', marginBottom:'20px' },
+    
+    input: { 
+        padding: '14px', 
+        borderRadius: '10px', 
+        border: `1px solid ${colors.border}`, 
+        background: colors.inputBg, 
+        color: colors.text, 
+        outline: 'none',
+        fontSize: '1rem',
+        transition: '0.3s'
+    },
+    
+    btn: { 
+        width: '100%', 
+        padding: '16px', 
+        background: 'linear-gradient(135deg, #FF9966, #FF5E62)', 
+        color: 'white', 
+        border: 'none', 
+        borderRadius: '12px', 
+        fontSize: '1.1rem', 
+        cursor: 'pointer', 
+        fontWeight:'bold', 
+        marginTop:'20px',
+        boxShadow: '0 4px 15px rgba(255, 94, 98, 0.4)',
+        transition: 'transform 0.2s'
+    }
+  };
+
   return (
-    <div style={containerStyle}>
-      <div style={formCardStyle}>
-        <h2 style={{color: 'var(--text-primary)', textAlign:'center'}}>🚚 Book Packers & Movers</h2>
-        <p style={{textAlign:'center', color:'var(--text-secondary)', marginBottom:'20px'}}>Get verified movers for a hassle-free shift.</p>
+    <div style={styles.container}>
+      <div style={styles.formCard}>
+        <h2 style={styles.header}>
+            <FaTruck color={colors.icon} style={{marginRight: '10px'}}/> 
+            Book Packers & Movers
+        </h2>
+        <p style={styles.subHeader}>Get verified movers for a hassle-free shift.</p>
         
         <form onSubmit={handleSubmit}>
           
-          <div style={inputGroup}>
-            <label>Moving From (Source)</label>
-            {/* name="source" kiya */}
-            <input name="source" type="text" placeholder="e.g. Malviya Nagar, Jaipur" onChange={handleChange} required style={inputStyle} />
+          <div style={styles.inputGroup}>
+            <div style={styles.labelIcon}><FaMapMarkerAlt /> Moving From (Source)</div>
+            <input 
+                name="source" 
+                type="text" 
+                placeholder="e.g. Malviya Nagar, Jaipur" 
+                onChange={handleChange} 
+                required 
+                style={styles.input} 
+            />
           </div>
 
-          <div style={inputGroup}>
-            <label>Moving To (Destination)</label>
-            {/* name="destination" kiya */}
-            <input name="destination" type="text" placeholder="e.g. Whitefield, Bangalore" onChange={handleChange} required style={inputStyle} />
+          <div style={styles.inputGroup}>
+            <div style={styles.labelIcon}><FaMapMarkerAlt /> Moving To (Destination)</div>
+            <input 
+                name="destination" 
+                type="text" 
+                placeholder="e.g. Whitefield, Bangalore" 
+                onChange={handleChange} 
+                required 
+                style={styles.input} 
+            />
           </div>
 
-          <div style={rowStyle}>
-            <div style={{flex:1}}>
-                <label>Move Date</label>
-                {/* name="move_date" kiya */}
-                <input name="move_date" type="date" onChange={handleChange} required style={inputStyle} />
+          <div style={styles.rowStyle}>
+            <div style={{flex:1, display:'flex', flexDirection:'column', gap:'8px'}}>
+                <div style={styles.labelIcon}><FaCalendarAlt /> Move Date</div>
+                <input 
+                    name="move_date" 
+                    type="date" 
+                    onChange={handleChange} 
+                    required 
+                    style={styles.input} 
+                />
             </div>
-            <div style={{flex:1}}>
-                <label>House Size</label>
-                {/* name="move_size" kiya */}
-                <select name="move_size" onChange={handleChange} style={inputStyle}>
+            <div style={{flex:1, display:'flex', flexDirection:'column', gap:'8px'}}>
+                <div style={styles.labelIcon}><FaBoxOpen /> House Size</div>
+                <select name="move_size" onChange={handleChange} style={styles.input}>
                     <option>1BHK</option>
                     <option>2BHK</option>
                     <option>3BHK</option>
@@ -95,25 +211,29 @@ const BookMovers = () => {
             </div>
           </div>
 
-          <div style={inputGroup}>
-            <label>List Major Items (Optional)</label>
-            {/* name="items_list" kiya */}
-            <textarea name="items_list" rows="3" placeholder="e.g. 1 Bed, 1 Fridge, 2 ACs..." onChange={handleChange} style={inputStyle}></textarea>
+          <div style={styles.inputGroup}>
+            <div style={styles.labelIcon}>List Major Items (Optional)</div>
+            <textarea 
+                name="items_list" 
+                rows="4" 
+                placeholder="e.g. 1 Bed, 1 Fridge, 2 ACs..." 
+                onChange={handleChange} 
+                style={{...styles.input, resize: 'vertical'}}
+            ></textarea>
           </div>
 
-          <button type="submit" style={btnStyle}>🚀 Send Request</button>
+          <button 
+            type="submit" 
+            style={styles.btn}
+            onMouseOver={(e) => e.target.style.transform = 'scale(1.02)'}
+            onMouseOut={(e) => e.target.style.transform = 'scale(1)'}
+          >
+            🚀 Send Request
+          </button>
         </form>
       </div>
     </div>
   );
 };
-
-// --- STYLES ---
-const containerStyle = { padding: '40px', display: 'flex', justifyContent: 'center', background: 'var(--bg-color)', minHeight:'90vh' };
-const formCardStyle = { width: '100%', maxWidth: '500px', background: 'var(--card-bg)', padding: '30px', borderRadius: '15px', boxShadow: '0 10px 30px rgba(0,0,0,0.1)', border: '1px solid var(--border-color)' };
-const inputGroup = { marginBottom: '15px', display:'flex', flexDirection:'column', gap:'5px', color:'var(--text-primary)', fontWeight:'600' };
-const rowStyle = { display:'flex', gap:'15px', marginBottom:'15px' };
-const inputStyle = { padding: '10px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-primary)' };
-const btnStyle = { width: '100%', padding: '12px', background: 'linear-gradient(135deg, #FF9966, #FF5E62)', color: 'white', border: 'none', borderRadius: '8px', fontSize: '1.1rem', cursor: 'pointer', fontWeight:'bold', marginTop:'10px' };
 
 export default BookMovers;

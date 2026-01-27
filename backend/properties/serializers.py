@@ -5,7 +5,8 @@ from .models import Property, PropertyImage, Wishlist
 class PropertyImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PropertyImage
-        fields = ['id', 'image']
+        # 👇 CHANGE: 'image_url' add kiya taaki frontend ko URL mile
+        fields = ['id', 'image', 'image_url'] 
 
 # --- 2. Property Serializer (Main) ---
 class PropertySerializer(serializers.ModelSerializer):
@@ -14,8 +15,16 @@ class PropertySerializer(serializers.ModelSerializer):
     seller_phone = serializers.SerializerMethodField()
     
     images = PropertyImageSerializer(many=True, read_only=True)
+    
+    # File Uploads
     uploaded_images = serializers.ListField(
         child=serializers.ImageField(max_length=1000000, allow_empty_file=False, use_url=False),
+        write_only=True, required=False
+    )
+    
+    # 👇 NEW: URL Uploads receive karne ke liye
+    image_urls = serializers.ListField(
+        child=serializers.URLField(),
         write_only=True, required=False
     )
 
@@ -24,26 +33,21 @@ class PropertySerializer(serializers.ModelSerializer):
         fields = [
             'id', 'seller', 'seller_name', 'seller_email', 'seller_phone', 
             'title', 'description', 'price', 'location', 
-            'category', 'bedrooms', 'images', 'uploaded_images', 'created_at'
+            'category', 'bedrooms', 'images', 'uploaded_images', 'image_urls', # 👈 Added here
+            'created_at', 'is_sold'
         ]
-        read_only_fields = ['seller', 'created_at']
+        read_only_fields = ['seller', 'created_at', 'is_sold']
 
-    # ✅ SAFE NAME CHECK (Ab ye Crash nahi karega)
+    # ✅ SAFE NAME CHECK
     def get_seller_name(self, obj):
-        # 1. Pehle check karo 'name' field hai ya nahi
         name = getattr(obj.seller, 'name', None)
-        if name:
-            return name
-            
-        # 2. Agar nahi, to First Name + Last Name check karo
+        if name: return name
+        
         first = getattr(obj.seller, 'first_name', '')
         last = getattr(obj.seller, 'last_name', '')
         full_name = f"{first} {last}".strip()
-        
-        if full_name:
-            return full_name
+        if full_name: return full_name
             
-        # 3. Kuch nahi mila to Username (Safe Option)
         return obj.seller.username
 
     # ✅ SAFE PHONE CHECK
@@ -52,9 +56,18 @@ class PropertySerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         uploaded_images = validated_data.pop('uploaded_images', [])
+        image_urls_list = validated_data.pop('image_urls', []) # 👇 URLs nikaale
+        
         property = Property.objects.create(**validated_data)
+        
+        # 1. Save Files
         for image in uploaded_images:
             PropertyImage.objects.create(property=property, image=image)
+            
+        # 2. Save URLs
+        for url in image_urls_list:
+            PropertyImage.objects.create(property=property, image_url=url)
+            
         return property
 
 # --- 3. Wishlist Serializer ---

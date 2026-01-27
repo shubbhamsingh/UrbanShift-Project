@@ -1,271 +1,304 @@
+/* --- PAGE LAYOUT --- */
 .detail-page {
-    padding: 40px 20px;
-    background: var(--bg-color);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
+  background-color: #121212; /* Dark Background */
+  min-height: 90vh;
+  padding: 40px 20px;
+  color: #ffffff; /* White Text */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .detail-container {
-    max-width: 1100px;
-    width: 100%;
-    background: var(--card-bg);
-    padding: 30px;
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-    border: 1px solid var(--border-color);
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
+/* --- LOADING & ERROR STATES --- */
+.loading-container, .error-container {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #121212;
+  color: white;
+  text-align: center;
+}
+
+.back-btn {
+  margin-top: 20px;
+  color: #f1c40f;
+  text-decoration: none;
+  border: 1px solid #f1c40f;
+  padding: 10px 20px;
+  border-radius: 5px;
+}
+
+/* --- HEADER --- */
 .detail-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
 .back-link {
-    color: var(--text-secondary);
-    text-decoration: none;
-    font-size: 1.1rem;
+  color: #888;
+  text-decoration: none;
+  font-size: 1.1rem;
+  transition: 0.3s;
 }
-
 .back-link:hover {
-    color: var(--accent-teal);
+  color: #f1c40f;
 }
 
 .status-badge {
-    padding: 5px 15px;
-    border-radius: 20px;
-    color: white;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 0.9rem;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-transform: uppercase;
 }
-.status-badge.RENT { background: #00b894; }
-.status-badge.SELL { background: #e17055; }
+.status-badge.RENT {
+  background-color: #f1c40f;
+  color: black;
+}
+.status-badge.SELL {
+  background-color: #2ecc71;
+  color: white;
+}
 
-/* LAYOUT */
+.wishlist-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.wishlist-btn:hover {
+  transform: scale(1.1);
+}
+
+/* --- CONTENT GRID --- */
 .content-wrapper {
-    display: flex;
-    gap: 40px;
-    flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1.5fr 1fr; /* Image takes more space */
+  gap: 40px;
 }
 
-/* IMAGES */
+@media (max-width: 768px) {
+  .content-wrapper {
+    grid-template-columns: 1fr; /* Stack on mobile */
+  }
+}
+
+/* --- IMAGE SECTION --- */
 .image-section {
-    flex: 1.5;
-    min-width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .main-image {
-    width: 100%;
-    height: 400px;
-    object-fit: cover;
-    border-radius: 15px;
-    border: 1px solid var(--border-color);
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  border-radius: 15px;
+  border: 1px solid #333;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
 .thumbnails {
-    display: flex;
-    gap: 10px;
-    margin-top: 15px;
-    overflow-x: auto;
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 10px;
 }
 
 .thumb-img {
-    width: 80px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 8px;
-    cursor: pointer;
-    opacity: 0.7;
-    transition: 0.3s;
+  width: 100px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: 0.2s;
 }
-
 .thumb-img:hover {
-    opacity: 1;
-    transform: scale(1.05);
+  border-color: #f1c40f;
 }
 
-/* INFO */
+/* --- INFO SECTION --- */
 .info-section {
-    flex: 1;
-    min-width: 300px;
-    color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
 }
 
 .prop-title {
-    font-size: 2rem;
-    margin-bottom: 10px;
+  font-size: 2.2rem;
+  margin: 0 0 10px 0;
+  color: white;
 }
 
 .prop-price {
-    font-size: 1.8rem;
-    color: var(--accent-orange);
-    margin-bottom: 20px;
+  font-size: 1.8rem;
+  color: #2ecc71;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+.per-month {
+  font-size: 1rem;
+  color: #888;
 }
 
-.per-month {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    font-weight: normal;
+.prop-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+  background: #1e1e1e;
+  border-radius: 10px;
+  margin-bottom: 25px;
+  border: 1px solid #333;
 }
 
 .prop-meta p {
-    margin-bottom: 10px;
-    font-size: 1.1rem;
+  margin: 0;
+  color: #ccc;
+  font-size: 1rem;
 }
 
-.prop-desc {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-color);
+.prop-desc h3 {
+  color: #f1c40f;
+  border-bottom: 1px solid #333;
+  padding-bottom: 10px;
+  margin-bottom: 15px;
 }
-
 .prop-desc p {
-    line-height: 1.6;
-    color: var(--text-secondary);
+  color: #bbb;
+  line-height: 1.6;
 }
 
+/* --- SELLER & CONTACT --- */
 .seller-box {
-    margin-top: 30px;
-    background: rgba(0,0,0,0.2);
-    padding: 20px;
-    border-radius: 10px;
+  margin-top: 30px;
+  padding: 25px;
+  background: #252525;
+  border-radius: 15px;
+  border: 1px solid #444;
+}
+
+.seller-box h3 {
+  margin-top: 0;
+  color: #ddd;
 }
 
 .contact-btn {
-    width: 100%;
-    padding: 12px;
-    background: var(--accent-teal);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1.1rem;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 15px;
+  width: 100%;
+  margin-top: 15px;
+  padding: 12px;
+  background: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
 }
-
 .contact-btn:hover {
-    background: #0a7e8c;
+  background: #2980b9;
 }
 
-/* LOADING / ERROR */
-.loading-container, .error-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 80vh;
-    color: var(--text-primary);
-}
-
-/* ... purane css ke neeche add karein ... */
-
-.wishlist-btn {
-    background: white;
-    border: 2px solid #eee;
-    padding: 10px;
-    border-radius: 50%;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-}
-
-.wishlist-btn:hover {
-    transform: scale(1.1);
-    box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-}
-
-/* ... Purane code ke neeche paste karein ... */
-
-/* --- MODAL STYLES --- */
+/* --- CONTACT MODAL --- */
 .modal-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    backdrop-filter: blur(5px);
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
 }
 
 .modal-content {
-    background: white;
-    width: 90%;
-    max-width: 400px;
-    padding: 30px;
-    border-radius: 15px;
-    position: relative;
-    text-align: center;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    animation: popUp 0.3s ease-out;
-}
-
-@keyframes popUp {
-    from { transform: scale(0.8); opacity: 0; }
-    to { transform: scale(1); opacity: 1; }
+  background: #2c3e50;
+  padding: 30px;
+  border-radius: 15px;
+  width: 90%;
+  max-width: 400px;
+  position: relative;
+  box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+  border: 1px solid #444;
 }
 
 .close-modal {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: transparent;
-    border: none;
-    font-size: 1.2rem;
-    cursor: pointer;
-    color: #666;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 1.2rem;
+  cursor: pointer;
 }
+.close-modal:hover { color: white; }
 
 .modal-content h2 {
-    color: var(--text-primary);
-    margin-bottom: 25px;
+  color: #f1c40f;
+  margin-top: 0;
+  text-align: center;
+  margin-bottom: 25px;
 }
 
 .contact-info {
-    text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .contact-row {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  background: rgba(255,255,255,0.05);
+  padding: 10px;
+  border-radius: 8px;
 }
 
 .icon-c {
-    font-size: 1.5rem;
-    color: var(--accent-teal);
+  color: #3498db;
+  font-size: 1.2rem;
 }
 
 .contact-row div {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
 }
 
 .contact-row span {
-    font-size: 0.8rem;
-    color: #888;
+  font-size: 0.8rem;
+  color: #888;
+  text-transform: uppercase;
 }
 
 .contact-row strong, .contact-row a {
-    font-size: 1rem;
-    color: #333;
-    font-weight: bold;
-    text-decoration: none;
+  color: white;
+  font-size: 1rem;
+  text-decoration: none;
+}
+.contact-row a:hover {
+  text-decoration: underline;
+  color: #f1c40f;
 }
 
 .modal-note {
-    font-size: 0.8rem;
-    color: #888;
-    margin-top: 15px;
+  font-size: 0.8rem;
+  color: #f39c12;
+  text-align: center;
+  margin-top: 20px;
+  background: rgba(243, 156, 18, 0.1);
+  padding: 10px;
+  border-radius: 5px;
 }
