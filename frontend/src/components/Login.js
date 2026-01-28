@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // ✅ useNavigate hata diya
+import { Link, useNavigate } from 'react-router-dom'; // ✅ useNavigate wapas lagaya
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { FaEye, FaEyeSlash } from 'react-icons/fa'; 
 
 const Login = () => {
-  // ✅ const navigate = useNavigate(); // Ye line hata di gayi hai (Unused thi)
+  const navigate = useNavigate(); // ✅ Navigation ke liye hook activate kiya
   const [formData, setFormData] = useState({ username: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [showPass, setShowPass] = useState(false); 
@@ -25,7 +25,6 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      // ✅ Uses Dynamic URL
       const response = await axios.post(`${BACKEND_URL}/api/users/login/`, formData);
       
       // Data Save karein
@@ -35,18 +34,27 @@ const Login = () => {
       
       toast.success(`Welcome back, ${response.data.username}! 👋`);
       
+      // ✅ SCROLL FIX: Login hote hi page ko upar bhejo
+      window.scrollTo(0, 0);
+
       // ✅ ROLE BASED REDIRECT LOGIC
       const userType = response.data.user_type;
 
       setTimeout(() => {
-          // Agar Seller ya Company hai to Dashboard, nahi to Home
-          if (userType === 'SELLER' || userType === 'COMPANY') {
-              // Note: Make sure '/dashboard' route exists in App.js
-              window.location.href = '/dashboard'; 
+          // 1. Navbar ko update karne ke liye (Taaki Logout button dikhe)
+          window.dispatchEvent(new Event("storage")); 
+          
+          // 2. Sahi Dashboard par bhejo (App.js ke routes ke hisaab se)
+          if (userType === 'SELLER') {
+              navigate('/seller-dashboard'); 
+          } else if (userType === 'COMPANY') {
+              navigate('/company-dashboard');
           } else {
-              window.location.href = '/'; 
+              navigate('/'); // User ke liye Home page
           }
-          // Note: window.location.href use kiya taaki page refresh ho aur Navbar update ho jaye
+          
+          // Note: Agar Navbar update na ho, to yahan 'window.location.reload()' use kar sakte hain, 
+          // par 'navigate' user experience ke liye smooth hai.
       }, 1000);
       
     } catch (error) {

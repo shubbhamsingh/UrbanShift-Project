@@ -33,7 +33,7 @@ const Footer = () => {
             <h3>Contact Us</h3>
             <ul className="footer-contact">
                 <li>📍 Sitapura, Jaipur, Rajasthan</li>
-                <li>📧 shubhamsingh161203@gmail.com</li>
+                <li>📧 urbanshiftt@gmail.com</li>
                 <li>📞 +91 84098 58830</li>
             </ul>
             

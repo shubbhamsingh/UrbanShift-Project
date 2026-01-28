@@ -10,6 +10,9 @@ class PropertyImageSerializer(serializers.ModelSerializer):
 
 # --- 2. Property Serializer (Main) ---
 class PropertySerializer(serializers.ModelSerializer):
+    # 👇 NEW: Chat feature ke liye 'owner' field add kiya (Frontend needs property.owner)
+    owner = serializers.ReadOnlyField(source='seller.id') 
+    
     seller_name = serializers.SerializerMethodField()
     seller_email = serializers.EmailField(source='seller.email', read_only=True)
     seller_phone = serializers.SerializerMethodField()
@@ -31,12 +34,12 @@ class PropertySerializer(serializers.ModelSerializer):
     class Meta:
         model = Property
         fields = [
-            'id', 'seller', 'seller_name', 'seller_email', 'seller_phone', 
+            'id', 'seller', 'owner', 'seller_name', 'seller_email', 'seller_phone', # 👈 'owner' added here
             'title', 'description', 'price', 'location', 
-            'category', 'bedrooms', 'images', 'uploaded_images', 'image_urls', # 👈 Added here
+            'category', 'bedrooms', 'images', 'uploaded_images', 'image_urls',
             'created_at', 'is_sold'
         ]
-        read_only_fields = ['seller', 'created_at', 'is_sold']
+        read_only_fields = ['seller', 'owner', 'created_at', 'is_sold']
 
     # ✅ SAFE NAME CHECK
     def get_seller_name(self, obj):

@@ -9,6 +9,8 @@ urlpatterns = [
     path('api/users/', include('users.urls')),       # User App
     path('api/properties/', include('properties.urls')), # ✅ Ab ye sahi jagah point karega
     path('api/relocation/', include('relocation.urls')),
+    # ...
+path('api/chat/', include('chat.urls')),
 ]
 
 # 👇 Image Uploads ke liye ye zaroori hai

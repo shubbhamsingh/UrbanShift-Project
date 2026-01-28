@@ -1,6 +1,6 @@
 import React from 'react';
-// 👇 Router hata diya, sirf Routes aur Route rakha
-import { Routes, Route } from 'react-router-dom'; 
+// 👇 FIX 1: useLocation import kiya URL check karne ke liye
+import { Routes, Route, useLocation } from 'react-router-dom'; 
 import { ThemeProvider } from './context/ThemeContext';
 import { Analytics } from '@vercel/analytics/react'; 
 import { ToastContainer } from 'react-toastify';
@@ -23,11 +23,17 @@ import ForgotPassword from './components/ForgotPassword';
 import MyMoves from './components/MyMoves';
 import Profile from './components/Profile';
 import UserDashboard from './components/UserDashboard';
+import Chat from './components/Chat'; 
 
 function App() {
+  // 👇 FIX 2: Current URL path nikala
+  const location = useLocation();
+
+  // 👇 FIX 3: Check kiya ki kya hum CHAT page par hain?
+  const isChatPage = location.pathname.startsWith('/chat');
+
   return (
     <ThemeProvider>
-      {/* 👇 Router hata diya hai yahan se */}
       <div style={{display: 'flex', flexDirection: 'column', minHeight: '100vh'}}>
           
           <Navbar />
@@ -45,37 +51,40 @@ function App() {
               theme="colored"
           />
 
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            
-            <Route path="/packers" element={<BookMovers />} />
-            
-            <Route path="/properties" element={<Properties />} /> 
-            <Route path="/add-property" element={<AddProperty />} />
-            
-            {/* 👇 FIX: 'property' ko 'properties' kar diya (Plural) */}
-            <Route path="/properties/:id" element={<PropertyDetail />} />
+          {/* 👇 FIX 4: Content area ko flex: 1 diya taaki wo puri bachi hui height le */}
+          <div style={{ flex: 1 }}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              
+              <Route path="/packers" element={<BookMovers />} />
+              
+              <Route path="/properties" element={<Properties />} /> 
+              <Route path="/add-property" element={<AddProperty />} />
+              <Route path="/properties/:id" element={<PropertyDetail />} />
 
-            <Route path="/seller-dashboard" element={<SellerDashboard />} />
-            <Route path="/wishlist" element={<Wishlist />} />
-            
-            <Route path="/company-dashboard" element={<CompanyDashboard />} />
-            <Route path="/company-requests" element={<CompanyRequests />} />
-            <Route path="/forgot-password" element={<ForgotPassword />} />
-            <Route path="/my-moves" element={<MyMoves />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/user-dashboard" element={<UserDashboard />} />
+              <Route path="/seller-dashboard" element={<SellerDashboard />} />
+              <Route path="/wishlist" element={<Wishlist />} />
+              
+              <Route path="/company-dashboard" element={<CompanyDashboard />} />
+              <Route path="/company-requests" element={<CompanyRequests />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/my-moves" element={<MyMoves />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/user-dashboard" element={<UserDashboard />} />
 
+              <Route path="/chat/:userId" element={<Chat />} /> 
 
-            <Route path="/admin-dashboard" element={<div style={{textAlign: 'center', padding: '50px'}}><h2>Admin Dashboard</h2></div>} />
-          </Routes>
+              <Route path="/admin-dashboard" element={<div style={{textAlign: 'center', padding: '50px'}}><h2>Admin Dashboard</h2></div>} />
+            </Routes>
+          </div>
 
           <Analytics />
-          <Footer />
+          
+          {/* 👇 FIX 5: Footer tabhi dikhega jab Chat page NA ho */}
+          {!isChatPage && <Footer />}
       </div>
-      {/* 👆 Router closing tag bhi hat gaya */}
     </ThemeProvider>
   );
 }

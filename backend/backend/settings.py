@@ -24,7 +24,8 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 INSTALLED_APPS = [
-    'jazzmin',  # ✅ Jazzmin MUST be at the top
+    'daphne',  # ✅ WSGI se pehle ASGI load hona chahiye (Chat ke liye zaroori)
+    'jazzmin',  # ✅ Jazzmin MUST be at the top of admin
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -35,11 +36,13 @@ INSTALLED_APPS = [
     # Third party apps
     'rest_framework',
     'corsheaders',
+    'channels', # ✅ Channels library
 
     # Custom Apps
     'users',
     'properties',
     'relocation',
+    'chat',  # ✅ Naya Chat App
 ]
 
 MIDDLEWARE = [
@@ -72,7 +75,18 @@ TEMPLATES = [
     },
 ]
 
+# ✅ WSGI ki jagah ab ASGI use hoga (Async Chat ke liye)
 WSGI_APPLICATION = 'backend.wsgi.application'
+ASGI_APPLICATION = 'backend.asgi.application' 
+
+# ==========================================
+# 💬 CHANNELS LAYER CONFIGURATION
+# ==========================================
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer', # Development ke liye
+    },
+}
 
 # ==========================================
 # 🗄️ DATABASE CONFIGURATION (SMART SWITCH)

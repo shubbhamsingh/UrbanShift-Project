@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaHeart, FaRegHeart, FaTimes, FaPhone, FaEnvelope, FaUser, FaShoppingCart, FaChevronLeft, FaChevronRight, FaExpand } from 'react-icons/fa'; 
+import { FaHeart, FaRegHeart, FaTimes, FaPhone, FaEnvelope, FaUser, FaShoppingCart, FaChevronLeft, FaChevronRight, FaExpand, FaComments } from 'react-icons/fa'; // ✅ FaComments import kiya
 import { toast } from 'react-toastify';
 
 // ✅ Theme Context Import
@@ -153,6 +153,22 @@ const PropertyDetail = () => {
       } finally { setBuyLoading(false); }
   };
 
+  // ✅ CHAT HANDLER
+  const handleChat = () => {
+    const token = localStorage.getItem('token');
+    if (!token) { 
+        toast.error("Please Login to chat with seller! 🔒"); 
+        navigate('/login'); 
+        return; 
+    }
+    // Check if property owner ID exists
+    if (property.owner) {
+        navigate(`/chat/${property.owner}`);
+    } else {
+        toast.error("Seller info not available for chat.");
+    }
+  };
+
   // --- STYLES (Moved inside) ---
   const styles = {
     page: { padding: '40px 20px', background: colors.bg, minHeight: '100vh', color: colors.text, transition: '0.3s' },
@@ -197,6 +213,9 @@ const PropertyDetail = () => {
     sellerBox: { padding: '25px', background: colors.cardBg, borderRadius: '15px', border: `1px solid ${colors.border}`, boxShadow: colors.shadow },
     contactBtn: { width: '100%', marginTop: '15px', padding: '12px', background: '#3498db', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer' },
     
+    // ✅ NEW CHAT BUTTON STYLE
+    chatBtn: { width: '100%', marginTop: '10px', padding: '12px', background: 'linear-gradient(135deg, #8e44ad, #9b59b6)', color: 'white', border: 'none', borderRadius: '8px', fontWeight: 'bold', fontSize: '1rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' },
+
     modalOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: colors.overlayBg, display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000 },
     modalContent: { background: colors.cardBg, padding: '30px', borderRadius: '15px', width: '90%', maxWidth: '400px', position: 'relative', border: `1px solid ${colors.border}` },
     closeModal: { position: 'absolute', top: '15px', right: '15px', background: 'none', border: 'none', color: colors.subText, fontSize: '1.2rem', cursor: 'pointer' },
@@ -313,8 +332,14 @@ const PropertyDetail = () => {
                     <div style={styles.sellerBox}>
                         <h3 style={{...styles.sectionTitle, color: colors.text, border: 'none'}}>👤 Owner Details</h3>
                         <p style={{color: colors.subText}}><strong>Name:</strong> {property.seller_name || "Verified Owner"}</p>
+                        
                         <button onClick={() => setShowContact(true)} style={styles.contactBtn}>
                             📞 Contact Owner
+                        </button>
+                        
+                        {/* ✅ CHAT BUTTON ADDED HERE */}
+                        <button onClick={handleChat} style={styles.chatBtn}>
+                            <FaComments /> Chat with Seller
                         </button>
                     </div>
                 </div>
