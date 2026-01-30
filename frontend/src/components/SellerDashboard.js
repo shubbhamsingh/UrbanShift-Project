@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { FaCamera, FaUserCircle } from 'react-icons/fa';
 
 const SellerDashboard = () => {
   const navigate = useNavigate();
   const [properties, setProperties] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [uploading, setUploading] = useState(false); // For profile pic upload
   
   // 👇 Smart URL Setup
   const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
@@ -41,6 +43,33 @@ const SellerDashboard = () => {
     } catch (error) {
         console.error(error);
         toast.error("Upload Failed! Check connection.");
+    }
+  };
+
+  // 📸 Profile Picture Upload Handler
+  const handleProfilePictureUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('profile_picture', file);
+
+    setUploading(true);
+    try {
+        const token = localStorage.getItem('token');
+        await axios.patch(`${BACKEND_URL}/api/users/me/`, formData, {
+            headers: { 
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        toast.success("Profile Picture Updated! 📸");
+        window.location.reload(); // Refresh to show new pic
+    } catch (error) {
+        console.error("Upload failed", error);
+        toast.error("Failed to upload image.");
+    } finally {
+        setUploading(false);
     }
   };
 
@@ -125,6 +154,31 @@ const SellerDashboard = () => {
   return (
     <div style={pageContainerStyle}>
       
+      {/* Profile Picture Section */}
+      <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          {user.profile_picture ? (
+            <img 
+              src={user.profile_picture.startsWith('http') ? user.profile_picture : `${BACKEND_URL}${user.profile_picture}`} 
+              alt="Profile" 
+              style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '3px solid var(--accent-orange)' }}
+            />
+          ) : (
+            <FaUserCircle size={100} color="var(--accent-orange)" />
+          )}
+          <label style={{ 
+            position: 'absolute', bottom: '5px', right: '5px', 
+            background: '#333', borderRadius: '50%', padding: '8px',
+            cursor: 'pointer', color: 'white', boxShadow: '0 2px 5px rgba(0,0,0,0.3)'
+          }}>
+            {uploading ? '...' : <FaCamera size={16} />}
+            <input type="file" accept="image/*" onChange={handleProfilePictureUpload} style={{ display: 'none' }} />
+          </label>
+        </div>
+        <h2 style={{ margin: '10px 0 5px', color: 'var(--text-primary)' }}>{user.username}</h2>
+        <p style={{ color: 'var(--text-secondary)', margin: 0 }}>{user.email || 'seller@urbanshift.com'}</p>
+      </div>
+
       {/* --- HEADER SECTION --- */}
       <div style={headerStyle}>
         <div>

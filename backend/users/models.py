@@ -14,10 +14,13 @@ class User(AbstractUser):
     
     # ✅ Critical Fix: Ye line add karein nahi to OTP save nahi hoga
     otp = models.CharField(max_length=6, blank=True, null=True)
+    otp_created_at = models.DateTimeField(null=True, blank=True)
     
     # Verification Fields
     is_verified = models.BooleanField(default=False)
     verification_document = models.ImageField(upload_to='verification_docs/', blank=True, null=True)
+    # 👇 NEW FIELD
+    profile_picture = models.ImageField(upload_to='profile_pics/', blank=True, null=True)
 
     # ✅ FIX: Clash rokne ke liye related_name
     groups = models.ManyToManyField(
@@ -35,5 +38,12 @@ class User(AbstractUser):
         verbose_name='user permissions',
     )
 
+# Helper method add karo class ke andar (line 38 ke baad):
+def is_otp_valid(self):
+    """Check if OTP is still valid (10 minutes expiry)"""
+    if not self.otp or not self.otp_created_at:
+        return False
+    expiry_time = self.otp_created_at + timedelta(minutes=10)
+    return timezone.now() < expiry_time
     def __str__(self):
         return self.username

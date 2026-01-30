@@ -7,6 +7,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.views import TokenObtainPairView
 from .serializers import UserSerializer, CustomTokenObtainPairSerializer
+from django.utils import timezone
 
 # ✅ New Imports for Logic
 from django.conf import settings
@@ -32,6 +33,7 @@ class RegisterView(APIView):
             # 2. OTP Generate karein (6 Digit)
             otp = str(random.randint(100000, 999999))
             user.otp = otp
+            user.otp_created_at = timezone.now() 
             user.save()
             print(f"\n🔥 YOUR OTP IS: {otp} 🔥\n")  # 👈 Ye line jodein
 
@@ -106,14 +108,19 @@ class VerifyEmailView(APIView):
         except User.DoesNotExist:
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
+        # ✅ Correct Indentation starts here
         if user.otp == otp:
-            user.is_active = True  # Account Active!
-            user.otp = None        # Clear OTP
+            # Check OTP expiry
+            if not user.is_otp_valid():
+                return Response({'error': 'OTP has expired. Please register again.'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            user.is_active = True
+            user.otp = None
+            user.otp_created_at = None  # Clear expiry time
             user.save()
             return Response({'message': 'Email verified successfully! You can login now.'}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid OTP. Please try again.'}, status=status.HTTP_400_BAD_REQUEST)
-
 
 # ==========================================
 # 2. Login View (Existing)

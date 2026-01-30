@@ -108,12 +108,27 @@ const AddProperty = () => {
     header: { color: colors.text, textAlign: 'center', marginBottom: '40px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' },
     
     formGroup: { marginBottom: '30px', display: 'flex', flexDirection: 'column', gap: '10px' },
-    rowFlex: { display: 'flex', gap: '30px', flexWrap: 'wrap', marginBottom: '30px' },
-    flexItem: { flex: 1, minWidth: '200px', display: 'flex', flexDirection: 'column', gap: '10px' },
+    
+    // ✅ FIX: Row ke liye ab Grid use kiya hai taaki boxes chipke nahi
+    rowFlex: { 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', // Responsive columns
+        gap: '20px', // Yahan gap fix kar diya
+        marginBottom: '30px' 
+    },
+    
+    flexItem: { 
+        display: 'flex', 
+        flexDirection: 'column', 
+        gap: '10px' 
+    },
 
     label: { color: colors.subText, fontSize: '0.95rem', fontWeight: 'bold', marginLeft: '5px' },
-    input: { width: '100%', padding: '16px', background: colors.inputBg, border: `1px solid ${colors.border}`, borderRadius: '10px', color: colors.text, outline: 'none', fontSize: '1rem', transition: '0.3s' },
-    textArea: { width: '100%', padding: '16px', background: colors.inputBg, border: `1px solid ${colors.border}`, borderRadius: '10px', color: colors.text, outline: 'none', fontSize: '1rem', minHeight: '200px', resize: 'vertical', fontFamily: 'inherit', lineHeight: '1.6' },
+    
+    // ✅ FIX: boxSizing add kiya taaki padding se box bahar na nikle
+    input: { width: '100%', boxSizing: 'border-box', padding: '16px', background: colors.inputBg, border: `1px solid ${colors.border}`, borderRadius: '10px', color: colors.text, outline: 'none', fontSize: '1rem', transition: '0.3s' },
+    
+    textArea: { width: '100%', boxSizing: 'border-box', padding: '16px', background: colors.inputBg, border: `1px solid ${colors.border}`, borderRadius: '10px', color: colors.text, outline: 'none', fontSize: '1rem', minHeight: '200px', resize: 'vertical', fontFamily: 'inherit', lineHeight: '1.6' },
 
     imageSection: { background: isDark ? '#2a2a2a' : '#eaeaea', padding:'30px', borderRadius:'15px', margin:'40px 0', border: `1px dashed ${colors.border}` },
     uploadRow: { display:'flex', gap:'15px', marginBottom:'20px', alignItems:'center' },
@@ -147,6 +162,7 @@ const AddProperty = () => {
                 <input name="location" placeholder="e.g. Malviya Nagar, Jaipur, Rajasthan" onChange={handleChange} required style={styles.input} />
             </div>
 
+            {/* Price, Category, Bedrooms Row */}
             <div style={styles.rowFlex}>
                 <div style={styles.flexItem}>
                     <label style={styles.label}>Price (₹)</label>

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useContext } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 import { useNavigate, Link } from 'react-router-dom';
+import { FaCamera, FaUserCircle } from 'react-icons/fa';
 
 // ✅ Theme Context Import
 import { ThemeContext } from '../context/ThemeContext';
@@ -11,6 +12,7 @@ const CompanyDashboard = () => {
   const [requests, setRequests] = useState([]);
   const [user, setUser] = useState({ username: 'Company' });
   const [stats, setStats] = useState({ pending: 0, ongoing: 0, completed: 0 });
+  const [uploading, setUploading] = useState(false); // For profile picture upload
 
   // ✅ Theme Logic
   const { mode } = useContext(ThemeContext);
@@ -71,6 +73,33 @@ const CompanyDashboard = () => {
     } catch (err) { toast.error("Error updating status"); }
   };
 
+  // 📸 Profile Picture Upload Handler
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('profile_picture', file);
+
+    setUploading(true);
+    try {
+        const token = localStorage.getItem('token');
+        await axios.patch(`${BACKEND_URL}/api/users/me/`, formData, {
+            headers: { 
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+        toast.success("Profile Picture Updated! 📸");
+        fetchData(); // Refresh user data
+    } catch (error) {
+        console.error("Upload failed", error);
+        toast.error("Failed to upload image.");
+    } finally {
+        setUploading(false);
+    }
+  };
+
   const myOngoing = requests.filter(r => r.status === 'ACCEPTED');
   const myHistory = requests.filter(r => ['COMPLETED', 'CANCELLED'].includes(r.status));
 
@@ -88,6 +117,31 @@ const CompanyDashboard = () => {
 
   return (
     <div style={styles.page}>
+      {/* Profile Section */}
+      <div style={{ textAlign: 'center', marginBottom: '30px' }}>
+        <div style={{ position: 'relative', display: 'inline-block' }}>
+          {user.profile_picture ? (
+            <img 
+              src={user.profile_picture.startsWith('http') ? user.profile_picture : `${BACKEND_URL}${user.profile_picture}`} 
+              alt="Profile" 
+              style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', border: '3px solid #f1c40f' }}
+            />
+          ) : (
+            <FaUserCircle size={100} color="#f1c40f" />
+          )}
+          <label style={{ 
+            position: 'absolute', bottom: '5px', right: '5px', 
+            background: '#333', borderRadius: '50%', padding: '8px',
+            cursor: 'pointer', color: 'white', boxShadow: '0 2px 5px rgba(0,0,0,0.3)'
+          }}>
+            {uploading ? '...' : <FaCamera size={16} />}
+            <input type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+          </label>
+        </div>
+        <h2 style={{ margin: '10px 0 5px', color: colors.text }}>{user.username}</h2>
+        <p style={{ color: colors.subText, margin: 0 }}>{user.email || 'company@urbanshift.com'}</p>
+      </div>
+
       <div style={styles.header}>
         <div>
             <h1 style={{margin:0}}>👋 Hello, {user.username}</h1>

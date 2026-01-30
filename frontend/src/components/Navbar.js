@@ -1,33 +1,35 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FaSun, FaMoon, FaLaptop, FaUserCircle, FaCommentDots, FaBars, FaTimes, FaDownload } from 'react-icons/fa';
-
-// ✅ Logo Import
-import logo from '../logo.png'; 
-
-// ✅ Theme Context Import
-import { ThemeContext } from '../context/ThemeContext'; 
+import logo from '../logo.png';
+import { ThemeContext } from '../context/ThemeContext';
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const location = useLocation(); // 👈 Track location changes
   const { mode, cycleTheme } = useContext(ThemeContext);
-  
+
   // --- STATE MANAGEMENT ---
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   const [menuOpen, setMenuOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null); // PWA State
   const [isAppInstalled, setIsAppInstalled] = useState(false);
+  const [userType, setUserType] = useState(localStorage.getItem('userType')); // 👈 Reactive userType
 
   // Theme Check
   const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
   const token = localStorage.getItem('token');
-  const userType = localStorage.getItem('userType');
+
+  // 👈 Re-read userType on every navigation
+  useEffect(() => {
+    setUserType(localStorage.getItem('userType'));
+  }, [location.pathname]);
 
   // --- 1. HANDLE SCREEN RESIZE ---
   useEffect(() => {
     const handleResize = () => {
-        setIsMobile(window.innerWidth < 768);
-        if (window.innerWidth >= 768) setMenuOpen(false); // Laptop pe menu band kar do
+      setIsMobile(window.innerWidth < 768);
+      if (window.innerWidth >= 768) setMenuOpen(false);
     };
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -38,13 +40,10 @@ const Navbar = () => {
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       setDeferredPrompt(e);
-      console.log("PWA Install Prompt Ready");
     });
-
     window.addEventListener('appinstalled', () => {
       setIsAppInstalled(true);
       setDeferredPrompt(null);
-      console.log("App Installed");
     });
   }, []);
 
@@ -58,27 +57,27 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    if(window.confirm("Are you sure you want to logout?")) {
-        localStorage.clear();
-        setMenuOpen(false);
-        navigate('/login');
+    if (window.confirm("Are you sure you want to logout?")) {
+      localStorage.clear();
+      setMenuOpen(false);
+      navigate('/login');
     }
   };
 
   // --- STYLES ---
   const colors = {
-      bg: isDark ? '#121212' : '#ffffff',
-      text: isDark ? '#ffffff' : '#333333',
-      menuBg: isDark ? '#1e1e1e' : '#f9f9f9',
-      border: isDark ? '#333' : '#e0e0e0',
-      icon: isDark ? '#f1c40f' : '#f39c12'
+    bg: isDark ? '#121212' : '#ffffff',
+    text: isDark ? '#ffffff' : '#333333',
+    menuBg: isDark ? '#1e1e1e' : '#f9f9f9',
+    border: isDark ? '#333' : '#e0e0e0',
+    icon: isDark ? '#f1c40f' : '#f39c12'
   };
 
   const navStyle = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: isMobile ? '10px 15px' : '15px 40px', // Mobile me padding kam
+    padding: isMobile ? '10px 15px' : '15px 40px',
     background: colors.bg,
     boxShadow: isDark ? '0 4px 10px rgba(255,255,255,0.05)' : '0 4px 15px rgba(0,0,0,0.05)',
     position: 'sticky',
@@ -89,7 +88,6 @@ const Navbar = () => {
     height: '70px'
   };
 
-  // Mobile Menu Container (Dropdown)
   const mobileMenuStyle = {
     position: 'absolute',
     top: '70px',
@@ -130,7 +128,7 @@ const Navbar = () => {
     cursor: 'pointer',
     display: 'flex',
     alignItems: 'center',
-    gap: '10px' // Icon aur text me gap
+    gap: '10px'
   };
 
   const btnStyle = {
@@ -158,99 +156,123 @@ const Navbar = () => {
     color: colors.text
   };
 
-  // Helper for Theme Icon
   const getThemeIcon = () => {
-      if (mode === 'light') return <FaSun title="Light Mode" />;
-      if (mode === 'dark') return <FaMoon title="Dark Mode" />;
-      return <FaLaptop title="System Mode" />;
+    if (mode === 'light') return <FaSun title="Light Mode" />;
+    if (mode === 'dark') return <FaMoon title="Dark Mode" />;
+    return <FaLaptop title="System Mode" />;
   };
 
   return (
     <nav style={navStyle}>
-      
+
       {/* --- LEFT: Hamburger (Mobile Only) + Logo --- */}
       <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '20px' }}>
-        
-        {/* Hamburger Button */}
         {isMobile && (
-            <button onClick={() => setMenuOpen(!menuOpen)} style={iconBtnStyle}>
-                {menuOpen ? <FaTimes /> : <FaBars />}
-            </button>
+          <button onClick={() => setMenuOpen(!menuOpen)} style={iconBtnStyle}>
+            {menuOpen ? <FaTimes /> : <FaBars />}
+          </button>
         )}
 
-        {/* Logo Link */}
         <Link to="/" style={logoContainer}>
-            <img src={logo} alt="Logo" style={{ height: isMobile ? '30px' : '40px', width: 'auto' }} />
-            <span style={logoText}>
-                Urban<span style={{ color: '#e67e22' }}>Shift</span>
-            </span>
+          <img src={logo} alt="Logo" style={{ height: isMobile ? '30px' : '40px', width: 'auto' }} />
+          <span style={logoText}>
+            Urban<span style={{ color: '#e67e22' }}>Shift</span>
+          </span>
         </Link>
       </div>
 
       {/* --- RIGHT: Install Icon + Theme + Links (Desktop Only) --- */}
       <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '15px' : '25px' }}>
-        
-        {/* ✅ PWA INSTALL ICON (Visible on both Laptop & Mobile if available) */}
+
         {deferredPrompt && !isAppInstalled && (
-             <button onClick={handleInstallClick} style={iconBtnStyle} title="Install App">
-                 <FaDownload color="#2ecc71" /> 
-             </button>
+          <button onClick={handleInstallClick} style={iconBtnStyle} title="Install App">
+            <FaDownload color="#2ecc71" />
+          </button>
         )}
 
-        {/* Theme Toggle */}
-        <div onClick={cycleTheme} style={{...iconBtnStyle, color: isDark ? '#f1c40f' : '#f39c12'}}>
-            {getThemeIcon()}
+        <div onClick={cycleTheme} style={{ ...iconBtnStyle, color: isDark ? '#f1c40f' : '#f39c12' }}>
+          {getThemeIcon()}
         </div>
 
         {/* Desktop Links (Hidden on Mobile) */}
         {!isMobile && (
-             <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                 <Link to="/" style={linkStyle}>Home</Link>
-                 
-                 {token ? (
-                    <>
-                        <Link to={userType === 'SELLER' ? "/seller-dashboard" : "/user-dashboard"} style={linkStyle}>Dashboard</Link>
-                        <Link to="/properties" style={linkStyle}>Find Homes</Link>
-                        <Link to="/chat/inbox" style={linkStyle}>
-                             <FaCommentDots size={20} /> Chat
-                        </Link>
-                        <Link to="/add-property" style={{...btnStyle, background: '#e67e22', color: 'white'}}>+ Post Property</Link>
-                        <Link to="/profile" style={{color: isDark ? '#fff':'#333', fontSize:'1.6rem'}}><FaUserCircle /></Link>
-                        <button onClick={handleLogout} style={{...btnStyle, background: 'transparent', border: `1px solid ${isDark ? '#e74c3c' : '#c0392b'}`, color: isDark ? '#e74c3c' : '#c0392b'}}>Logout</button>
-                    </>
-                 ) : (
-                    <>
-                        <Link to="/properties" style={linkStyle}>Properties</Link>
-                        <Link to="/login" style={{...btnStyle, background: '#3498db', color:'white'}}>Login</Link>
-                        <Link to="/register" style={{...btnStyle, background: '#2ecc71', color:'white'}}>Register</Link>
-                    </>
-                 )}
-             </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+            <Link to="/" style={linkStyle}>Home</Link>
+
+            {token ? (
+              <>
+                <Link to={
+                  userType === 'SELLER' ? "/seller-dashboard" :
+                    userType === 'COMPANY' ? "/company-dashboard" :
+                      "/user-dashboard"
+                } style={linkStyle}>
+                  {userType === 'SELLER' ? '📊 Seller Panel' : userType === 'COMPANY' ? '🚚 Mover Panel' : '👤 My Dashboard'}
+                </Link>
+                <Link to="/properties" style={linkStyle}>Find Homes</Link>
+                <Link to="/chat/inbox" style={linkStyle}>
+                  <FaCommentDots size={20} /> Chat
+                </Link>
+
+                {/* ✅ FIX: Post Property Button Only for SELLER */}
+                {userType === 'SELLER' && (
+                  <Link to="/add-property" style={{ ...btnStyle, background: '#e67e22', color: 'white' }}>+ Post Property</Link>
+                )}
+
+                <Link to="/profile" style={{ color: isDark ? '#fff' : '#333', fontSize: '1.6rem' }}><FaUserCircle /></Link>
+                <button onClick={handleLogout} style={{ ...btnStyle, background: 'transparent', border: `1px solid ${isDark ? '#e74c3c' : '#c0392b'}`, color: isDark ? '#e74c3c' : '#c0392b' }}>Logout</button>
+              </>
+            ) : (
+              <>
+                <Link to="/properties" style={linkStyle}>Properties</Link>
+                <Link to="/login" style={{ ...btnStyle, background: '#3498db', color: 'white' }}>Login</Link>
+                <Link to="/register" style={{ ...btnStyle, background: '#2ecc71', color: 'white' }}>Register</Link>
+              </>
+            )}
+          </div>
         )}
       </div>
 
-      {/* --- MOBILE MENU DROPDOWN (Hamburger Content) --- */}
+      {/* --- MOBILE MENU DROPDOWN --- */}
       {isMobile && menuOpen && (
         <div style={mobileMenuStyle}>
-            <Link to="/" onClick={() => setMenuOpen(false)} style={linkStyle}>🏠 Home</Link>
-            
-            {token ? (
-                <>
-                    <Link to={userType === 'SELLER' ? "/seller-dashboard" : "/user-dashboard"} onClick={() => setMenuOpen(false)} style={linkStyle}>📊 Dashboard</Link>
-                    <Link to="/properties" onClick={() => setMenuOpen(false)} style={linkStyle}>🔍 Find Homes</Link>
-                    <Link to="/chat/inbox" onClick={() => setMenuOpen(false)} style={linkStyle}>💬 Chat</Link>
-                    <Link to="/add-property" onClick={() => setMenuOpen(false)} style={{...linkStyle, color: '#e67e22'}}>➕ Post Property</Link>
-                    <Link to="/profile" onClick={() => setMenuOpen(false)} style={linkStyle}>👤 My Profile</Link>
-                    <div style={{borderTop: `1px solid ${colors.border}`}}></div>
-                    <button onClick={handleLogout} style={{...btnStyle, width:'100%', background: '#e74c3c', color: 'white', justifyContent:'center'}}>Logout</button>
-                </>
-            ) : (
-                <>
-                    <Link to="/properties" onClick={() => setMenuOpen(false)} style={linkStyle}>Properties</Link>
-                    <Link to="/login" onClick={() => setMenuOpen(false)} style={{...btnStyle, background: '#3498db', color: 'white', justifyContent:'center'}}>Login</Link>
-                    <Link to="/register" onClick={() => setMenuOpen(false)} style={{...btnStyle, background: '#2ecc71', color: 'white', justifyContent:'center'}}>Register</Link>
-                </>
-            )}
+          <Link to="/" onClick={() => setMenuOpen(false)} style={linkStyle}>🏠 Home</Link>
+          
+          {/* PWA Install Button in Mobile */}
+          {deferredPrompt && !isAppInstalled && (
+            <button onClick={() => { handleInstallClick(); setMenuOpen(false); }} 
+              style={{ ...btnStyle, background: '#2ecc71', color: 'white', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <FaDownload /> Install App
+            </button>
+          )}
+
+          {token ? (
+            <>
+              <Link to={
+                userType === 'SELLER' ? "/seller-dashboard" :
+                  userType === 'COMPANY' ? "/company-dashboard" :
+                    "/user-dashboard"
+              } onClick={() => setMenuOpen(false)} style={linkStyle}>
+                {userType === 'SELLER' ? '📊 Seller Panel' : userType === 'COMPANY' ? '🚚 Mover Panel' : '👤 My Dashboard'}
+              </Link>
+              <Link to="/properties" onClick={() => setMenuOpen(false)} style={linkStyle}>🔍 Find Homes</Link>
+              <Link to="/chat/inbox" onClick={() => setMenuOpen(false)} style={linkStyle}>💬 Chat</Link>
+
+              {/* ✅ FIX: Post Property Only for SELLER in Mobile Menu */}
+              {userType === 'SELLER' && (
+                <Link to="/add-property" onClick={() => setMenuOpen(false)} style={{ ...linkStyle, color: '#e67e22' }}>➕ Post Property</Link>
+              )}
+
+              <Link to="/profile" onClick={() => setMenuOpen(false)} style={linkStyle}>👤 My Profile</Link>
+              <div style={{ borderTop: `1px solid ${colors.border}` }}></div>
+              <button onClick={handleLogout} style={{ ...btnStyle, width: '100%', background: '#e74c3c', color: 'white', justifyContent: 'center' }}>Logout</button>
+            </>
+          ) : (
+            <>
+              <Link to="/properties" onClick={() => setMenuOpen(false)} style={linkStyle}>Properties</Link>
+              <Link to="/login" onClick={() => setMenuOpen(false)} style={{ ...btnStyle, background: '#3498db', color: 'white', justifyContent: 'center' }}>Login</Link>
+              <Link to="/register" onClick={() => setMenuOpen(false)} style={{ ...btnStyle, background: '#2ecc71', color: 'white', justifyContent: 'center' }}>Register</Link>
+            </>
+          )}
         </div>
       )}
 

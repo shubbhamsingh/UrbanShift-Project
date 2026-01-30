@@ -18,9 +18,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-urbanshift-dev-key')
 
 # Debug Mode
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
-
-ALLOWED_HOSTS = ['*']
+DEBUG =  os.environ.get('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
 
 # Application definition
 INSTALLED_APPS = [
@@ -42,7 +41,8 @@ INSTALLED_APPS = [
     'users',
     'properties',
     'relocation',
-    'chat',  # ✅ Naya Chat App
+    'chat',
+    'payments', # ✅ Naya Payments App
 ]
 
 MIDDLEWARE = [
@@ -82,12 +82,23 @@ ASGI_APPLICATION = 'backend.asgi.application'
 # ==========================================
 # 💬 CHANNELS LAYER CONFIGURATION
 # ==========================================
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer', # Development ke liye
-    },
-}
-
+# Smart switch between Redis (Production) and InMemory (Development)
+if os.environ.get('REDIS_URL'):
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+                'hosts': [os.environ.get('REDIS_URL')],
+            },
+        },
+    }
+else:
+    # Development ke liye InMemory
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels.layers.InMemoryChannelLayer',
+        },
+    }
 # ==========================================
 # 🗄️ DATABASE CONFIGURATION (SMART SWITCH)
 # ==========================================
@@ -129,13 +140,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom User Model
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = os.environ.get('AUTH_USER_MODEL', 'users.User')
 
 # ==========================================
 # 🌍 CORS & CSRF CONFIGURATION
 # ==========================================
 
-CORS_ALLOW_ALL_ORIGINS = True  # Testing ke liye open rakha hai
+CORS_ALLOW_ALL_ORIGINS =  False # Testing ke liye open rakha hai
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
@@ -167,8 +178,13 @@ SIMPLE_JWT = {
 # ==========================================
 # 📧 BREVO API CONFIGURATION
 # ==========================================
-# Credentials .env file se load honge
 BREVO_API_KEY = os.environ.get('BREVO_API_KEY')
+
+# ==========================================
+# 💳 RAZORPAY CONFIGURATION
+# ==========================================
+RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID')
+RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET')
 
 # ==========================================
 # 🎨 JAZZMIN SETTINGS

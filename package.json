@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
     "react-swipeable": "^7.0.2",
     "tree-node-cli": "^1.6.0"
   }

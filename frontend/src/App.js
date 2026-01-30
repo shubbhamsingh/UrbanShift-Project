@@ -16,7 +16,11 @@ import PropertyDetail from './components/PropertyDetail';
 import SellerDashboard from './components/SellerDashboard'; 
 import Footer from './components/Footer'; 
 import Wishlist from './components/Wishlist'; 
+
+// ✅ MOVERS & PACKERS COMPONENTS
 import BookMovers from './components/BookMovers';
+import PackersMovers from './components/PackersMovers'; // 👈 IMPORT ADDED
+
 import CompanyDashboard from './components/CompanyDashboard';
 import CompanyRequests from './components/CompanyRequests';
 import ForgotPassword from './components/ForgotPassword';
@@ -24,6 +28,7 @@ import MyMoves from './components/MyMoves';
 import Profile from './components/Profile';
 import UserDashboard from './components/UserDashboard';
 import Chat from './components/Chat'; 
+import ScrollToTop from './components/ScrollToTop'; // 👈 SCROLL FIX
 
 function App() {
   // 👇 FIX 2: Current URL path nikala
@@ -36,6 +41,7 @@ function App() {
     <ThemeProvider>
       <div style={{display: 'flex', flexDirection: 'column', minHeight: '100vh'}}>
           
+          <ScrollToTop /> {/* 👈 Har page change par top scroll */}
           <Navbar />
           
           <ToastContainer 
@@ -58,7 +64,10 @@ function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               
-              <Route path="/packers" element={<BookMovers />} />
+              {/* ✅ MOVERS ROUTES FIXED */}
+              <Route path="/packers-movers" element={<PackersMovers />} /> {/* Listing Page */}
+              <Route path="/book-movers" element={<BookMovers />} />       {/* Booking Form */}
+              <Route path="/packers" element={<BookMovers />} />           {/* Fallback */}
               
               <Route path="/properties" element={<Properties />} /> 
               <Route path="/add-property" element={<AddProperty />} />

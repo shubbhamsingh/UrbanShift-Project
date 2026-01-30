@@ -7,10 +7,10 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),       # User App
-    path('api/properties/', include('properties.urls')), # ✅ Ab ye sahi jagah point karega
-    path('api/relocation/', include('relocation.urls')),
-    # ...
-path('api/chat/', include('chat.urls')),
+    path('api/properties/', include('properties.urls')), # Properties App
+    path('api/relocation/', include('relocation.urls')), # Relocation App
+    path('api/chat/', include('chat.urls')),             # Chat App
+    path('api/payments/', include('payments.urls')),     # ✅ Naya Payments URL
 ]
 
 # 👇 Image Uploads ke liye ye zaroori hai

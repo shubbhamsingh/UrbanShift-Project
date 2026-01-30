@@ -13,9 +13,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
+        fields = ['id', 'username', 'email', 'password', 'user_type', 'phone_number', 'is_verified', 'verification_document', 'profile_picture']
         # ✅ FIX: Yahan 'phone' ki jagah 'phone_number' kar diya hai
-        fields = ['id', 'username', 'email', 'password', 'user_type', 'phone_number', 'is_verified', 'verification_document']
-
     # --- 🔒 PASSWORD VALIDATION LOGIC ---
     def validate_password(self, value):
         if value: # Agar password diya gaya hai tabhi validate karein

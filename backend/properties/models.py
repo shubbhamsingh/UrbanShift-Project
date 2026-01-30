@@ -30,7 +30,7 @@ class Property(models.Model):
 class PropertyImage(models.Model):
     property = models.ForeignKey(Property, related_name='images', on_delete=models.CASCADE)
     image = models.ImageField(upload_to='property_photos/', null=True, blank=True)
-    image_url = models.URLField(null=True, blank=True)
+    image_url = models.URLField(max_length=2000, null=True, blank=True)
 
     def __str__(self):
         return f"Image for {self.property.title}"
