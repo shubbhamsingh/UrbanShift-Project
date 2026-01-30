@@ -1,0 +1,30 @@
+# System & OS
+.DS_Store
+Thumbs.db
+*.log
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Python / Backend
+venv/
+env/
+__pycache__/
+*.pyc
+*.sqlite3
+backend/.env
+
+# React / Frontend
+frontend/node_modules/
+frontend/build/
+frontend/.env
+
+# IDE / Editor
+.vscode/
+.idea/
+
+# Agent Artifacts
+brain/
+.gemini/
+.agent/
