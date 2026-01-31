@@ -68,7 +68,7 @@ const CompanyRequests = () => {
             { headers: { 'Authorization': `Bearer ${token}` } }
         );
         toast.success("Job Accepted! Check Dashboard.");
-        navigate('/seller-dashboard'); // Updated redirect to match your routing
+        navigate('/company-dashboard'); // Updated redirect to match your routing
     } catch (err) { 
         console.error(err);
         toast.error("Failed to accept."); 
@@ -98,7 +98,7 @@ const CompanyRequests = () => {
   return (
     <div style={styles.page}>
       <div style={styles.header}>
-        <Link to="/seller-dashboard" style={styles.backLink}>← Back to Dashboard</Link>
+        <Link to="/company-dashboard" style={styles.backLink}>← Back to Dashboard</Link>
         <div>
             <h2 style={styles.title}>🔔 New Available Jobs</h2>
             <p style={{color: colors.subText}}>Accept these jobs to start working.</p>

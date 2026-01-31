@@ -72,22 +72,37 @@ class VerifyPaymentView(APIView):
             # Save Transaction Record
             transaction = Transaction.objects.create(
                 user=request.user,
-                amount=0, # Updated later or ignored for now
+                amount=request.data.get('amount', 0), # Get from request
                 transaction_id=razorpay_payment_id,
                 status='SUCCESS',
-                description=f"Payment for Move Request #{move_id}"
+                description=f"Payment for {request.data.get('property_title', 'Service/Move')}"
             )
 
-            # Update Move Request Status
+            # Update Move Request Status (If Move)
             if move_id:
                 try:
                     move = MoveRequest.objects.get(id=move_id)
                     move.is_paid = True
                     move.transaction_id = razorpay_payment_id
-                    move.payment_amount = 5000 # Mock amount or fetch real
+                    move.payment_amount = request.data.get('amount', 5000)
                     move.save()
+                    
+                    # ✅ TODO: Send Mover Booking Email here
                 except MoveRequest.DoesNotExist:
                     pass
+            
+            # ✅ Send Payment Success Email (Property/General)
+            # PropertyDetail.js se 'property_title' aur 'amount' aana chahiye
+            from users.utils_email import send_notification_email
+            from django.utils import timezone
+            
+            send_notification_email(request.user, 'payment_success', {
+                'userName': request.user.username,
+                'amount': request.data.get('amount', '5000'),
+                'propertyTitle': request.data.get('property_title', 'UrbanShift Property'), # Frontend must send this
+                'txnId': razorpay_payment_id,
+                'date': timezone.now().strftime("%Y-%m-%d")
+            })
 
             return Response({'message': 'Payment Verified Successfully!'}, status=status.HTTP_200_OK)
 

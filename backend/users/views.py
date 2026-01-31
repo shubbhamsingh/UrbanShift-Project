@@ -37,51 +37,16 @@ class RegisterView(APIView):
             user.save()
             print(f"\n🔥 YOUR OTP IS: {otp} 🔥\n")  # 👈 Ye line jodein
 
-            # 3. Brevo API Configuration
-            configuration = sib_api_v3_sdk.Configuration()
-            configuration.api_key['api-key'] = settings.BREVO_API_KEY
-
-            api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+            # 3. Send Verification Email using Utility
+            from .utils_email import send_notification_email
             
-            # 4. Email Content Prepare karein
-            sender = {"name": "UrbanShift Team", "email": "urbanshiftt@gmail.com"}
-            to = [{"email": user.email, "name": user.username}]
-            
-            html_content = f"""
-            <html>
-                <body style="font-family: Arial, sans-serif; color: #333;">
-                    <div style="max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px;">
-                        <h2 style="color: #FF9966; text-align: center;">Welcome to UrbanShift! 🚀</h2>
-                        <p>Hi <strong>{user.username}</strong>,</p>
-                        <p>Thank you for registering. Please use the OTP below to verify your email address:</p>
-                        <div style="text-align: center; margin: 20px 0;">
-                            <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #333; background: #f4f6f8; padding: 10px 20px; border-radius: 5px;">
-                                {otp}
-                            </span>
-                        </div>
-                        <p>This OTP is valid for 10 minutes.</p>
-                        <hr style="border: none; border-top: 1px solid #eee;">
-                        <p style="font-size: 12px; color: #888; text-align: center;">If you didn't request this, please ignore this email.</p>
-                    </div>
-                </body>
-            </html>
-            """
+            send_notification_email(user, 'email_verification', {
+                'userName': user.username,
+                'otpCode': otp,
+                'verifyLink': f"https://urbanshift.vercel.app/verify-email?email={user.email}" # Optional link if you have a frontend route
+            })
 
-            send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
-                to=to,
-                html_content=html_content,
-                sender=sender,
-                subject="Verify Your UrbanShift Account - OTP Inside"
-            )
-
-            # 5. Email Send karein
-            try:
-                api_instance.send_transac_email(send_smtp_email)
-                print(f"✅ OTP Email sent to {user.email}")
-            except ApiException as e:
-                print(f"❌ Brevo Error: {e}")
-                # Error aane par bhi success return kar rahe hain taaki flow na toote, 
-                # lekin production me ise handle karna chahiye.
+            print(f"✅ OTP Email sent to {user.email} (via Utility)")
 
             return Response({
                 'message': 'Registration successful! OTP sent to your email.',
@@ -118,6 +83,14 @@ class VerifyEmailView(APIView):
             user.otp = None
             user.otp_created_at = None  # Clear expiry time
             user.save()
+            
+            # 4. Send Welcome Email
+            from .utils_email import send_notification_email
+            send_notification_email(user, 'welcome', {
+                'userName': user.username,
+                'exploreLink': "https://urbanshift.vercel.app/properties"
+            })
+            
             return Response({'message': 'Email verified successfully! You can login now.'}, status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Invalid OTP. Please try again.'}, status=status.HTTP_400_BAD_REQUEST)
@@ -137,6 +110,17 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+        
+    def perform_update(self, serializer):
+        user = serializer.save()
+        
+        # Send Profile Update Email
+        from .utils_email import send_notification_email
+        send_notification_email(user, 'profile_update', {
+            'userName': user.username,
+            'date': timezone.now().strftime("%Y-%m-%d"),
+            'time': timezone.now().strftime("%H:%M:%S")
+        })
 
 # ==========================================
 # 4. Upload Verification View (Existing)
@@ -163,3 +147,89 @@ class UploadVerificationView(APIView):
             
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# ==========================================
+# 5. Forgot Password Request View (New)
+# ==========================================
+# ==========================================
+# 5. Forgot Password Request View (OTP)
+# ==========================================
+class RequestPasswordResetView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        try:
+            user = User.objects.get(email=email)
+            
+            # Generate OTP
+            otp = str(random.randint(100000, 999999))
+            user.otp = otp
+            user.otp_created_at = timezone.now()
+            user.save()
+            
+            from .utils_email import send_notification_email
+            send_notification_email(user, 'forgot_password', {
+                'userName': user.username,
+                'otpCode': otp
+            })
+            
+            return Response({'message': 'Password reset OTP sent to your email.'}, status=status.HTTP_200_OK)
+            
+        except User.DoesNotExist:
+            return Response({'message': 'If an account exists, an OTP has been sent.'}, status=status.HTTP_200_OK)
+
+# ==========================================
+# 6. Password Reset Confirm View (OTP Verification)
+# ==========================================
+class PasswordResetConfirmView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email', '').strip()
+        otp = request.data.get('otp', '').strip()
+        password = request.data.get('password')
+        
+        if not email or not otp or not password:
+            return Response({'error': 'Email, OTP, and Password are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email=email)
+            
+            # --- DEBUGGING LOGS ---
+            print(f"🔍 DEBUG: Verifying OTP for {email}")
+            print(f"   Input OTP: '{otp}' (Type: {type(otp)})")
+            print(f"   DB OTP:    '{user.otp}' (Type: {type(user.otp)})")
+            # ----------------------
+
+            # Verify OTP
+            if user.otp == otp:
+                if not user.is_otp_valid():
+                    return Response({'error': 'OTP has expired. Request a new one.'}, status=status.HTTP_400_BAD_REQUEST)
+
+                # --- 🔒 PASSWORD VALIDATION (Duplicate from Serializer) ---
+                import re
+                if len(password) < 8:
+                    return Response({'error': 'Password must be at least 8 chars long.'}, status=status.HTTP_400_BAD_REQUEST)
+                if not re.search(r'[A-Z]', password):
+                    return Response({'error': 'Password must contain at least one uppercase letter (A-Z).'}, status=status.HTTP_400_BAD_REQUEST)
+                if not re.search(r'[a-z]', password):
+                    return Response({'error': 'Password must contain at least one lowercase letter (a-z).'}, status=status.HTTP_400_BAD_REQUEST)
+                if not re.search(r'\d', password):
+                    return Response({'error': 'Password must contain at least one number (0-9).'}, status=status.HTTP_400_BAD_REQUEST)
+                if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+                    return Response({'error': 'Password must contain at least one special character.'}, status=status.HTTP_400_BAD_REQUEST)
+                # ----------------------------------------------------------
+
+                user.set_password(password)
+                user.otp = None # Clear OTP after use
+                user.otp_created_at = None
+                user.save()
+                return Response({'message': 'Password reset successful! You can login now.'}, status=status.HTTP_200_OK)
+            else:
+                print("❌ OTP Mismatch!")
+                return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        except User.DoesNotExist:
+            print(f"❌ User not found for email: {email}")
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)

@@ -1,18 +1,33 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState('');
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate(); // Hook for navigation
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // ⚠️ Note: Actual email sending ke liye Backend me SMTP setup chahiye.
-    // Abhi hum User Experience ke liye frontend ready kar rahe hain.
     
+    // 👇 Real API Integration
+    const BACKEND_URL = window.location.hostname === "localhost" ? "http://127.0.0.1:8000" : "https://urbanshift-project.onrender.com";
+
     if(email) {
-        toast.success(`Reset link sent to ${email} (Simulation) 📨`);
-        // Future me yahan axios.post call aayega
+        toast.info("Sending OTP... ⏳");
+        
+        try {
+            await axios.post(`${BACKEND_URL}/api/users/forgot-password/`, { email });
+            toast.success(`OTP sent to ${email} 📨`);
+            
+            // Redirect to Reset Password Page with Email
+            navigate('/reset-password', { state: { email: email } });
+            
+        } catch (error) {
+            console.error(error);
+            toast.error("Failed to send OTP. Try again.");
+        }
     } else {
         toast.error("Please enter a valid email!");
     }
@@ -21,9 +36,9 @@ const ForgotPassword = () => {
   return (
     <div style={containerStyle}>
       <div style={cardStyle}>
-        <h2 style={{color:'var(--text-primary)', textAlign:'center'}}>🔑 Forgot Password?</h2>
+        <h2 style={{color:'var(--text-primary)', textAlign:'center'}}>🔑 Reset Password</h2>
         <p style={{color:'var(--text-secondary)', textAlign:'center', marginBottom:'20px'}}>
-            Enter your email address and we'll send you a link to reset your password.
+            Enter your email address and we'll send you a <b>6-digit OTP</b> to reset your password.
         </p>
         
         <form onSubmit={handleSubmit}>
@@ -39,7 +54,7 @@ const ForgotPassword = () => {
                 />
             </div>
             
-            <button type="submit" style={btnStyle}>Send Reset Link</button>
+            <button type="submit" style={btnStyle}>Send OTP</button>
             
             <div style={{textAlign:'center', marginTop:'20px'}}>
                 <Link to="/login" style={{color:'#aaa', textDecoration:'none'}}>← Back to Login</Link>

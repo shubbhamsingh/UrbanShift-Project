@@ -176,8 +176,17 @@ SIMPLE_JWT = {
 }
 
 # ==========================================
-# 📧 BREVO API CONFIGURATION
+# 📧 EMAIL CONFIGURATION (BREVO SMTP)
 # ==========================================
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp-relay.brevo.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.environ.get('BREVO_SMTP_LOGIN', '75b4f8001@smtp-brevo.com') # Default fallback (should be env)
+EMAIL_HOST_PASSWORD = os.environ.get('BREVO_API_KEY') # Using API Key as password for SMTP
+DEFAULT_FROM_EMAIL = 'UrbanShift <noreply@urbanshift.vercel.app>'
+SERVER_EMAIL = 'noreply@urbanshift.vercel.app'
+
 BREVO_API_KEY = os.environ.get('BREVO_API_KEY')
 
 # ==========================================

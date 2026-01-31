@@ -25,6 +25,7 @@ import OfflineBanner from './components/OfflineBanner'; // 👈 ADDED OFFLINE BA
 import CompanyDashboard from './components/CompanyDashboard';
 import CompanyRequests from './components/CompanyRequests';
 import ForgotPassword from './components/ForgotPassword';
+import ResetPassword from './components/ResetPassword';
 import MyMoves from './components/MyMoves';
 import Profile from './components/Profile';
 import UserDashboard from './components/UserDashboard';
@@ -81,6 +82,7 @@ function App() {
               <Route path="/company-dashboard" element={<CompanyDashboard />} />
               <Route path="/company-requests" element={<CompanyRequests />} />
               <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/my-moves" element={<MyMoves />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/user-dashboard" element={<UserDashboard />} />

@@ -12,7 +12,19 @@ class SubmitMoveRequestView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(customer=self.request.user)
+        move_request = serializer.save(customer=self.request.user)
+        
+        # 📧 Send Quote Request Email
+        from users.utils_email import send_notification_email
+        send_notification_email(self.request.user, 'movers_quote_received', {
+            'userName': self.request.user.username,
+            'fromCity': move_request.source,
+            'toCity': move_request.destination,
+            'moveDate': str(move_request.move_date),
+            'moveSize': move_request.move_size,
+            'itemsList': move_request.items_list or "Standard Items",
+            'requestLink': f"https://urbanshift.vercel.app/my-moves"
+        })
 
 # 2. Company Dashboard (Company ke liye Pending requests)
 class CompanyMoveRequestsView(generics.ListAPIView):
@@ -128,6 +140,20 @@ class ProcessPaymentView(APIView):
         move_request.transaction_id = fake_txn_id
         
         move_request.save()
+        
+        # 📧 Send Booking Confirmed Email
+        from users.utils_email import send_notification_email
+        send_notification_email(request.user, 'movers_booking_confirmed', {
+            'userName': request.user.username,
+            'moveDate': str(move_request.move_date),
+            'fromCity': move_request.source,
+            'toCity': move_request.destination,
+            'tokenAmount': '5000',
+            'companyName': move_request.company.username if move_request.company else "UrbanShift Partner",
+            'driverName': 'Assigned Driver',
+            'driverPhone': '9999999999',
+            'bookingLink': f"https://urbanshift.vercel.app/my-moves"
+        })
 
         return Response({
             'status': 'Payment Successful',

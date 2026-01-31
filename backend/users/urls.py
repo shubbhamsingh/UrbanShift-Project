@@ -5,7 +5,9 @@ from .views import (
     VerifyEmailView,  # 👈 Ye Naya Import Zaroori Hai
     CustomTokenObtainPairView, 
     UserDetailView, 
-    UploadVerificationView
+    UploadVerificationView,
+    RequestPasswordResetView,
+    PasswordResetConfirmView
 )
 
 urlpatterns = [
@@ -23,4 +25,7 @@ urlpatterns = [
 
     # ✅ Verification Document Upload URL (Seller ke liye)
     path('upload-verification/', UploadVerificationView.as_view(), name='upload_verification'),
+    
+    path('forgot-password/', RequestPasswordResetView.as_view(), name='forgot_password'),
+    path('reset-password-confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
 ]

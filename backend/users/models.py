@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from datetime import timedelta
+from django.utils import timezone
 
 class User(AbstractUser): 
     USER_TYPE_CHOICES = (
@@ -38,12 +40,12 @@ class User(AbstractUser):
         verbose_name='user permissions',
     )
 
-# Helper method add karo class ke andar (line 38 ke baad):
-def is_otp_valid(self):
-    """Check if OTP is still valid (10 minutes expiry)"""
-    if not self.otp or not self.otp_created_at:
-        return False
-    expiry_time = self.otp_created_at + timedelta(minutes=10)
-    return timezone.now() < expiry_time
+    def is_otp_valid(self):
+        """Check if OTP is still valid (10 minutes expiry)"""
+        if not self.otp or not self.otp_created_at:
+            return False
+        expiry_time = self.otp_created_at + timedelta(minutes=10)
+        return timezone.now() < expiry_time
+
     def __str__(self):
         return self.username
