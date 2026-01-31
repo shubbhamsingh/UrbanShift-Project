@@ -5,12 +5,29 @@
     {
       "src": "app-icon.png",
       "type": "image/png",
-      "sizes": "192x192"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     },
     {
       "src": "app-icon.png",
       "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+       "src": "app-icon.png",
+       "sizes": "512x512",
+       "type": "image/png",
+       "form_factor": "wide",
+       "label": "UrbanShift App"
+    },
+    {
+       "src": "app-icon.png",
+       "sizes": "512x512",
+       "type": "image/png",
+       "label": "UrbanShift Mobile"
     }
   ],
   "start_url": ".",

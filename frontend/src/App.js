@@ -19,7 +19,8 @@ import Wishlist from './components/Wishlist';
 
 // ✅ MOVERS & PACKERS COMPONENTS
 import BookMovers from './components/BookMovers';
-import PackersMovers from './components/PackersMovers'; // 👈 IMPORT ADDED
+import PackersMovers from './components/PackersMovers'; 
+import OfflineBanner from './components/OfflineBanner'; // 👈 ADDED OFFLINE BANNER
 
 import CompanyDashboard from './components/CompanyDashboard';
 import CompanyRequests from './components/CompanyRequests';
@@ -42,6 +43,7 @@ function App() {
       <div style={{display: 'flex', flexDirection: 'column', minHeight: '100vh'}}>
           
           <ScrollToTop /> {/* 👈 Har page change par top scroll */}
+          <OfflineBanner /> {/* 👈 OFFLINE INDICATOR */}
           <Navbar />
           
           <ToastContainer 

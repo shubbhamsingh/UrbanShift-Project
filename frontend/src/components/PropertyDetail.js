@@ -3,8 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaHeart, FaRegHeart, FaTimes, FaPhone, FaEnvelope, FaUser, FaShoppingCart, FaComments } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-
-// ✅ Custom Components
 import { ThemeContext } from '../context/ThemeContext';
 
 const PropertyDetail = () => {
@@ -20,15 +18,9 @@ const PropertyDetail = () => {
     const [isWishlisted, setIsWishlisted] = useState(false);
     const [showContact, setShowContact] = useState(false);
 
-
-    // Image Gallery (commented - not used currently)
-    // const [currentImageIndex, setCurrentImageIndex] = useState(0);
-    // const [showImageModal, setShowImageModal] = useState(false);
-
     const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
     const BACKEND_URL = isLocal ? "http://127.0.0.1:8000" : "https://urbanshift-project.onrender.com";
 
-    // --- STYLES ---
     const colors = {
         bg: isDark ? '#121212' : '#f4f6f8',
         cardBg: isDark ? '#1e1e1e' : '#ffffff',
@@ -60,15 +52,69 @@ const PropertyDetail = () => {
     }, [id, BACKEND_URL]);
 
     // --- HANDLERS ---
-    const handlePaymentStart = () => {
+    
+    const BOOKING_AMOUNT = 5000; // Fixed Token Amount
+
+    const handlePaymentStart = async () => {
         const token = localStorage.getItem('token');
         if (!token) { toast.error("Please Login to buy! 🔒"); navigate('/login'); return; }
-        toast.info("Online purchase coming soon! Please contact owner.");
-    };
 
-    // Image Navigation (commented - not used currently)
-    // const nextImage = (e) => { if (e) e.stopPropagation(); setCurrentImageIndex((prev) => prev === property.images.length - 1 ? 0 : prev + 1); };
-    // const prevImage = (e) => { if (e) e.stopPropagation(); setCurrentImageIndex((prev) => prev === 0 ? property.images.length - 1 : prev - 1); };
+        try {
+            // 1. Create Order on Backend (Using Booking Amount)
+            const orderRes = await axios.post(`${BACKEND_URL}/api/payments/create-order/`, {
+                amount: BOOKING_AMOUNT 
+            }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            const { order_id, amount, key, currency } = orderRes.data;
+
+            // 2. Initialize Razorpay Options
+            const options = {
+                key: key, 
+                amount: amount, 
+                currency: currency,
+                name: "UrbanShift Property",
+                description: `Booking Token for ${property.title}`,
+                image: "https://urbanshift-project.onrender.com/logo.png",
+                order_id: order_id, 
+                handler: async function (response) {
+                    try {
+                        toast.info("Verifying Payment... ⏳");
+                        await axios.post(`${BACKEND_URL}/api/payments/verify-payment/`, {
+                            razorpay_order_id: response.razorpay_order_id,
+                            razorpay_payment_id: response.razorpay_payment_id,
+                            razorpay_signature: response.razorpay_signature,
+                        }, {
+                            headers: { Authorization: `Bearer ${token}` }
+                        });
+
+                        toast.success(`Booking Confirmed! Token of ₹${BOOKING_AMOUNT.toLocaleString('en-IN')} Paid. 🎉`);
+                    } catch (err) {
+                        console.error(err);
+                        toast.error("Payment Verification Failed! ❌");
+                    }
+                },
+                prefill: {
+                    name: "UrbanShift User",
+                    email: "user@example.com",
+                    contact: "9999999999"
+                },
+                theme: { color: "#2ecc71" }
+            };
+
+            const rzp1 = new window.Razorpay(options);
+            rzp1.on('payment.failed', function (response){
+                toast.error(`Payment Failed: ${response.error.description}`);
+            });
+            rzp1.open();
+
+        } catch (err) {
+            console.error("Payment Start Error:", err);
+            const errorMessage = err.response?.data?.error || "Could not initiate payment. Try again.";
+            toast.error(errorMessage);
+        }
+    };
 
     const handleWishlistToggle = async () => {
         const token = localStorage.getItem('token');
@@ -87,8 +133,58 @@ const PropertyDetail = () => {
         else toast.error("Seller info unavailable.");
     };
 
-    // Styles Object
+    // Image Gallery
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+    // ... (rest of useEffects) ...
+
+    // Image Helper Logic 
+    const images = property?.images || [];
+    const currentImage = images[currentImageIndex]?.image || images[currentImageIndex]?.image_url || property?.image; // Fallback
+
+    const nextImage = (e) => { 
+        if (e) e.stopPropagation(); 
+        setCurrentImageIndex((prev) => prev === images.length - 1 ? 0 : prev + 1); 
+    };
+    
+    const prevImage = (e) => { 
+        if (e) e.stopPropagation(); 
+        setCurrentImageIndex((prev) => prev === 0 ? images.length - 1 : prev - 1); 
+    };
+
+    // ... (rest of handlers) ...
+
+    // Swipe Logic
+    const [touchStart, setTouchStart] = useState(null);
+    const [touchEnd, setTouchEnd] = useState(null);
+
+    const minSwipeDistance = 50; 
+
+    const onTouchStart = (e) => {
+        setTouchEnd(null); 
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+        
+        if (isLeftSwipe) {
+            nextImage();
+        } else if (isRightSwipe) {
+            prevImage();
+        }
+    };
+
+    // ... (rest of handlers) ...
+
+    // Styles Object (Expanded for Gallery)
     const styles = {
+        // ... (existing styles) ...
         page: { padding: '40px 20px', background: colors.bg, minHeight: '100vh', color: colors.text, transition: '0.3s' },
         container: { maxWidth: '1200px', margin: '0 auto' },
         header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' },
@@ -96,8 +192,17 @@ const PropertyDetail = () => {
         badge: { padding: '5px 15px', borderRadius: '20px', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase' },
         contentWrapper: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '40px' },
 
-        mainImageContainer: { position: 'relative', width: '100%', height: '400px', cursor: 'pointer', overflow: 'hidden', borderRadius: '15px', border: `1px solid ${colors.border}`, boxShadow: colors.shadow },
-        mainImage: { width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s' },
+        mainImageContainer: { position: 'relative', width: '100%', height: '400px', cursor: 'pointer', overflow: 'hidden', borderRadius: '15px', border: `1px solid ${colors.border}`, boxShadow: colors.shadow, touchAction: 'pan-y' },
+        mainImage: { width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s', userSelect: 'none' }, // Added userSelect none to prevent highlighting during swipe
+        
+        // Gallery Arrows
+        arrowBtn: { position: 'absolute', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', padding: '10px', cursor: 'pointer', borderRadius: '50%', fontSize: '1.2rem', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' },
+        
+        // Thumbnails
+        thumbnailContainer: { display: 'flex', gap: '10px', overflowX: 'auto', padding: '10px 0' },
+        thumbnail: { width: '80px', height: '60px', objectFit: 'cover', borderRadius: '8px', cursor: 'pointer', border: '2px solid transparent', transition: '0.2s' },
+        activeThumbnail: { border: '2px solid #f1c40f', transform: 'scale(1.05)' },
+
         soldOverlay: { position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%) rotate(-15deg)', background: 'rgba(231, 76, 60, 0.9)', color: 'white', padding: '15px 40px', fontSize: '2rem', fontWeight: 'bold', border: '5px solid white', borderRadius: '10px', zIndex: 2 },
 
         infoSection: { display: 'flex', flexDirection: 'column' },
@@ -132,12 +237,50 @@ const PropertyDetail = () => {
                 </div>
 
                 <div style={styles.contentWrapper}>
-                    {/* IMAGES */}
+                    {/* IMAGES SECTION */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        <div style={styles.mainImageContainer}>
-                            <img src={property.images[0]?.image || property.images[0]?.image_url} alt={property.title} style={{ ...styles.mainImage, filter: property.is_sold ? 'grayscale(80%)' : 'none' }} />
+                        
+                        {/* Main Image */}
+                        <div 
+                            style={styles.mainImageContainer}
+                            onTouchStart={onTouchStart}
+                            onTouchMove={onTouchMove}
+                            onTouchEnd={onTouchEnd}
+                        >
+                            {images.length > 1 && (
+                                <button onClick={prevImage} style={{ ...styles.arrowBtn, left: '10px' }}>❮</button>
+                            )}
+                            
+                            <img 
+                                src={currentImage} 
+                                alt={property.title} 
+                                style={{ ...styles.mainImage, filter: property.is_sold ? 'grayscale(80%)' : 'none' }} 
+                            />
+                            
+                            {images.length > 1 && (
+                                <button onClick={nextImage} style={{ ...styles.arrowBtn, right: '10px' }}>❯</button>
+                            )}
+
                             {property.is_sold && <div style={styles.soldOverlay}>SOLD OUT</div>}
                         </div>
+
+                        {/* Thumbnails */}
+                        {images.length > 1 && (
+                            <div style={styles.thumbnailContainer}>
+                                {images.map((img, index) => (
+                                    <img 
+                                        key={index} 
+                                        src={img.image || img.image_url} 
+                                        alt={`Thumbnail ${index}`} 
+                                        style={{ 
+                                            ...styles.thumbnail, 
+                                            ...(index === currentImageIndex ? styles.activeThumbnail : {}) 
+                                        }}
+                                        onClick={() => setCurrentImageIndex(index)}
+                                    />
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     {/* INFO */}
@@ -160,7 +303,7 @@ const PropertyDetail = () => {
                         ) : (
                             property.category === 'SELL' && (
                                 <button onClick={handlePaymentStart} style={styles.buyBtn}>
-                                    <FaShoppingCart /> Buy Now
+                                    <FaShoppingCart /> Pay Booking Token (₹5,000)
                                 </button>
                             )
                         )}
@@ -176,8 +319,6 @@ const PropertyDetail = () => {
                     </div>
                 </div>
             </div>
-
-
 
             {/* CONTACT MODAL */}
             {showContact && (

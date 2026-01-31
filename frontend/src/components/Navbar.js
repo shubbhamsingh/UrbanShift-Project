@@ -14,7 +14,7 @@ const Navbar = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState(null); // PWA State
   const [isAppInstalled, setIsAppInstalled] = useState(false);
-  const [userType, setUserType] = useState(localStorage.getItem('userType')); // 👈 Reactive userType
+  const [userType, setUserType] = useState(localStorage.getItem('userType')?.toUpperCase() || ''); // 👈 Store uppercase for consistency
 
   // Theme Check
   const isDark = mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -22,7 +22,7 @@ const Navbar = () => {
 
   // 👈 Re-read userType on every navigation
   useEffect(() => {
-    setUserType(localStorage.getItem('userType'));
+    setUserType(localStorage.getItem('userType')?.toUpperCase() || '');
   }, [location.pathname]);
 
   // --- 1. HANDLE SCREEN RESIZE ---
@@ -162,28 +162,27 @@ const Navbar = () => {
     return <FaLaptop title="System Mode" />;
   };
 
+  // 👇 SMART URL SETUP (Automatic Detection)
+  const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+  const ADMIN_URL = isLocal 
+    ? "http://127.0.0.1:8000/admin/" 
+    : "https://urbanshift-project.onrender.com/admin/";
+
   return (
     <nav style={navStyle}>
 
-      {/* --- LEFT: Hamburger (Mobile Only) + Logo --- */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '10px' : '20px' }}>
-        {isMobile && (
-          <button onClick={() => setMenuOpen(!menuOpen)} style={iconBtnStyle}>
-            {menuOpen ? <FaTimes /> : <FaBars />}
-          </button>
-        )}
+      {/* --- LEFT: Logo Only (Always Visible) --- */}
+      <Link to="/" style={logoContainer}>
+        <img src={logo} alt="Logo" style={{ height: isMobile ? '30px' : '40px', width: 'auto' }} />
+        <span style={logoText}>
+          Urban<span style={{ color: '#e67e22' }}>Shift</span>
+        </span>
+      </Link>
 
-        <Link to="/" style={logoContainer}>
-          <img src={logo} alt="Logo" style={{ height: isMobile ? '30px' : '40px', width: 'auto' }} />
-          <span style={logoText}>
-            Urban<span style={{ color: '#e67e22' }}>Shift</span>
-          </span>
-        </Link>
-      </div>
-
-      {/* --- RIGHT: Install Icon + Theme + Links (Desktop Only) --- */}
+      {/* --- RIGHT: Icons (Install, Theme, Hamburger) + Desktop Links --- */}
       <div style={{ display: 'flex', alignItems: 'center', gap: isMobile ? '15px' : '25px' }}>
 
+        {/* PWA Install Button (Always in Navbar now) */}
         {deferredPrompt && !isAppInstalled && (
           <button onClick={handleInstallClick} style={iconBtnStyle} title="Install App">
             <FaDownload color="#2ecc71" />
@@ -201,13 +200,19 @@ const Navbar = () => {
 
             {token ? (
               <>
-                <Link to={
-                  userType === 'SELLER' ? "/seller-dashboard" :
+                {userType === 'ADMIN' ? (
+                  /* ✅ OPEN ADMIN PANEL IN NEW TAB */
+                  <a href={ADMIN_URL} target="_blank" rel="noopener noreferrer" style={linkStyle}>🛡️ Admin Panel</a>
+                ) : (
+                  <Link to={
+                    userType === 'SELLER' ? "/seller-dashboard" :
                     userType === 'COMPANY' ? "/company-dashboard" :
-                      "/user-dashboard"
-                } style={linkStyle}>
-                  {userType === 'SELLER' ? '📊 Seller Panel' : userType === 'COMPANY' ? '🚚 Mover Panel' : '👤 My Dashboard'}
-                </Link>
+                    "/user-dashboard"
+                  } style={linkStyle}>
+                    {userType === 'SELLER' ? '📊 Seller Panel' : userType === 'COMPANY' ? '🚚 Mover Panel' : ' My Dashboard'}
+                  </Link>
+                )}
+
                 <Link to="/properties" style={linkStyle}>Find Homes</Link>
                 <Link to="/chat/inbox" style={linkStyle}>
                   <FaCommentDots size={20} /> Chat
@@ -230,6 +235,13 @@ const Navbar = () => {
             )}
           </div>
         )}
+
+        {/* HAMBURGER MENU (Moved to Right, Mobile Only) */}
+        {isMobile && (
+          <button onClick={() => setMenuOpen(!menuOpen)} style={iconBtnStyle}>
+            {menuOpen ? <FaTimes /> : <FaBars />}
+          </button>
+        )}
       </div>
 
       {/* --- MOBILE MENU DROPDOWN --- */}
@@ -237,23 +249,22 @@ const Navbar = () => {
         <div style={mobileMenuStyle}>
           <Link to="/" onClick={() => setMenuOpen(false)} style={linkStyle}>🏠 Home</Link>
           
-          {/* PWA Install Button in Mobile */}
-          {deferredPrompt && !isAppInstalled && (
-            <button onClick={() => { handleInstallClick(); setMenuOpen(false); }} 
-              style={{ ...btnStyle, background: '#2ecc71', color: 'white', justifyContent: 'center', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <FaDownload /> Install App
-            </button>
-          )}
+          {/* ❌ REMOVED: Install App button from here as requested */}
 
           {token ? (
             <>
-              <Link to={
-                userType === 'SELLER' ? "/seller-dashboard" :
+              {userType === 'ADMIN' ? (
+                 <a href={ADMIN_URL} target="_blank" rel="noopener noreferrer" onClick={() => setMenuOpen(false)} style={linkStyle}>🛡️ Admin Panel</a>
+              ) : (
+                <Link to={
+                  userType === 'SELLER' ? "/seller-dashboard" :
                   userType === 'COMPANY' ? "/company-dashboard" :
-                    "/user-dashboard"
-              } onClick={() => setMenuOpen(false)} style={linkStyle}>
-                {userType === 'SELLER' ? '📊 Seller Panel' : userType === 'COMPANY' ? '🚚 Mover Panel' : '👤 My Dashboard'}
-              </Link>
+                  "/user-dashboard"
+                } onClick={() => setMenuOpen(false)} style={linkStyle}>
+                  {userType === 'SELLER' ? '📊 Seller Panel' : userType === 'COMPANY' ? '🚚 Mover Panel' : '👤 My Dashboard'}
+                </Link>
+              )}
+              
               <Link to="/properties" onClick={() => setMenuOpen(false)} style={linkStyle}>🔍 Find Homes</Link>
               <Link to="/chat/inbox" onClick={() => setMenuOpen(false)} style={linkStyle}>💬 Chat</Link>
 

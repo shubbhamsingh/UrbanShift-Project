@@ -135,7 +135,7 @@ const PackersMovers = () => {
                             <h2 style={{ margin: '0 0 20px 0', color: colors.text }}>Get Free Quote</h2>
                             <div><label style={styles.label}><FaMapMarkerAlt /> From</label><input name="fromLocation" placeholder="Current City" value={formData.fromLocation} onChange={handleChange} required style={styles.input} /></div>
                             <div><label style={styles.label}><FaMapMarkerAlt /> To</label><input name="toLocation" placeholder="Destination City" value={formData.toLocation} onChange={handleChange} required style={styles.input} /></div>
-                            <div style={{ display: 'flex', gap: '15px' }}>
+                            <div className="responsive-row">
                                 <div style={{ flex: 1 }}><label style={styles.label}><FaCalendarAlt /> Date</label><input name="moveDate" type="date" value={formData.moveDate} onChange={handleChange} required style={styles.input} /></div>
                                 <div style={{ flex: 1 }}><label style={styles.label}><FaPhone /> Mobile</label><input name="contact" placeholder="9876..." value={formData.contact} onChange={handleChange} required style={styles.input} /></div>
                             </div>

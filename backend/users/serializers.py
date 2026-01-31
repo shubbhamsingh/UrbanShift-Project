@@ -83,7 +83,11 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
     def validate(self, attrs):
         data = super().validate(attrs)
-        data['user_type'] = self.user.user_type
+        # ✅ ADMIN LOGIC FIX: Always return 'ADMIN' if superuser, ignoring DB field
+        if self.user.is_superuser or self.user.is_staff:
+             data['user_type'] = 'ADMIN'
+        else:
+             data['user_type'] = self.user.user_type
         data['username'] = self.user.username
         data['is_verified'] = self.user.is_verified
         return data

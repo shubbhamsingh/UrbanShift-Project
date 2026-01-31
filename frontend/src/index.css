@@ -226,3 +226,16 @@ a {
   border: 1px solid #555 !important;
   margin-bottom: 5px !important;
 }
+
+/* --- RESPONSIVE LAYOUT UTILS --- */
+.responsive-row {
+  display: flex;
+  flex-direction: column; /* Default: Stack vertically (Mobile) */
+  gap: 1.25rem; /* 20px */
+}
+
+@media (min-width: 768px) {
+  .responsive-row {
+    flex-direction: row; /* Desktop: Side by side */
+  }
+}

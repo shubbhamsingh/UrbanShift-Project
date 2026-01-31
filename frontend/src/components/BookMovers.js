@@ -158,7 +158,7 @@ const BookMovers = () => {
         {step === 1 ? (
             /* STEP 1: FORM */
             <form onSubmit={handleCalculateQuote}>
-                <div style={{display:'flex', gap:'20px'}}>
+                <div className="responsive-row">
                     <div style={{flex:1, ...styles.inputGroup}}>
                         <div style={styles.labelIcon}><FaMapMarkerAlt /> Moving From</div>
                         <input name="source" value={formData.source} placeholder="Jaipur" onChange={handleChange} required style={styles.input} />
@@ -169,7 +169,7 @@ const BookMovers = () => {
                     </div>
                 </div>
 
-                <div style={{display:'flex', gap:'20px', marginBottom:'20px'}}>
+                <div className="responsive-row" style={{marginBottom: '20px'}}>
                     <div style={{flex:1, display:'flex', flexDirection:'column', gap:'8px'}}>
                         <div style={styles.labelIcon}><FaCalendarAlt /> Date</div>
                         <input name="move_date" type="date" value={formData.move_date} onChange={handleChange} required style={styles.input} />

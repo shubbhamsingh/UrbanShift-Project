@@ -219,35 +219,38 @@ const Profile = () => {
     }
   };
 
-  if (loading) return <div style={{textAlign:'center', padding:'50px', color: colors.text}}>Loading Profile...</div>;
+    if (loading) return <div style={{textAlign:'center', padding:'50px', color: colors.text}}>Loading Profile...</div>;
+    
+    // Check if user exists before rendering to avoid blank screen/crash
+    if (!user) return <div style={{textAlign:'center', padding:'50px', color: 'red'}}>Error Loading User Data. Please try logging in again.</div>;
 
-  return (
-    <div style={styles.container}>
-      
-      {!isEditing ? (
-        /* --- CARD 1: VIEW PROFILE --- */
-        <div style={styles.card}>
-          <div style={styles.avatarContainer}>
-             <FaUser size={40} color="#fff" />
-          </div>
-          
-          <h2 style={{color: colors.text, marginTop: '15px'}}>{user.username}</h2>
-          <span style={styles.roleBadge}>{user.user_type}</span>
+    return (
+        <div style={styles.container}>
+        
+        {!isEditing ? (
+            /* --- CARD 1: VIEW PROFILE --- */
+            <div style={styles.card}>
+            <div style={styles.avatarContainer}>
+                <FaUser size={40} color="#fff" />
+            </div>
+            
+            <h2 style={{color: colors.text, marginTop: '15px'}}>{user?.username || "Guest User"}</h2>
+            <span style={styles.roleBadge}>{user?.user_type || "USER"}</span>
 
-          <div style={styles.infoContainer}>
-             <div style={styles.infoRow}>
-                <FaEnvelope color="#f1c40f" /> <span>{user.email}</span>
-             </div>
-             <div style={styles.infoRow}>
-                <FaPhone color="#f1c40f" /> <span>{user.phone || "No phone added"}</span>
-             </div>
-          </div>
+            <div style={styles.infoContainer}>
+                <div style={styles.infoRow}>
+                    <FaEnvelope color="#f1c40f" /> <span>{user?.email || "No Email"}</span>
+                </div>
+                <div style={styles.infoRow}>
+                    <FaPhone color="#f1c40f" /> <span>{user?.phone || "No phone added"}</span>
+                </div>
+            </div>
 
-          <button onClick={() => setIsEditing(true)} style={styles.editBtn}>
-             <FaEdit /> Edit Profile
-          </button>
-        </div>
-      ) : (
+            <button onClick={() => setIsEditing(true)} style={styles.editBtn}>
+                <FaEdit /> Edit Profile
+            </button>
+            </div> // END CARD
+        ) : (
         /* --- CARD 2: EDIT PROFILE --- */
         <div style={styles.card}>
            <div style={{display:'flex', justifyContent:'space-between', width:'100%', marginBottom:'20px'}}>
