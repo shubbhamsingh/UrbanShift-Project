@@ -86,7 +86,8 @@ const PropertyDetail = () => {
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_signature: response.razorpay_signature,
                             amount: BOOKING_AMOUNT,
-                            property_title: property.title
+                            property_title: property.title,
+                            property_id: property.id // ✅ Sending Property ID to trigger Seller Email
                         }, {
                             headers: { Authorization: `Bearer ${token}` }
                         });
@@ -327,11 +328,45 @@ const PropertyDetail = () => {
                 <div style={styles.modalOverlay} onClick={() => setShowContact(false)}>
                     <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                         <button style={{ position: 'absolute', top: '15px', right: '15px', border: 'none', background: 'none', color: colors.subText, fontSize: '1.2rem', cursor: 'pointer' }} onClick={() => setShowContact(false)}><FaTimes /></button>
-                        <h2 style={{ color: '#f1c40f', textAlign: 'center', marginBottom: '20px' }}>Contact Details</h2>
+                        <h2 style={{ color: '#f1c40f', textAlign: 'center', marginBottom: '20px' }}>Contact Owner</h2>
+                        
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}><FaUser color="#3498db" /> <strong style={{ color: colors.text }}>{property.seller_name}</strong></div>
-                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}><FaEnvelope color="#3498db" /> <span style={{ color: colors.text }}>{property.seller_email}</span></div>
-                            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}><FaPhone color="#3498db" /> <span style={{ color: colors.text }}>{property.seller_phone}</span></div>
+                            <p style={{ textAlign: 'center', color: colors.subText, fontSize: '0.9rem' }}>Fill your details to show interest. The owner will be notified via email.</p>
+                            
+                            <form onSubmit={(e) => {
+                                e.preventDefault();
+                                const formData = new FormData(e.target);
+                                const data = {
+                                    name: formData.get('name'),
+                                    email: formData.get('email'),
+                                    phone: formData.get('phone')
+                                };
+
+                                axios.post(`${BACKEND_URL}/api/properties/${id}/contact-owner/`, data, {
+                                    headers: { 
+                                        'Content-Type': 'application/json',
+                                        ...(localStorage.getItem('token') ? { Authorization: `Bearer ${localStorage.getItem('token')}` } : {})
+                                    }
+                                })
+                                .then(() => {
+                                    toast.success("Inquiry Sent Successfully! 📩");
+                                    setShowContact(false);
+                                })
+                                .catch(err => {
+                                    console.error(err);
+                                    toast.error("Failed to send inquiry.");
+                                });
+                            }}>
+                                <input name="name" placeholder="Your Name" required style={{ width: '100%', padding: '10px', borderRadius: '5px', border: `1px solid ${colors.border}`, background: colors.bg, color: colors.text }} />
+                                <input name="email" type="email" placeholder="Your Email" required style={{ width: '100%', padding: '10px', borderRadius: '5px', border: `1px solid ${colors.border}`, background: colors.bg, color: colors.text }} />
+                                <input name="phone" type="tel" placeholder="Your Phone Number" required style={{ width: '100%', padding: '10px', borderRadius: '5px', border: `1px solid ${colors.border}`, background: colors.bg, color: colors.text }} />
+                                
+                                <button type="submit" style={{ ...styles.buyBtn, background: '#3498db', marginTop: '10px' }}>Send Inquiry</button>
+                            </form>
+                            
+                            <div style={{ marginTop: '10px', borderTop: `1px solid ${colors.border}`, paddingTop: '10px' }}>
+                                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', fontSize: '0.9rem' }}><FaUser color="#3498db" /> <strong style={{ color: colors.text }}>{property.seller_name}</strong></div>
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.permissions import IsAuthenticated  # ✅ Ye missing tha, ab add kar diya
 from django.shortcuts import get_object_or_404
 from .models import Property, PropertyImage, Wishlist
@@ -17,7 +17,7 @@ class IsSellerUser(permissions.BasePermission):
 class PropertyViewSet(viewsets.ModelViewSet):
     queryset = Property.objects.all().order_by('-created_at')
     serializer_class = PropertySerializer
-    parser_classes = (MultiPartParser, FormParser)
+    parser_classes = (MultiPartParser, FormParser, JSONParser)
 
     def get_permissions(self):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
@@ -29,6 +29,24 @@ class PropertyViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(seller=self.request.user)
 
+    def perform_destroy(self, instance):
+        # 📧 Send Admin Alert (Property Deleted)
+        try:
+            from users.utils_email import send_notification_email
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            admin_user = User.objects.filter(is_superuser=True).first()
+            if admin_user:
+                send_notification_email(admin_user, 'property_deleted', {
+                    'sellerName': instance.seller.username,
+                    'propertyTitle': instance.title,
+                    'deleteReason': "Seller Removed Listing"
+                })
+        except Exception as e:
+            print(f"Admin Alert Failed: {e}")
+        
+        instance.delete()
+
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -39,6 +57,19 @@ class PropertyViewSet(viewsets.ModelViewSet):
             for image in images:
                 PropertyImage.objects.create(property=property_instance, image=image)
         
+        # 📧 Send Email Notification to Seller
+        try:
+            from users.utils_email import send_notification_email
+            send_notification_email(self.request.user, 'property_listed', {
+                'userName': self.request.user.username,
+                'propertyTitle': property_instance.title,
+                'price': str(property_instance.price),
+                'location': property_instance.location,
+                'listingLink': f"https://urbanshift.vercel.app/properties/{property_instance.id}"
+            })
+        except Exception as e:
+            print(f"Error sending email: {e}")
+
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
@@ -76,6 +107,35 @@ class PropertyViewSet(viewsets.ModelViewSet):
         property_obj.save()
         
         return Response({'message': 'Property Purchased Successfully! 🎉🏡'}, status=status.HTTP_200_OK)
+
+    # 4. Contact Owner (Lead Generation)
+    @action(detail=True, methods=['post'], url_path='contact-owner')
+    def contact_owner(self, request, pk=None):
+        """
+        Allows a potential buyer to contact the property owner.
+        """
+        property_obj = self.get_object()
+        seller = property_obj.seller
+        
+        buyer_name = request.data.get('name', request.user.username if request.user.is_authenticated else "Guest")
+        buyer_email = request.data.get('email', request.user.email if request.user.is_authenticated else "N/A")
+        buyer_phone = request.data.get('phone', "N/A")
+        
+        # Send Email to Seller
+        try:
+            from users.utils_email import send_notification_email
+            send_notification_email(seller, 'new_lead', {
+                'userName': seller.username,
+                'propertyTitle': property_obj.title,
+                'buyerName': buyer_name,
+                'buyerEmail': buyer_email,
+                'buyerPhone': buyer_phone,
+                'chatLink': "https://urbanshift.vercel.app/chat"
+            })
+        except Exception as e:
+            print(f"Error sending lead email: {e}")
+        
+        return Response({'message': 'Inquiry sent successfully to the owner! 📩'}, status=status.HTTP_200_OK)
 
 
 # --- WISHLIST VIEWS ---

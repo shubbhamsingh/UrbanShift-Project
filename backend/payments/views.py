@@ -87,7 +87,33 @@ class VerifyPaymentView(APIView):
                     move.payment_amount = request.data.get('amount', 5000)
                     move.save()
                     
-                    # ✅ TODO: Send Mover Booking Email here
+                    # ✅ Send Mover Booking & Payment Emails
+                    if move.company:
+                         from users.utils_email import send_notification_email
+                         from django.utils import timezone
+                         
+                         # 1. Booking Confirmed Email
+                         send_notification_email(move.company, 'booking_confirmed_company', {
+                             'userName': move.company.username,
+                             'customerName': request.user.username,
+                             'customerPhone': 'N/A', # Need to fetch profile if available
+                             'moveDate': str(move.move_date),
+                             'fromCity': move.source,
+                             'toCity': move.destination,
+                             'tokenAmount': str(move.payment_amount),
+                             'bookingLink': f"https://urbanshift.vercel.app/company/my-jobs"
+                         })
+
+                         # 2. Payment Received Email
+                         send_notification_email(move.company, 'payment_received_company', {
+                             'userName': move.company.username,
+                             'amount': str(move.payment_amount),
+                             'bookingId': str(move.id),
+                             'customerName': request.user.username,
+                             'date': timezone.now().strftime("%Y-%m-%d"),
+                             'walletLink': f"https://urbanshift.vercel.app/company/wallet"
+                         })
+
                 except MoveRequest.DoesNotExist:
                     pass
             
@@ -96,6 +122,7 @@ class VerifyPaymentView(APIView):
             from users.utils_email import send_notification_email
             from django.utils import timezone
             
+            # 1. Email to Buyer (Payer)
             send_notification_email(request.user, 'payment_success', {
                 'userName': request.user.username,
                 'amount': request.data.get('amount', '5000'),
@@ -103,6 +130,46 @@ class VerifyPaymentView(APIView):
                 'txnId': razorpay_payment_id,
                 'date': timezone.now().strftime("%Y-%m-%d")
             })
+
+            # 2. Email to Seller (If Property)
+            property_id = request.data.get('property_id')
+            if property_id:
+                try:
+                    from properties.models import Property
+                    property_obj = Property.objects.get(id=property_id)
+                    
+                    # ✅ Mark Property as Sold
+                    if not property_obj.is_sold:
+                        property_obj.buyer = request.user
+                        property_obj.is_sold = True
+                        property_obj.save()
+                    
+                    send_notification_email(property_obj.seller, 'property_sold', {
+                        'userName': property_obj.seller.username,
+                        'propertyTitle': property_obj.title,
+                        'amount': str(request.data.get('amount', '0')),
+                        'buyerName': request.user.username,
+                        'txnId': razorpay_payment_id,
+                        'date': timezone.now().strftime("%Y-%m-%d"),
+                        'dashboardLink': "https://urbanshift.vercel.app/dashboard/seller"
+                    })
+
+                    # 📧 Send Admin Alert (Property Sold)
+                    try:
+                        from django.contrib.auth import get_user_model
+                        User = get_user_model()
+                        admin_user = User.objects.filter(is_superuser=True).first()
+                        if admin_user:
+                             send_notification_email(admin_user, 'property_sold_admin', {
+                                'sellerName': property_obj.seller.username,
+                                'propertyTitle': property_obj.title,
+                                'soldPrice': str(request.data.get('amount', '0')),
+                                'buyerName': request.user.username
+                             })
+                    except Exception as e:
+                        print(f"Admin Alert Failed: {e}")
+                except Exception as e:
+                     print(f"Error sending seller notification: {e}")
 
             return Response({'message': 'Payment Verified Successfully!'}, status=status.HTTP_200_OK)
 

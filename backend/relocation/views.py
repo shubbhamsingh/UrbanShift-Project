@@ -26,6 +26,23 @@ class SubmitMoveRequestView(generics.CreateAPIView):
             'requestLink': f"https://urbanshift.vercel.app/my-moves"
         })
 
+        # 📧 2. Send New Job Alert to All Movers (Companies)
+        # (Ideal scenario: Filter by Service Area, but sending to all Verified Companies for now)
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        movers = User.objects.filter(user_type='COMPANY', is_verified=True)
+        
+        for mover in movers:
+            send_notification_email(mover, 'new_job_opportunity', {
+                'userName': mover.username,
+                'customerName': self.request.user.username,
+                'fromCity': move_request.source,
+                'toCity': move_request.destination,
+                'moveDate': str(move_request.move_date),
+                'moveSize': move_request.move_size,
+                'dashboardLink': "https://urbanshift.vercel.app/company/dashboard"
+            })
+
 # 2. Company Dashboard (Company ke liye Pending requests)
 class CompanyMoveRequestsView(generics.ListAPIView):
     serializer_class = MoveRequestSerializer
@@ -66,6 +83,9 @@ class UpdateMoveStatusView(APIView):
             return Response({'error': 'Only companies can update status'}, status=status.HTTP_403_FORBIDDEN)
 
         if new_status in ['ACCEPTED', 'COMPLETED', 'CANCELLED']:
+            # Capture old company before clearing/changing if needed
+            assigned_company = move_request.company
+            
             move_request.status = new_status
             
             # Agar ACCEPT kiya, to Company assign kar do
@@ -73,6 +93,69 @@ class UpdateMoveStatusView(APIView):
                 move_request.company = request.user
             
             move_request.save()
+
+            # 📧 Send Cancellation Email
+            if new_status == 'CANCELLED':
+                 # Determine who cancelled
+                 cancelled_by = request.user
+                 is_company = getattr(cancelled_by, 'user_type', None) == 'COMPANY'
+                 
+                 # 1. To Company (if User Cancelled) - ALREADY DONE
+                 if assigned_company and not is_company:
+                     from users.utils_email import send_notification_email
+                     send_notification_email(assigned_company, 'booking_cancelled_company', {
+                         'userName': assigned_company.username,
+                         'bookingId': str(move_request.id),
+                         'moveDate': str(move_request.move_date),
+                         'fromCity': move_request.source,
+                         'toCity': move_request.destination,
+                         'cancellationReason': request.data.get('reason', 'Client Request')
+                     })
+
+                 # 2. To Admin (Alert based on who cancelled)
+                 try:
+                    from django.contrib.auth import get_user_model
+                    User = get_user_model()
+                    admin_user = User.objects.filter(is_superuser=True).first()
+                    
+                    if admin_user:
+                        if is_company: # Mover Rejected
+                             send_notification_email(admin_user, 'job_rejected_by_mover', {
+                                'bookingId': str(move_request.id),
+                                'moverName': request.user.username,
+                                'rejectionReason': request.data.get('reason', 'Not provided'),
+                                'customerName': move_request.customer.username,
+                                'adminPanelLink': "https://urbanshift.vercel.app/admin/moves"
+                             })
+                        else: # User Cancelled
+                             send_notification_email(admin_user, 'booking_cancelled_by_user', {
+                                'userName': request.user.username,
+                                'bookingId': str(move_request.id),
+                                'refundStatus': 'Manual Review Needed',
+                                'cancellationReason': request.data.get('reason', 'Not provided')
+                             })
+                 except Exception as e:
+                     print(f"Admin Alert Failed: {e}")
+            
+            # 📧 Send Completion Email to Admin
+            if new_status == 'COMPLETED':
+                 try:
+                    from django.contrib.auth import get_user_model
+                    User = get_user_model()
+                    admin_user = User.objects.filter(is_superuser=True).first()
+                    if admin_user:
+                         send_notification_email(admin_user, 'job_completed', {
+                            'bookingId': str(move_request.id),
+                            'moverName': request.user.username,
+                            'companyName': getattr(request.user, 'company_name', 'Company'),
+                            'customerName': move_request.customer.username,
+                            'fromCity': move_request.source,
+                            'toCity': move_request.destination,
+                            'completionTime': "Now"
+                         })
+                 except Exception as e:
+                     print(f"Admin Alert Failed: {e}") 
+
             return Response({'status': 'updated'})
 
         return Response({'error': 'Invalid status'}, status=status.HTTP_400_BAD_REQUEST)
@@ -108,6 +191,33 @@ class AddReviewView(generics.CreateAPIView):
                 reviewer=request.user,
                 company=move_request.company
             )
+            
+            # 📧 Send Review Notification to Company
+            from users.utils_email import send_notification_email
+            company_email_thread = send_notification_email(move_request.company, 'new_review_received', {
+                'userName': move_request.company.username, 
+                'customerName': request.user.username,
+                'rating': str(request.data.get('rating', 5)),
+                'reviewText': request.data.get('comment', 'No comments'),
+                'reviewLink': f"https://urbanshift.vercel.app/company/reviews"
+            })
+            
+            # 📧 Send Admin Alert
+            try:
+                from django.contrib.auth import get_user_model
+                User = get_user_model()
+                admin_user = User.objects.filter(is_superuser=True).first()
+                if admin_user:
+                    send_notification_email(admin_user, 'new_review_posted', {
+                        'userName': request.user.username, 
+                        'moverName': move_request.company.username,
+                        'rating': str(request.data.get('rating', 5)),
+                        'reviewText': request.data.get('comment', 'No comments'),
+                        'adminLink': f"https://urbanshift.vercel.app/admin/reviews"
+                    })
+            except Exception as e:
+                print(f"Admin Alert Failed: {e}")
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

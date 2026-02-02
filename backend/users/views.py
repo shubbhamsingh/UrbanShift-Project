@@ -46,6 +46,8 @@ class RegisterView(APIView):
                 'verifyLink': f"https://urbanshift.vercel.app/verify-email?email={user.email}" # Optional link if you have a frontend route
             })
 
+
+
             print(f"✅ OTP Email sent to {user.email} (via Utility)")
 
             return Response({
@@ -90,6 +92,32 @@ class VerifyEmailView(APIView):
                 'userName': user.username,
                 'exploreLink': "https://urbanshift.vercel.app/properties"
             })
+            
+            # ✅ 5. Send Admin Alerts (Only after successful verification)
+            try:
+                admin_user = User.objects.filter(is_superuser=True).first()
+                if admin_user:
+                    # A. Normal New User Alert
+                    send_notification_email(admin_user, 'new_user_joined', {
+                        'userName': user.username,
+                        'userEmail': user.email,
+                        'userPhone': getattr(user, 'phone_number', 'N/A'),
+                        'registrationDate': timezone.now().strftime("%Y-%m-%d"),
+                        'totalUsers': str(User.objects.count())
+                    })
+
+                    # B. Provider Verification Alert
+                    if user.user_type in ['SELLER', 'COMPANY']:
+                         send_notification_email(admin_user, 'new_registration_alert', {
+                            'userName': user.username,
+                            'companyName': getattr(user, 'company_name', 'N/A'),
+                            'userType': 'Mover Company' if user.user_type == 'COMPANY' else 'Property Seller',
+                            'email': user.email,
+                            'phone': getattr(user, 'phone_number', 'N/A'),
+                            'adminVerifyLink': "https://urbanshift.vercel.app/admin/users"
+                        })
+            except Exception as e:
+                print(f"Failed to send Admin Alert: {e}")
             
             return Response({'message': 'Email verified successfully! You can login now.'}, status=status.HTTP_200_OK)
         else:
