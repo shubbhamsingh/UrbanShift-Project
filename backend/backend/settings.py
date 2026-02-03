@@ -146,16 +146,18 @@ AUTH_USER_MODEL = os.environ.get('AUTH_USER_MODEL', 'users.User')
 # 🌍 CORS & CSRF CONFIGURATION
 # ==========================================
 
-CORS_ALLOW_ALL_ORIGINS =  False # Testing ke liye open rakha hai
+CORS_ALLOW_ALL_ORIGINS = True  # ✅ Allow all for easier access (or specify exact domains below)
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
+    "https://urbanshift.vercel.app", # ✅ Corrected Vercel URL
     "https://urban-shift-project.vercel.app", 
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://urbanshift-project.onrender.com", 
+    "https://urbanshift.vercel.app", # ✅ Corrected here too
     "https://urban-shift-project.vercel.app",
 ]
 
