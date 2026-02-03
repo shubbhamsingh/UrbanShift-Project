@@ -3,6 +3,7 @@ import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom'; 
 import { ThemeProvider } from './context/ThemeContext';
 import { Analytics } from '@vercel/analytics/react'; 
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -94,6 +95,7 @@ function App() {
           </div>
 
           <Analytics />
+          <SpeedInsights />
           
           {/* 👇 FIX 5: Footer tabhi dikhega jab Chat page NA ho */}
           {!isChatPage && <Footer />}
