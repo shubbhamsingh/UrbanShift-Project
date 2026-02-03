@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 // 👇 FIX 1: useLocation import kiya URL check karne ke liye
 import { Routes, Route, useLocation } from 'react-router-dom'; 
 import { ThemeProvider } from './context/ThemeContext';
@@ -32,16 +32,19 @@ import Profile from './components/Profile';
 import UserDashboard from './components/UserDashboard';
 import Chat from './components/Chat'; 
 import ScrollToTop from './components/ScrollToTop'; // 👈 SCROLL FIX
+import SplashScreen from './components/SplashScreen';
 
 function App() {
   // 👇 FIX 2: Current URL path nikala
   const location = useLocation();
+  const [showSplash, setShowSplash] = useState(true);
 
   // 👇 FIX 3: Check kiya ki kya hum CHAT page par hain?
   const isChatPage = location.pathname.startsWith('/chat');
 
   return (
     <ThemeProvider>
+      {showSplash && <SplashScreen onComplete={() => setShowSplash(false)} />}
       <div style={{display: 'flex', flexDirection: 'column', minHeight: '100vh'}}>
           
           <ScrollToTop /> {/* 👈 Har page change par top scroll */}
