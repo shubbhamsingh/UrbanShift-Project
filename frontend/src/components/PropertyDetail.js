@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { FaHeart, FaRegHeart, FaTimes, FaPhone, FaEnvelope, FaUser, FaShoppingCart, FaComments } from 'react-icons/fa';
+import { FaHeart, FaRegHeart, FaTimes, FaUser, FaShoppingCart, FaComments } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import { ThemeContext } from '../context/ThemeContext';
 
