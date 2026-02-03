@@ -114,8 +114,16 @@ const PropertyDetail = () => {
 
         } catch (err) {
             console.error("Payment Start Error:", err);
-            const errorMessage = err.response?.data?.error || "Could not initiate payment. Try again.";
-            toast.error(errorMessage);
+            // ✅ Better Error Message for Auth Failures
+            const status = err.response?.status;
+            if (status === 401) {
+                toast.error("Session Expired. Please Login Again. 🔒");
+                localStorage.removeItem('token'); 
+                navigate('/login');
+            } else {
+                const errorMessage = err.response?.data?.error || "Payment Initiation Failed. Check Network/Admin.";
+                toast.error(errorMessage);
+            }
         }
     };
 
@@ -188,15 +196,15 @@ const PropertyDetail = () => {
     // Styles Object (Expanded for Gallery)
     const styles = {
         // ... (existing styles) ...
-        page: { padding: '40px 20px', background: colors.bg, minHeight: '100vh', color: colors.text, transition: '0.3s' },
-        container: { maxWidth: '1200px', margin: '0 auto' },
+        page: { padding: '20px 10px', background: colors.bg, minHeight: '100vh', color: colors.text, transition: '0.3s', overflowX: 'hidden' }, // ✅ Fix overflow & padding
+        container: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
         header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' },
         backLink: { color: '#f1c40f', textDecoration: 'none', fontSize: '1.1rem', fontWeight: 'bold' },
         badge: { padding: '5px 15px', borderRadius: '20px', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase' },
-        contentWrapper: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '40px' },
+        contentWrapper: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }, // ✅ Fix Grid for Mobile (was 350px)
 
-        mainImageContainer: { position: 'relative', width: '100%', height: '400px', cursor: 'pointer', overflow: 'hidden', borderRadius: '15px', border: `1px solid ${colors.border}`, boxShadow: colors.shadow, touchAction: 'pan-y' },
-        mainImage: { width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s', userSelect: 'none' }, // Added userSelect none to prevent highlighting during swipe
+        mainImageContainer: { position: 'relative', width: '100%', height: '300px', cursor: 'pointer', overflow: 'hidden', borderRadius: '15px', border: `1px solid ${colors.border}`, boxShadow: colors.shadow, touchAction: 'pan-y' }, // ✅ Adjusted height
+        mainImage: { width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s', userSelect: 'none' }, 
         
         // Gallery Arrows
         arrowBtn: { position: 'absolute', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.6)', color: 'white', border: 'none', padding: '10px', cursor: 'pointer', borderRadius: '50%', fontSize: '1.2rem', zIndex: 2, display: 'flex', alignItems: 'center', justifyContent: 'center' },

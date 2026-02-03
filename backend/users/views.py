@@ -128,8 +128,15 @@ class VerifyEmailView(APIView):
 # ==========================================
 # 2. Login View (Existing)
 # ==========================================
+# ✅ SECURITY: Strict Login Rate Limiting
+from rest_framework.throttling import AnonRateThrottle
+
+class LoginThrottle(AnonRateThrottle):
+    rate = '5/minute'
+
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
+    throttle_classes = [LoginThrottle]  # ✅ Limits login attempts to 5 per minute per IP
 
 # ==========================================
 # 3. User Detail & Update View (Existing)

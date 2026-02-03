@@ -19,6 +19,10 @@ urlpatterns = [
     path('api/payments/', include('payments.urls')),     # ✅ Naya Payments URL
 ]
 
-# 👇 Image Uploads ke liye ye zaroori hai
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# 👇 Image Uploads ke liye (Works in Production too now)
+from django.views.static import serve 
+from django.urls import re_path
+
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+]
