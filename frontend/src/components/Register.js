@@ -6,6 +6,7 @@ import { FaEye, FaEyeSlash, FaCheckCircle, FaCircle, FaTimesCircle, FaArrowLeft 
 
 import PhoneInput from 'react-phone-input-2';
 import 'react-phone-input-2/lib/style.css'; 
+import GoogleAuthButton from './GoogleAuthButton';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -58,6 +59,33 @@ const Register = () => {
 
   const handlePhoneChange = (value) => {
     setFormData({ ...formData, phone_number: value });
+  };
+
+  // ✅ Google Sign-Up Success Handler
+  const handleGoogleSuccess = (data) => {
+    localStorage.setItem('token', data.access);
+    localStorage.setItem('userType', data.user_type);
+    localStorage.setItem('username', data.username);
+    
+    toast.success(`Welcome to UrbanShift, ${data.username}! 🎉`);
+    window.scrollTo(0, 0);
+    
+    setTimeout(() => {
+      window.dispatchEvent(new Event("storage"));
+      
+      if (data.user_type === 'SELLER') {
+          navigate('/seller-dashboard');
+      } else if (data.user_type === 'COMPANY') {
+          navigate('/company-dashboard');
+      } else {
+          navigate('/');
+      }
+    }, 500);
+  };
+
+  // ✅ Google Sign-Up Error Handler
+  const handleGoogleError = (error) => {
+    toast.error(error || 'Google sign-up failed ❌');
   };
 
   // ✅ STEP 1: Register & Send OTP
@@ -147,6 +175,20 @@ const Register = () => {
         {step === 1 && (
             <>
                 <h2 style={{ textAlign: 'center', marginBottom: '20px', color: 'var(--text-primary)' }}>🚀 Join UrbanShift</h2>
+                
+                {/* ✅ Google Sign-Up Button */}
+                <GoogleAuthButton 
+                  onSuccess={handleGoogleSuccess}
+                  onError={handleGoogleError}
+                  buttonText="Sign up with Google"
+                />
+
+                {/* Divider */}
+                <div style={dividerStyle}>
+                  <div style={dividerLineStyle}></div>
+                  <span style={dividerTextStyle}>or register with email</span>
+                  <div style={dividerLineStyle}></div>
+                </div>
                 
                 <form onSubmit={handleSubmit}>
                 
@@ -328,5 +370,8 @@ const inputGroup = { marginBottom: '15px', display: 'flex', flexDirection: 'colu
 const inputStyle = { padding: '12px', borderRadius: '8px', border: '1px solid var(--border-color)', background: 'var(--bg-color)', color: 'var(--text-primary)', width: '100%', outline: 'none' };
 const btnStyle = { width: '100%', padding: '12px', marginTop: '10px', background: 'linear-gradient(135deg, #ff7e5f, #feb47b)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold' };
 const eyeIconStyle = { position: 'absolute', right: '15px', top: '12px', cursor: 'pointer', color: '#888' };
+const dividerStyle = { display: 'flex', alignItems: 'center', margin: '20px 0', gap: '10px' };
+const dividerLineStyle = { flex: 1, height: '1px', background: 'var(--border-color)' };
+const dividerTextStyle = { color: 'var(--text-secondary)', fontSize: '0.85rem' };
 
 export default Register;

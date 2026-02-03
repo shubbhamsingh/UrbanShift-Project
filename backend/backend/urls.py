@@ -3,8 +3,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import HttpResponse
+
+# ✅ Simple Health Check for Cron Jobs
+def health_check(request):
+    return HttpResponse("OK")
 
 urlpatterns = [
+    path('', health_check),  # ✅ Root URL ping (200 OK)
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),       # User App
     path('api/properties/', include('properties.urls')), # Properties App

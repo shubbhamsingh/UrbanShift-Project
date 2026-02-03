@@ -2,12 +2,13 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     RegisterView, 
-    VerifyEmailView,  # 👈 Ye Naya Import Zaroori Hai
+    VerifyEmailView,
     CustomTokenObtainPairView, 
     UserDetailView, 
     UploadVerificationView,
     RequestPasswordResetView,
-    PasswordResetConfirmView
+    PasswordResetConfirmView,
+    GoogleAuthView  # ✅ NEW
 )
 
 urlpatterns = [
@@ -28,4 +29,7 @@ urlpatterns = [
     
     path('forgot-password/', RequestPasswordResetView.as_view(), name='forgot_password'),
     path('reset-password-confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    
+    # ✅ Google OAuth URL (NEW)
+    path('google-auth/', GoogleAuthView.as_view(), name='google_auth'),
 ]

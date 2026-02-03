@@ -6,6 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializer, CustomTokenObtainPairSerializer
 from django.utils import timezone
 
@@ -14,6 +15,7 @@ from django.conf import settings
 import random
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
+import requests  # For Google token verification
 
 User = get_user_model()
 
@@ -261,3 +263,73 @@ class PasswordResetConfirmView(APIView):
         except User.DoesNotExist:
             print(f"❌ User not found for email: {email}")
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+# ==========================================
+# 7. Google OAuth View (Firebase)
+# ==========================================
+class GoogleAuthView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        name = request.data.get('name', '')
+        token = request.data.get('token')
+        
+        if not email:
+            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            # Check if user already exists with this email
+            existing_user = User.objects.filter(email=email).first()
+            
+            if existing_user:
+                # Existing user - just login
+                user = existing_user
+                created = False
+            else:
+                # New user - create with unique username
+                base_username = email.split('@')[0]
+                username = base_username
+                
+                # Ensure username is unique
+                counter = 1
+                while User.objects.filter(username=username).exists():
+                    username = f"{base_username}{counter}"
+                    counter += 1
+                
+                user = User.objects.create(
+                    email=email,
+                    username=username,
+                    is_active=True,
+                    user_type='BUYER',
+                )
+                user.set_unusable_password()
+                user.save()
+                created = True
+                
+                # Send Welcome Email
+                from .utils_email import send_notification_email
+                try:
+                    send_notification_email(user, 'welcome', {
+                        'userName': user.username,
+                        'exploreLink': "https://urban-shift-project.vercel.app/properties"
+                    })
+                except Exception as e:
+                    print(f"Welcome email failed: {e}")
+                
+                print(f"✅ New user created via Google: {email} (username: {username})")
+            
+            # Generate JWT tokens
+            refresh = RefreshToken.for_user(user)
+            
+            return Response({
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'username': user.username,
+                'user_type': user.user_type,
+                'is_new_user': created
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"Google Auth Error: {e}")
+            return Response({'error': 'Authentication failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

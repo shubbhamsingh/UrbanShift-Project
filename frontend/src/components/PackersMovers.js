@@ -62,7 +62,7 @@ const PackersMovers = () => {
                 headers: { Authorization: `Bearer ${token}` }
             });
 
-            console.log("Move Request Created:", response.data);
+            // Move request created successfully
             
             const newTxnId = `REQ_${response.data.id || Math.floor(Math.random() * 1000000)}`;
             setTxnId(newTxnId);
@@ -71,7 +71,7 @@ const PackersMovers = () => {
             toast.success("Booking Request Submitted! 🎉");
 
         } catch (error) {
-            console.error("Booking Error:", error);
+            // Booking error occurred
             setStatus(null);
             toast.error(error.response?.data?.detail || "Failed to submit booking. Please try again.");
         }
