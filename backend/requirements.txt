@@ -45,3 +45,5 @@ whitenoise==6.11.0
 zope.interface==8.2
 channels-redis==4.2.0
 razorpay
+cloudinary
+django-cloudinary-storage
