@@ -196,8 +196,23 @@ const PropertyDetail = () => {
     // Styles Object (Expanded for Gallery)
     const styles = {
         // ... (existing styles) ...
-        page: { padding: '20px 10px', background: colors.bg, minHeight: '100vh', color: colors.text, transition: '0.3s', overflowX: 'hidden' }, // ✅ Fix overflow & padding
-        container: { maxWidth: '1200px', margin: '0 auto', width: '100%' },
+        page: { 
+            padding: '20px 10px', 
+            background: colors.bg, 
+            minHeight: '100vh', 
+            color: colors.text, 
+            transition: '0.3s', 
+            overflowX: 'hidden',
+            width: '100%',
+            boxSizing: 'border-box' // ✅ Ensures padding doesn't add to width
+        }, 
+        container: { 
+            maxWidth: '1200px', 
+            margin: '0 auto', 
+            width: '100%',
+            padding: '0 5px', // ✅ Extra safe padding inside container
+            boxSizing: 'border-box'
+        },
         header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' },
         backLink: { color: '#f1c40f', textDecoration: 'none', fontSize: '1.1rem', fontWeight: 'bold' },
         badge: { padding: '5px 15px', borderRadius: '20px', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase' },
