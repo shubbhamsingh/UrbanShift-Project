@@ -1,15 +1,27 @@
 /* --- PAGE LAYOUT --- */
 .detail-page {
-  background-color: #121212; /* Dark Background */
-  min-height: 90vh;
+  /* background set inline for theme */
+  min-height: 100vh;
   padding: 40px 20px;
-  color: #ffffff; /* White Text */
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box; /* ✅ Vital for preventing overflow */
+  overflow-x: hidden;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .detail-container {
   max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
+  padding: 0 15px; /* Safe padding */
+  box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+  .detail-page {
+    padding: 20px 10px !important; /* Force small padding on mobile */
+  }
 }
 
 /* --- LOADING & ERROR STATES --- */

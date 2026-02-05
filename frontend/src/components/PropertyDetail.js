@@ -3,7 +3,9 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaHeart, FaRegHeart, FaTimes, FaUser, FaShoppingCart, FaComments } from 'react-icons/fa';
 import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import { ThemeContext } from '../context/ThemeContext';
+import './propertyDetail.css'; // ✅ Import External CSS
 
 const PropertyDetail = () => {
     const { id } = useParams();
@@ -197,27 +199,20 @@ const PropertyDetail = () => {
     const styles = {
         // ... (existing styles) ...
         page: { 
-            padding: '20px 10px', 
             background: colors.bg, 
             minHeight: '100vh', 
             color: colors.text, 
             transition: '0.3s', 
-            overflowX: 'hidden',
-            width: '100%',
-            maxWidth: '100vw', // ✅ Force max width
-            boxSizing: 'border-box' // ✅ Ensures padding doesn't add to width
+            // Layout moved to CSS (.detail-page)
         }, 
         container: { 
-            maxWidth: '1200px', 
-            margin: '0 auto', 
-            width: '100%',
-            padding: '0 5px', // ✅ Extra safe padding inside container
-            boxSizing: 'border-box'
+            // Layout moved to CSS (.detail-container)
         },
         header: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px' },
         backLink: { color: '#f1c40f', textDecoration: 'none', fontSize: '1.1rem', fontWeight: 'bold' },
         badge: { padding: '5px 15px', borderRadius: '20px', fontWeight: 'bold', fontSize: '0.9rem', textTransform: 'uppercase' },
-        contentWrapper: { display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }, // ✅ Fix Grid for Mobile (was 350px)
+        // Grid moved to CSS (.content-wrapper)
+        contentWrapper: { gap: '20px' }, 
 
         mainImageContainer: { position: 'relative', width: '100%', height: '300px', cursor: 'pointer', overflow: 'hidden', borderRadius: '15px', border: `1px solid ${colors.border}`, boxShadow: colors.shadow, touchAction: 'pan-y' }, // ✅ Adjusted height
         mainImage: { width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s', userSelect: 'none' }, 
@@ -247,8 +242,9 @@ const PropertyDetail = () => {
     if (error) return <div style={{ ...styles.page, display: 'flex', justifyContent: 'center', alignItems: 'center' }}><h2>❌ {error}</h2></div>;
 
     return (
-        <div style={styles.page}>
-            <div style={styles.container}>
+        <div style={styles.page} className="detail-page">
+            <div style={styles.container} className="detail-container">
+
 
                 {/* HEADER */}
                 <div style={styles.header}>
