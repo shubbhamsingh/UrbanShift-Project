@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FaHeart, FaRegHeart, FaTimes, FaUser, FaShoppingCart, FaComments } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import { toast } from 'react-toastify';
 import { ThemeContext } from '../context/ThemeContext';
 import './propertyDetail.css'; // ✅ Import External CSS
 
