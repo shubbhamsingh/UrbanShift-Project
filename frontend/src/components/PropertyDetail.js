@@ -204,6 +204,7 @@ const PropertyDetail = () => {
             transition: '0.3s', 
             overflowX: 'hidden',
             width: '100%',
+            maxWidth: '100vw', // ✅ Force max width
             boxSizing: 'border-box' // ✅ Ensures padding doesn't add to width
         }, 
         container: { 
