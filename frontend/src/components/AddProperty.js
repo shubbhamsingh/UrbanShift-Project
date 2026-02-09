@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FaCloudUploadAlt, FaTimes, FaHome } from 'react-icons/fa';
+import imageCompression from 'browser-image-compression'; // ✅ Image Compression
 
 // ✅ Correct Import
 import { ThemeContext } from '../context/ThemeContext'; 
@@ -73,6 +74,23 @@ const AddProperty = () => {
   const removeFile = (index) => setFiles(files.filter((_, i) => i !== index));
   const removeUrl = (index) => setImageUrls(imageUrls.filter((_, i) => i !== index));
 
+  // ✅ Compress Image Function (Max 9MB to stay under Cloudinary 10MB limit)
+  const compressImage = async (file) => {
+    const options = {
+      maxSizeMB: 6, // Target 6MB (Cloudinary limit is 10MB)
+      maxWidthOrHeight: 1920, // Max resolution
+      useWebWorker: true,
+    };
+    try {
+      const compressed = await imageCompression(file, options);
+      console.log(`📸 Compressed ${file.name}: ${(file.size/1024/1024).toFixed(2)}MB → ${(compressed.size/1024/1024).toFixed(2)}MB`);
+      return compressed;
+    } catch (error) {
+      console.error('Compression failed:', error);
+      return file; // Return original if compression fails
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (files.length === 0 && imageUrls.length === 0) {
@@ -81,12 +99,20 @@ const AddProperty = () => {
     }
 
     setLoading(true);
-    const data = new FormData();
-    Object.keys(formData).forEach(key => data.append(key, formData[key]));
-    files.forEach(file => data.append('uploaded_images', file));
-    imageUrls.forEach(url => data.append('image_urls', url));
+    toast.info("Compressing images... 📸"); // User feedback
 
     try {
+      const data = new FormData();
+      Object.keys(formData).forEach(key => data.append(key, formData[key]));
+      
+      // ✅ Compress each image before adding to FormData
+      for (const file of files) {
+        const compressedFile = await compressImage(file);
+        data.append('uploaded_images', compressedFile);
+      }
+      
+      imageUrls.forEach(url => data.append('image_urls', url));
+
       const token = localStorage.getItem('token');
       await axios.post(`${BACKEND_URL}/api/properties/`, data, {
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
@@ -100,6 +126,7 @@ const AddProperty = () => {
       setLoading(false);
     }
   };
+
 
   // --- STYLES ---
   const styles = {
