@@ -63,15 +63,21 @@ class PropertySerializer(serializers.ModelSerializer):
         
         property = Property.objects.create(**validated_data)
         
-        # 1. Save Files
+        # 1. Save Files (with Error Logging)
         for image in uploaded_images:
-            PropertyImage.objects.create(property=property, image=image)
+            try:
+                PropertyImage.objects.create(property=property, image=image)
+                print(f"✅ Image Saved: {image.name}")
+            except Exception as e:
+                print(f"❌ IMAGE UPLOAD ERROR: {type(e).__name__}: {e}")
+                raise  # Re-raise to show 500 error with details
             
         # 2. Save URLs
         for url in image_urls_list:
             PropertyImage.objects.create(property=property, image_url=url)
             
         return property
+
 
 # --- 3. Wishlist Serializer ---
 class WishlistSerializer(serializers.ModelSerializer):
