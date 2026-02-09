@@ -52,10 +52,8 @@ class PropertyViewSet(viewsets.ModelViewSet):
         serializer.is_valid(raise_exception=True)
         property_instance = serializer.save(seller=self.request.user)
 
-        images = request.FILES.getlist('photos')
-        if images:
-            for image in images:
-                PropertyImage.objects.create(property=property_instance, image=image)
+        # ✅ Images are handled by Serializer (uploaded_images & image_urls)
+        # No need to process 'photos' separately
         
         # 📧 Send Email Notification to Seller
         try:
