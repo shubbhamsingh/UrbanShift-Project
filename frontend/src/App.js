@@ -99,7 +99,7 @@ function App() {
                 {/* Movers (Public) */}
                 <Route path="/packers-movers" element={<PackersMovers />} />
                 <Route path="/book-movers" element={<BookMovers />} />
-                <Route path="/packers" element={<BookMovers />} /> // Kept for backward compatibility
+                <Route path="/packers" element={<BookMovers />} /> {/* Kept for backward compatibility */}
 
                 {/* ✅ PROTECTED ROUTES - Require Login */}
                 <Route path="/add-property" element={
