@@ -10,10 +10,10 @@
 </p>
 
 <p align="center">
-  <a href="https://urbanshift.vercel.app" target="_blank">🌐 Live Demo</a> •
+  <a href="https://urbanshift.vercel.app">🌐 Live Demo</a> •
   <a href="#features">✨ Features</a> •
-  <a href="#screenshots">� Screenshots</a> •
-  <a href="#tech-stack">�️ Tech Stack</a> •
+  <a href="#screenshots">📸 Screenshots</a> •
+  <a href="#tech-stack">🛠️ Tech Stack</a> •
   <a href="#installation">📦 Installation</a>
 </p>
 
