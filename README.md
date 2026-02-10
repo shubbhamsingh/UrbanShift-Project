@@ -236,7 +236,7 @@ UrbanShift/
 **Shubham Singh**
 
 - GitHub: [@shubbhamsingh](https://github.com/shubbhamsingh)
-- Project Link: [UrbanShift](https://github.com/shubbhamsingh/UrbanShift-Project)
+- LinkedIn: [Shubham Raj](https://www.linkedin.com/in/shubham-raj840/)
 
 ---
 
