@@ -10,16 +10,16 @@
 </p>
 
 <p align="center">
-  <a href="https://urbanshift.vercel.app">🌐 Live Demo</a> •
+  <a href="https://urbanshift.vercel.app" target="_blank">🌐 Live Demo</a> •
   <a href="#features">✨ Features</a> •
-  <a href="#tech-stack">🛠️ Tech Stack</a> •
-  <a href="#screenshots">📸 Screenshots</a> •
-  <a href="#installation">� Installation</a>
+  <a href="#screenshots">� Screenshots</a> •
+  <a href="#tech-stack">�️ Tech Stack</a> •
+  <a href="#installation">📦 Installation</a>
 </p>
 
 ---
 
-## � Overview
+## 📖 Overview
 
 **UrbanShift** is a full-stack real estate platform that connects property buyers, sellers, and renters. It also offers integrated **Packers & Movers** services for seamless relocation. Built with modern technologies for a smooth, responsive experience across all devices.
 
@@ -27,31 +27,31 @@
 
 ## ✨ Features
 
-### � Property Management
+### 🏠 Property Management
 
 - 📝 List properties for **Rent** or **Sale**
 - 🖼️ Multi-image upload with **automatic compression** (Cloudinary)
-- � Advanced property search & filters
+- 🔍 Advanced property search & filters
 - ❤️ Wishlist / Favorite properties
 - 📱 Mobile-responsive property gallery with swipe gestures
 
-### � User System
+### 👤 User System
 
 - 🔐 **JWT Authentication** (Login/Register)
 - 🌐 **Google OAuth** (Continue with Google)
 - 📧 **Email Verification** via OTP (Brevo)
-- � Forgot/Reset Password
-- � User Profile with avatar upload
+- 🔑 Forgot/Reset Password
+- 🖼️ User Profile with avatar upload
 - ✅ Seller Verification by Admin
 
-### � Dashboards
+### 📊 Dashboards
 
 - 🏪 **Seller Dashboard** — Manage listings, track leads
 - 🛒 **User Dashboard** — View purchases & bookings
 - 🚚 **Company Dashboard** — Manage relocation requests
 - 👑 **Admin Panel** — Verify users, manage properties (Jazzmin UI)
 
-### � Packers & Movers
+### 🚛 Packers & Movers
 
 - 📦 Book relocation services
 - 💬 Real-time **Chat** with service providers
@@ -59,9 +59,9 @@
 - 💳 **Razorpay Payments** integration
 - 🎉 Beautiful success animations (Confetti!)
 
-### � User Experience
+### 🎨 User Experience
 
-- � **Dark/Light/System Theme** toggle
+- 🌗 **Dark/Light/System Theme** toggle
 - ⚡ Splash screen with animations
 - 📲 **PWA Ready** — Installable on mobile
 - 🔔 Toast notifications
@@ -69,40 +69,9 @@
 
 ---
 
-## 🛠️ Tech Stack
+## � Screenshots
 
-### Frontend
-
-| Technology         | Purpose       |
-| ------------------ | ------------- |
-| **React 19**       | UI Framework  |
-| **React Router 7** | Navigation    |
-| **Axios**          | API Calls     |
-| **TailwindCSS**    | Styling       |
-| **React Icons**    | Icons         |
-| **React Toastify** | Notifications |
-| **Firebase**       | Google Auth   |
-| **Vercel**         | Hosting       |
-
-### Backend
-
-| Technology                | Purpose          |
-| ------------------------- | ---------------- |
-| **Django 6**              | Web Framework    |
-| **Django REST Framework** | REST API         |
-| **Django Channels**       | WebSocket (Chat) |
-| **Simple JWT**            | Authentication   |
-| **Cloudinary**            | Image Storage    |
-| **PostgreSQL**            | Database         |
-| **Brevo (Sendinblue)**    | Email Service    |
-| **Razorpay**              | Payments         |
-| **Render**                | Hosting          |
-
----
-
-## 📸 Screenshots
-
-> **📌 Add the following screenshots to showcase your app:**
+> **📌 A glimpse of the UrbanShift experience:**
 
 ### 1. Home Page
 
@@ -157,7 +126,38 @@ _Fully responsive mobile experience_
 
 ---
 
-## � Installation
+## 🛠️ Tech Stack
+
+### Frontend
+
+| Technology         | Purpose       |
+| ------------------ | ------------- |
+| **React 19**       | UI Framework  |
+| **React Router 7** | Navigation    |
+| **Axios**          | API Calls     |
+| **TailwindCSS**    | Styling       |
+| **React Icons**    | Icons         |
+| **React Toastify** | Notifications |
+| **Firebase**       | Google Auth   |
+| **Vercel**         | Hosting       |
+
+### Backend
+
+| Technology                | Purpose          |
+| ------------------------- | ---------------- |
+| **Django 6**              | Web Framework    |
+| **Django REST Framework** | REST API         |
+| **Django Channels**       | WebSocket (Chat) |
+| **Simple JWT**            | Authentication   |
+| **Cloudinary**            | Image Storage    |
+| **PostgreSQL**            | Database         |
+| **Brevo (Sendinblue)**    | Email Service    |
+| **Razorpay**              | Payments         |
+| **Render**                | Hosting          |
+
+---
+
+## 📦 Installation
 
 ### Prerequisites
 
@@ -204,7 +204,7 @@ RAZORPAY_KEY_SECRET=your-razorpay-secret
 
 ---
 
-## � Project Structure
+## 📂 Project Structure
 
 ```
 UrbanShift/
