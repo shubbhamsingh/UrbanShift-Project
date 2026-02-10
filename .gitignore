@@ -28,3 +28,4 @@ frontend/.env
 brain/
 .gemini/
 .agent/
+run_command.txt
