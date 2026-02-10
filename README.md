@@ -119,10 +119,13 @@ _Browse all properties with filters_
 ![Property Detail](screenshots/property-detail.png)
 _Detailed view with image gallery, seller info, and contact options_
 
-### 4. Seller Dashboard
+### 4. Seller & Company Dashboards
 
 ![Seller Dashboard](screenshots/seller-dashboard.png)
 _Manage your property listings_
+
+![Company Dashboard](screenshots/company-dashboard.png)
+_Manage relocation requests (Packers & Movers)_
 
 ### 5. Packers & Movers
 
@@ -139,14 +142,17 @@ _Chat with property owners or service providers_
 ![Payment](screenshots/payment.png)
 _Razorpay payment integration_
 
-### 8. Dark Mode
+### 8. Dark & Light Mode
 
 ![Dark Mode](screenshots/dark-mode.png)
-_Beautiful dark theme_
+_Dark Theme_
+
+![Light Mode](screenshots/bright-mode.png)
+_Light Theme_
 
 ### 9. Mobile View
 
-![Mobile](screenshots/mobile.png)
+![Mobile](screenshots/mobile.jpg)
 _Fully responsive mobile experience_
 
 ---
