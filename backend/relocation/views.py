@@ -1,3 +1,4 @@
+import logging
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -5,6 +6,8 @@ from django.db.models import Q
 import uuid  # 👈 New Import (Fake ID generate karne ke liye)
 from .models import MoveRequest
 from .serializers import MoveRequestSerializer, ReviewSerializer
+
+logger = logging.getLogger(__name__)
 
 # 1. Submit Request (Customer ke liye)
 class SubmitMoveRequestView(generics.CreateAPIView):
@@ -135,7 +138,7 @@ class UpdateMoveStatusView(APIView):
                                 'cancellationReason': request.data.get('reason', 'Not provided')
                              })
                  except Exception as e:
-                     print(f"Admin Alert Failed: {e}")
+                     logger.error(f"Admin Alert Failed: {e}")
             
             # 📧 Send Completion Email to Admin
             if new_status == 'COMPLETED':
@@ -154,7 +157,7 @@ class UpdateMoveStatusView(APIView):
                             'completionTime': "Now"
                          })
                  except Exception as e:
-                     print(f"Admin Alert Failed: {e}") 
+                     logger.error(f"Admin Alert Failed: {e}") 
 
             return Response({'status': 'updated'})
 
@@ -216,7 +219,7 @@ class AddReviewView(generics.CreateAPIView):
                         'adminLink': f"https://urbanshift.vercel.app/admin/reviews"
                     })
             except Exception as e:
-                print(f"Admin Alert Failed: {e}")
+                logger.error(f"Admin Alert Failed: {e}")
             
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         

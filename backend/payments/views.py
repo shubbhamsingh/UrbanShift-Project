@@ -1,3 +1,4 @@
+import logging
 import razorpay
 from django.conf import settings
 from rest_framework.views import APIView
@@ -6,6 +7,8 @@ from rest_framework import status, permissions
 from .models import Transaction
 from .serializers import TransactionSerializer
 from relocation.models import MoveRequest
+
+logger = logging.getLogger(__name__)
 
 # Initialize Razorpay Client
 client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -167,9 +170,9 @@ class VerifyPaymentView(APIView):
                                 'buyerName': request.user.username
                              })
                     except Exception as e:
-                        print(f"Admin Alert Failed: {e}")
+                        logger.error(f"Admin Alert Failed: {e}")
                 except Exception as e:
-                     print(f"Error sending seller notification: {e}")
+                     logger.error(f"Error sending seller notification: {e}")
 
             return Response({'message': 'Payment Verified Successfully!'}, status=status.HTTP_200_OK)
 

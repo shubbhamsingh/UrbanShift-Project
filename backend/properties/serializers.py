@@ -1,5 +1,8 @@
+import logging
 from rest_framework import serializers
 from .models import Property, PropertyImage, Wishlist
+
+logger = logging.getLogger(__name__)
 
 # --- 1. Property Image Serializer ---
 class PropertyImageSerializer(serializers.ModelSerializer):
@@ -67,9 +70,9 @@ class PropertySerializer(serializers.ModelSerializer):
         for image in uploaded_images:
             try:
                 PropertyImage.objects.create(property=property, image=image)
-                print(f"✅ Image Saved: {image.name}")
+                logger.info(f"✅ Image Saved: {image.name}")
             except Exception as e:
-                print(f"❌ IMAGE UPLOAD ERROR: {type(e).__name__}: {e}")
+                logger.error(f"❌ IMAGE UPLOAD ERROR: {type(e).__name__}: {e}")
                 raise  # Re-raise to show 500 error with details
             
         # 2. Save URLs

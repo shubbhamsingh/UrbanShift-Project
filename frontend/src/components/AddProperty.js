@@ -83,9 +83,10 @@ const AddProperty = () => {
     };
     try {
       const compressed = await imageCompression(file, options);
-      console.log(`📸 Compressed ${file.name}: ${(file.size/1024/1024).toFixed(2)}MB → ${(compressed.size/1024/1024).toFixed(2)}MB`);
+      // Removed debug log: Compressed file size
       return compressed;
     } catch (error) {
+      // Keep error log for critical functionality failure but could be removed for strict production
       console.error('Compression failed:', error);
       return file; // Return original if compression fails
     }
@@ -120,7 +121,7 @@ const AddProperty = () => {
       toast.success("Property Listed Successfully! 🎉");
       navigate('/seller-dashboard');
     } catch (error) {
-      console.error(error);
+      console.error("Submission error:", error);
       toast.error("Failed to post property. Check inputs.");
     } finally {
       setLoading(false);

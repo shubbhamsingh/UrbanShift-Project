@@ -1,3 +1,4 @@
+import logging
 from django.shortcuts import render
 from rest_framework import generics, permissions, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -16,6 +17,11 @@ import random
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 import requests  # For Google token verification
+
+# ✅ SECURITY: Strict Login Rate Limiting
+from rest_framework.throttling import AnonRateThrottle
+
+logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
@@ -37,7 +43,7 @@ class RegisterView(APIView):
             user.otp = otp
             user.otp_created_at = timezone.now() 
             user.save()
-            print(f"\n🔥 YOUR OTP IS: {otp} 🔥\n")  # 👈 Ye line jodein
+            logger.info(f"🔥 YOUR OTP IS: {otp} 🔥")
 
             # 3. Send Verification Email using Utility
             from .utils_email import send_notification_email
@@ -48,9 +54,7 @@ class RegisterView(APIView):
                 'verifyLink': f"https://urbanshift.vercel.app/verify-email?email={user.email}" # Optional link if you have a frontend route
             })
 
-
-
-            print(f"✅ OTP Email sent to {user.email} (via Utility)")
+            logger.info(f"✅ OTP Email sent to {user.email} (via Utility)")
 
             return Response({
                 'message': 'Registration successful! OTP sent to your email.',
@@ -119,7 +123,7 @@ class VerifyEmailView(APIView):
                             'adminVerifyLink': "https://urbanshift.vercel.app/admin/users"
                         })
             except Exception as e:
-                print(f"Failed to send Admin Alert: {e}")
+                logger.error(f"Failed to send Admin Alert: {e}")
             
             return Response({'message': 'Email verified successfully! You can login now.'}, status=status.HTTP_200_OK)
         else:
@@ -128,8 +132,6 @@ class VerifyEmailView(APIView):
 # ==========================================
 # 2. Login View (Existing)
 # ==========================================
-# ✅ SECURITY: Strict Login Rate Limiting
-from rest_framework.throttling import AnonRateThrottle
 
 class LoginThrottle(AnonRateThrottle):
     rate = '5/minute'
@@ -234,9 +236,9 @@ class PasswordResetConfirmView(APIView):
             user = User.objects.get(email=email)
             
             # --- DEBUGGING LOGS ---
-            print(f"🔍 DEBUG: Verifying OTP for {email}")
-            print(f"   Input OTP: '{otp}' (Type: {type(otp)})")
-            print(f"   DB OTP:    '{user.otp}' (Type: {type(user.otp)})")
+            logger.debug(f"🔍 DEBUG: Verifying OTP for {email}")
+            logger.debug(f"   Input OTP: '{otp}' (Type: {type(otp)})")
+            logger.debug(f"   DB OTP:    '{user.otp}' (Type: {type(user.otp)})")
             # ----------------------
 
             # Verify OTP
@@ -264,11 +266,11 @@ class PasswordResetConfirmView(APIView):
                 user.save()
                 return Response({'message': 'Password reset successful! You can login now.'}, status=status.HTTP_200_OK)
             else:
-                print("❌ OTP Mismatch!")
+                logger.warning("❌ OTP Mismatch!")
                 return Response({'error': 'Invalid OTP'}, status=status.HTTP_400_BAD_REQUEST)
         
         except User.DoesNotExist:
-            print(f"❌ User not found for email: {email}")
+            logger.warning(f"❌ User not found for email: {email}")
             return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
 # ==========================================
@@ -319,12 +321,12 @@ class GoogleAuthView(APIView):
                 try:
                     send_notification_email(user, 'welcome', {
                         'userName': user.username,
-                        'exploreLink': "https://urban-shift-project.vercel.app/properties"
+                        'exploreLink': "https://urbanshift.vercel.app/properties"
                     })
                 except Exception as e:
-                    print(f"Welcome email failed: {e}")
+                    logger.error(f"Welcome email failed: {e}")
                 
-                print(f"✅ New user created via Google: {email} (username: {username})")
+                logger.info(f"✅ New user created via Google: {email} (username: {username})")
             
             # Generate JWT tokens
             refresh = RefreshToken.for_user(user)
@@ -338,5 +340,5 @@ class GoogleAuthView(APIView):
             }, status=status.HTTP_200_OK)
             
         except Exception as e:
-            print(f"Google Auth Error: {e}")
+            logger.error(f"Google Auth Error: {e}")
             return Response({'error': 'Authentication failed'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
