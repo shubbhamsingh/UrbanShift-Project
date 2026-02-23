@@ -326,6 +326,20 @@ class GoogleAuthView(APIView):
                 except Exception as e:
                     logger.error(f"Welcome email failed: {e}")
                 
+                # ✅ Send Admin Alert for Google Registration
+                try:
+                    admin_user = User.objects.filter(is_superuser=True).first()
+                    if admin_user:
+                        send_notification_email(admin_user, 'new_user_joined', {
+                            'userName': user.username,
+                            'userEmail': user.email,
+                            'userPhone': getattr(user, 'phone_number', 'N/A'),
+                            'registrationDate': timezone.now().strftime("%Y-%m-%d"),
+                            'totalUsers': str(User.objects.count())
+                        })
+                except Exception as e:
+                    logger.error(f"Admin alert email failed for Google user: {e}")
+
                 logger.info(f"✅ New user created via Google: {email} (username: {username})")
             
             # Generate JWT tokens
