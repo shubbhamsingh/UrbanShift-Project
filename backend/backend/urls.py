@@ -4,13 +4,18 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 
-# ✅ Simple Health Check for Cron Jobs
+# ✅ Simple Health Check for Cron Jobs (Lightweight, no middleware overhead)
+@csrf_exempt
 def health_check(request):
-    return HttpResponse("OK")
+    response = HttpResponse("OK", content_type="text/plain")
+    response["Cache-Control"] = "no-cache, no-store"
+    return response
 
 urlpatterns = [
-    path('', health_check),  # ✅ Root URL ping (200 OK)
+    path('', health_check),       # ✅ Root URL ping (200 OK)
+    path('health/', health_check), # ✅ Dedicated health endpoint for cron-job.org
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),       # User App
     path('api/properties/', include('properties.urls')), # Properties App
