@@ -152,7 +152,7 @@ cloudinary.config(
     secure=True
 )
 
-print(f"✅ Cloudinary Config Loaded: {CLOUDINARY_STORAGE.get('CLOUD_NAME')}") # Debug Log
+print(f"[OK] Cloudinary Config Loaded: {CLOUDINARY_STORAGE.get('CLOUD_NAME')}") # Debug Log
 # ✅ FORCE Django to use Cloudinary (Modern Config)
 STORAGES = {
     "default": {
